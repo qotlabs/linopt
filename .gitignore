@@ -1,0 +1,5 @@
+*.o
+*.cfg
+*.dat
+*.pro.user*
+*.lib
