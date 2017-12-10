@@ -13,10 +13,10 @@ basis::basis(const basis &b):
 basis::basis(std::initializer_list<fock> il):
     std::set<fock>(il) {}
 
-basis::basis(int nphot, int modes):
+basis::basis(int nphot, int modes, const fock &head):
     basis()
 {
-    generate_basis(nphot, modes);
+    generate_basis(nphot, modes, head);
 }
 
 basis basis::operator+(const basis &b) const
@@ -31,8 +31,20 @@ basis &basis::operator+=(const basis &b)
     return *this;
 }
 
-basis &basis::generate_basis(int nphot, int modes)
+basis &basis::generate_basis(const int nphot, const unsigned modes, const fock &head)
 {
+    if(head.size() == modes)
+    {
+        if(nphot == 0)
+            this->insert(head);
+        return *this;
+    }
+    for(int i = 0; i <= nphot; i++)
+    {
+        fock f(head);
+        f.push_back(i);
+        generate_basis(nphot - i, modes, f);
+    }
     return *this;
 }
 
@@ -62,10 +74,68 @@ state::state():
 state::state(const state &s):
     std::map<fock, complex_type>(s) {}
 
+state state::operator+(const state &s) const
+{
+    state snew;
+    auto a = this->begin();
+    auto b = s.begin();
+    while(a != this->end() && b != s.end())
+    {
+        if(a->first < b->first)
+        {
+            snew.insert(snew.end(), *a);
+            a++;
+        }
+        else if(a->first == b->first)
+        {
+            snew.insert(snew.end(), state_element(a->first, a->second + b->second));
+            a++;
+            b++;
+        }
+        else
+        {
+            snew.insert(snew.end(), *b);
+            b++;
+        }
+    }
+    if(a == this->end())
+        snew.insert(b, s.end());
+    else
+        snew.insert(a, this->end());
+    return snew;
+}
+
+state &state::operator+=(const state &s)
+{
+    for(auto iter = s.begin(); iter != s.end(); iter++)
+        (*this)[iter->first] += iter->second;
+    return *this;
+}
+
+state &state::operator-=(const state &s)
+{
+    for(auto iter = s.begin(); iter != s.end(); iter++)
+        (*this)[iter->first] -= iter->second;
+    return *this;
+}
+
+state state::operator-() const
+{
+    state s = *this;
+    for(auto iter = s.begin(); iter != s.end(); iter++)
+        iter->second = -iter->second;
+    return s;
+}
+
 state state::operator*(complex_type x) const
 {
     state s = *this;
     return s *= x;
+}
+
+state linopt::operator*(complex_type x, const state &s)
+{
+    return s*x;
 }
 
 state &state::operator*=(complex_type x)
@@ -103,7 +173,32 @@ state &state::normalize()
 
 complex_type state::dot(const state &s) const
 {
-    return 0.;
+    complex_type z = 0.;
+    auto a = this->begin();
+    auto b = s.begin();
+    while(a != this->end() && b != s.end())
+    {
+        if(a->first < b->first)
+        {
+            a++;
+        }
+        else if(a->first == b->first)
+        {
+            z += conj(a->second) * (b->second);
+            a++;
+            b++;
+        }
+        else
+        {
+            b++;
+        }
+    }
+    return z;
+}
+
+complex_type linopt::dot(const state &a, const state &b)
+{
+    return a.dot(b);
 }
 
 state state::postselect(const fock &ancilla) const
@@ -132,12 +227,15 @@ basis state::get_basis() const
 }
 
 template<typename T>
-std::ostream& print_array(std::ostream &stream, const T &a)
+std::ostream& print_array(std::ostream &stream, const T &a,
+                          const char *b1 = "{",
+                          const char *delim = ", ",
+                          const char *b2 = "}")
 {
-    stream << "{";
+    stream << b1;
     for(auto iter = a.begin(); iter != --a.end(); iter++)
-        stream << *iter << ", ";
-    stream << *(--a.end()) << "}";
+        stream << *iter << delim;
+    stream << *(--a.end()) << b2;
     return stream;
 }
 
@@ -154,10 +252,10 @@ std::ostream& operator<<(std::ostream &stream, const fock &f)
 
 std::ostream& operator<<(std::ostream &stream, const basis &b)
 {
-    return print_array(stream, b);
+    return print_array(stream, b, "{", ",\n", "}");
 }
 
 std::ostream& operator<<(std::ostream &stream, const state &s)
 {
-    return print_array(stream, s);
+    return print_array(stream, s, "{", ",\n", "}");
 }

@@ -27,10 +27,11 @@ public:
     basis();
     basis(const basis &b);
     basis(std::initializer_list<fock> il);
-    explicit basis(int nphot, int modes);
+    explicit basis(int nphot, int modes, const fock &head = fock());
     basis operator+(const basis &b) const;
+    basis operator+(basis &&b) const {return b += *this;}
     basis &operator+=(const basis &b);
-    basis &generate_basis(int nphot, int modes);    // TODO
+    basis &generate_basis(const int nphot, const unsigned modes, const fock &head = fock());
     basis postselect(const fock &ancilla) const;
     state apply_func(const basis_func &f) const;
 };
@@ -40,20 +41,24 @@ class state : public std::map<fock, complex_type>
 public:
     state();
     state(const state &s);
-    state operator+(const state &s) const;  // TODO
-    state &operator+=(const state &s);      // TODO
-    state operator-(const state &s) const;  // TODO
-    state &operator-=(const state &s);      // TODO
+    state operator+(const state &s) const;
+    state &operator+=(const state &s);
+    state operator-(const state &s) const {return *this + (-s);}
+    state &operator-=(const state &s);
+    state operator-() const;
     state operator*(complex_type x) const;
     state &operator*=(complex_type x);
     state operator/(complex_type x) const;
     state &operator/=(complex_type x);
     real_type norm() const;
     state &normalize();
-    complex_type dot(const state &s) const; // TODO
+    complex_type dot(const state &s) const;
     state postselect(const fock &ancilla) const;
     basis get_basis() const;
 };
+
+state operator*(complex_type x, const state &s);
+complex_type dot(const state &a, const state &b);
 
 }
 
