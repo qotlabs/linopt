@@ -1,4 +1,4 @@
-#include "linopt.h"
+#include "states.h"
 
 #include <algorithm>
 
@@ -75,7 +75,7 @@ state &state::operator*=(complex_type x)
     return *this;
 }
 
-state operator/(complex_type x) const
+state state::operator/(complex_type x) const
 {
     state s = *this;
     return s /= x;

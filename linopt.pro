@@ -4,7 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    linopt.cpp
+    states.cpp
 
 HEADERS += \
+    states.h \
     linopt.h
