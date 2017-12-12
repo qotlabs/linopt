@@ -31,12 +31,12 @@ basis &basis::operator+=(const basis &b)
     return *this;
 }
 
-basis &basis::generate_basis(const int nphot, const unsigned modes, const fock &head)
+basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 {
-    if(head.size() == modes)
+    if(static_cast<int>(head.size()) == modes)
     {
         if(nphot == 0)
-            this->insert(head);
+            this->insert(this->end(), head);
         return *this;
     }
     for(int i = 0; i <= nphot; i++)

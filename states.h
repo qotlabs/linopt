@@ -31,7 +31,7 @@ public:
     basis operator+(const basis &b) const;
     basis operator+(basis &&b) const {return b += *this;}
     basis &operator+=(const basis &b);
-    basis &generate_basis(const int nphot, const unsigned modes, const fock &head = fock());
+    basis &generate_basis(const int nphot, const int modes, const fock &head = fock());
     basis postselect(const fock &ancilla) const;
     state apply_func(const basis_func &f) const;
 };

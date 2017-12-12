@@ -4,8 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    states.cpp
+    states.cpp \
+    matrix.cpp
 
 HEADERS += \
     states.h \
-    linopt.h
+    linopt.h \
+    matrix.h
