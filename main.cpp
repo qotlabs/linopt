@@ -20,8 +20,12 @@ int main()
     B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
-    matrix m = matrix::Random(4, 4);
-    for(int i = 0; i < 10000000; i++)
+    matrix_type m(4, 4);
+    m << 1, 1, 1, 1,
+         1, 1, 1, 1,
+         1, 1, 1, 1,
+         1, 1, 1, 1;
+    for(int i = 0; i < 1000; i++)
     {
         permanent(m);
     }

@@ -7,9 +7,18 @@
 namespace linopt
 {
 
-typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> matrix;
+typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;
+typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
 
-complex_type permanent(const matrix &M);
+class unitary_matrix: public matrix_type
+{
+public:
+    typedef std::vector<real_type> angles;
+    using matrix_type::matrix_type;
+    unitary_matrix &hurwitz(const angles &a);
+};
+
+complex_type permanent(const matrix_type &M);
 
 }
 
