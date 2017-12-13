@@ -11,3 +11,5 @@ HEADERS += \
     states.h \
     linopt.h \
     matrix.h
+
+QMAKE_CXXFLAGS_RELEASE += -march=native -ffast-math -O3

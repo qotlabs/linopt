@@ -20,9 +20,8 @@ int main()
     B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
-    matrix m = matrix::Random(7, 7);
-    cout << m;
-    for(int i = 0; i < 1; i++)
+    matrix m = matrix::Random(4, 4);
+    for(int i = 0; i < 10000000; i++)
     {
         permanent(m);
     }
