@@ -4,6 +4,14 @@
 
 using namespace linopt;
 
+int fock::total() const
+{
+    int tot = 0;
+    for(auto iter = begin(); iter != end(); iter++)
+        tot += *iter;
+    return tot;
+}
+
 basis::basis():
     std::set<fock>() {}
 

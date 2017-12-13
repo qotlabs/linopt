@@ -12,14 +12,21 @@
 namespace linopt
 {
 
+class fock;
 class basis;
 class state;
 
 typedef double real_type;
 typedef std::complex<real_type> complex_type;
-typedef std::vector<int> fock;
 typedef std::pair<fock, complex_type> state_element;
 typedef std::function<complex_type(fock)> basis_func;
+
+class fock : public std::vector<int>
+{
+public:
+    using std::vector<int>::vector;
+    int total() const;
+};
 
 class basis : public std::set<fock>
 {
