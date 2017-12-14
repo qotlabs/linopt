@@ -5,11 +5,13 @@ CONFIG -= qt
 
 SOURCES += main.cpp \
     states.cpp \
-    matrix.cpp
+    matrix.cpp \
+    chip.cpp
 
 HEADERS += \
     states.h \
     linopt.h \
-    matrix.h
+    matrix.h \
+    chip.h
 
 QMAKE_CXXFLAGS_RELEASE += -march=native -ffast-math -O3

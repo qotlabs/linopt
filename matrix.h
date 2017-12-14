@@ -16,9 +16,18 @@ public:
     typedef std::vector<real_type> angles;
     using matrix_type::matrix_type;
     unitary_matrix &hurwitz(const angles &a);
+    bool is_column_unitary(real_type eps = 1.e-15) const;
+    bool is_row_unitary(real_type eps = 1.e-15) const;
+    bool is_unitary(real_type eps = 1.e-15) const;
 };
 
 complex_type permanent(const matrix_type &M);
+
+static inline real_type mod(real_type x, real_type a)
+{
+    x = std::fmod(x, a);
+    return (x < 0) ? x + a : x;
+}
 
 }
 

@@ -1,5 +1,6 @@
 #include <cassert>
 #include <limits.h>
+#include <complex>
 #include "matrix.h"
 
 using namespace linopt;
@@ -46,8 +47,54 @@ complex_type linopt::permanent(const matrix_type &M)
     return perm;
 }
 
-
 unitary_matrix &unitary_matrix::hurwitz(const angles &a)
 {
+    int N = std::sqrt(a.size());
+    assert(N*N == static_cast<int>(a.size()));
+    if(cols() != N || rows() != N)
+        resize(N, N);
+    int i, j, k = 0;
+    complex_type eii, eij;
+    vector_type coli(N);
+    real_type xi;
+    eii = std::polar(1., 2.*M_PI*a[k++]);
+    setZero();
+    diagonal().fill(eii);
+    for(j = 1; j <= N-1; j++)
+    {
+        for(i = j - 1; i >= 1; i--)
+        {
+            xi = std::pow(mod(a[k++], 1.), 1./(2.*(i + 1)));
+            eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*a[k++]);
+            eij = xi;
+            coli = col(i);
+            col(i) = col(i)*eii - col(j)*conj(eij);
+            col(j) =   coli*eij + col(j)*conj(eii);
+        }
+        xi = std::sqrt(mod(a[k++], 1.));
+        eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*a[k++]);
+        eij = std::polar(xi, 2.*M_PI*a[k++]);
+        coli = col(i);
+        col(i) = col(i)*eii - col(j)*conj(eij);
+        col(j) =   coli*eij + col(j)*conj(eii);
+    }
     return *this;
+}
+
+bool unitary_matrix::is_column_unitary(real_type eps) const
+{
+    return (this->adjoint() * (*this)).isIdentity(eps);
+}
+
+bool unitary_matrix::is_row_unitary(real_type eps) const
+{
+    return ((*this) * this->adjoint()).isIdentity(eps);
+}
+
+bool unitary_matrix::is_unitary(real_type eps) const
+{
+    if(cols() != rows())
+        return false;
+    else
+        return is_column_unitary(eps) && is_row_unitary(eps);
 }
