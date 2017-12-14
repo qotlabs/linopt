@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <complex>
 #include "matrix.h"
+#include <iostream>
 
 using namespace linopt;
 
@@ -78,6 +79,7 @@ unitary_matrix &unitary_matrix::hurwitz(const angles &a)
         col(i) = col(i)*eii - col(j)*conj(eij);
         col(j) =   coli*eij + col(j)*conj(eii);
     }
+    std::cout << "k = " << k << std::endl;
     return *this;
 }
 

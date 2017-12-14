@@ -7,6 +7,7 @@ using namespace linopt;
 
 int main()
 {
+    fock input_state = {1, 2, 0, 3};
     vector<state> B(6);
     B[0][{1, 0, 1, 0}] =  M_SQRT1_2;
     B[0][{0, 1, 0, 1}] =  M_SQRT1_2;
@@ -20,15 +21,12 @@ int main()
     B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
-    matrix_type m(4, 4);
-    m << 1, 1, 1, 1,
-         1, 1, 1, 1,
-         1, 1, 1, 1,
-         1, 1, 1, 1;
-    for(int i = 0; i < 1000; i++)
-    {
-        permanent(m);
-    }
-    cout << permanent(m) << endl;
+    unitary_matrix U;
+    unitary_matrix::angles a(16, 0.4);
+    U.hurwitz(a);
+    chip C;
+    cout << U << endl;
+    C.set_unitary(U);
+    C.set_input(input_state);
     return 0;
 }

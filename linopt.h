@@ -3,5 +3,6 @@
 
 #include "states.h"
 #include "matrix.h"
+#include "chip.h"
 
 #endif // LINOPT_H

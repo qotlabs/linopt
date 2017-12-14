@@ -13,12 +13,13 @@ typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
 class unitary_matrix: public matrix_type
 {
 public:
+    static constexpr real_type default_epsilon = 1e-15;
     typedef std::vector<real_type> angles;
     using matrix_type::matrix_type;
     unitary_matrix &hurwitz(const angles &a);
-    bool is_column_unitary(real_type eps = 1.e-15) const;
-    bool is_row_unitary(real_type eps = 1.e-15) const;
-    bool is_unitary(real_type eps = 1.e-15) const;
+    bool is_column_unitary(real_type eps = default_epsilon) const;
+    bool is_row_unitary(real_type eps = default_epsilon) const;
+    bool is_unitary(real_type eps = default_epsilon) const;
 };
 
 complex_type permanent(const matrix_type &M);
