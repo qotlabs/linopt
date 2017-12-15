@@ -22,21 +22,9 @@ int main()
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
     unitary_matrix::angles a(64, 0.4);
-    basis b(4, 8);
-    chip C;
-    C.unitary().hurwitz(a);
-    cout << C.unitary() << endl;
-    C.input() = input_state;
-    C.set_basis(b);
-    cout << b.size() << endl;
-    matrix_type m(4, 4);
-    m.setRandom();
-    complex_type z = 0;
-    for(int i = 0; i < 3300000; i++)
-    {
-        z += permanent(m);
-        //C.output_state();
-    }
-    cout << C.output_state() << endl;
+    stanisic_functor cost_function(basis(4, 8), basis(2, 4), input_state, B);
+    for(int i = 0; i < 1000; i++)
+        cost_function(a);
+    cout << cost_function(a) << endl;
     return 0;
 }

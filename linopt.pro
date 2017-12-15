@@ -6,12 +6,14 @@ CONFIG -= qt
 SOURCES += main.cpp \
     states.cpp \
     matrix.cpp \
-    chip.cpp
+    chip.cpp \
+    cost_functor.cpp
 
 HEADERS += \
     states.h \
     linopt.h \
     matrix.h \
-    chip.h
+    chip.h \
+    cost_functor.h
 
 QMAKE_CXXFLAGS_RELEASE += -march=native -ffast-math -O3
