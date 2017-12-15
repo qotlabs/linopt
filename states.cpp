@@ -12,11 +12,19 @@ int fock::total() const
     return tot;
 }
 
+int factorial_precomputed[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880,\
+                               3628800, 39916800, 479001600};
+
+static inline real_type factorial(int n)
+{
+    return (n <= 12) ? factorial_precomputed[n] : std::tgamma(n+1);
+}
+
 real_type fock::prod_fact() const
 {
     real_type p = 1.;
     for(auto iter = begin(); iter != end(); iter++)
-        p *= std::tgamma((*iter) + 1);
+        p *= factorial(*iter);
     return p;
 }
 
@@ -98,7 +106,7 @@ basis basis::postselect(const fock &ancilla) const
     {
         if(std::equal(ancilla.rbegin(), ancilla.rend(), fp->rbegin()))
             b.insert(b.end(),
-                     fock(fp->begin(), fp->begin() + fp->size() - ancilla.size()));
+                     fock(fp->begin(), fp->end() - ancilla.size()));
     }
     return b;
 }
@@ -262,16 +270,12 @@ complex_type linopt::dot(const state &a, const state &b)
 state state::postselect(const fock &ancilla) const
 {
     state s;
+    auto asize = ancilla.size();
     for(auto iter = begin(); iter != end(); iter++)
     {
-        state_element e = *iter;
-        fock f = e.first;
-        complex_type val = e.second;
+        const fock &f = iter->first;
         if(std::equal(ancilla.rbegin(), ancilla.rend(), f.rbegin()))
-        {
-            f = fock(f.begin(), f.begin() + f.size() - ancilla.size());
-            s.insert(s.end(), state_element(f, val));
-        }
+            s.emplace_hint(s.end(), fock(f.begin(), f.end() - asize), iter->second);
     }
     return s;
 }
