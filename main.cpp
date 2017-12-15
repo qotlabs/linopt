@@ -22,7 +22,7 @@ int main()
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
     unitary_matrix::angles a(64, 0.4);
-    stanisic_functor cost_function(basis(4, 8), basis(2, 4), input_state, B);
+    stanisic_functor cost_function(basis(2, 4) * basis(2, 4), basis(2, 4), input_state, B);
     for(int i = 0; i < 1000; i++)
         cost_function(a);
     cout << cost_function(a) << endl;

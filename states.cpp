@@ -20,6 +20,18 @@ real_type fock::prod_fact() const
     return p;
 }
 
+fock fock::operator*(const fock &f) const
+{
+    fock newf = *this;
+    return newf *= f;
+}
+
+fock &fock::operator*=(const fock &f)
+{
+    insert(end(), f.begin(), f.end());
+    return *this;
+}
+
 basis::basis():
     std::set<fock>() {}
 
@@ -44,6 +56,21 @@ basis basis::operator+(const basis &b) const
 basis &basis::operator+=(const basis &b)
 {
     insert(b.begin(), b.end());
+    return *this;
+}
+
+basis basis::operator*(const basis &b) const
+{
+    basis newb;
+    for(auto f1 = begin(); f1 != end(); f1++)
+        for(auto f2 = b.begin(); f2 != b.end(); f2++)
+            newb.insert(newb.end(), (*f1) * (*f2));
+    return newb;
+}
+
+basis &basis::operator*=(const basis &b)
+{
+    *this = (*this) * b;
     return *this;
 }
 
@@ -133,6 +160,21 @@ state &state::operator-=(const state &s)
     for(auto iter = s.begin(); iter != s.end(); iter++)
         (*this)[iter->first] -= iter->second;
     return *this;
+}
+
+state state::operator*(const state &s) const
+{
+    state snew;
+    for(auto a = begin(); a != end(); a++)
+        for(auto b = s.begin(); b != s.end(); b++)
+            snew.insert(snew.end(), state_element(a->first * b->first, a->second * b->second));
+    return snew;
+}
+
+state &state::operator*=(const state &s)
+{
+    state snew = *this;
+    return snew *= s;
 }
 
 state state::operator-() const

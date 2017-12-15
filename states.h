@@ -27,6 +27,8 @@ public:
     using std::vector<int>::vector;
     int total() const;
     real_type prod_fact() const;
+    fock operator*(const fock &f) const;
+    fock &operator*=(const fock &f);
 };
 
 class basis : public std::set<fock>
@@ -37,8 +39,9 @@ public:
     basis(std::initializer_list<fock> il);
     explicit basis(int nphot, int modes, const fock &head = fock());
     basis operator+(const basis &b) const;
-    basis operator+(basis &&b) const {return b += *this;}
     basis &operator+=(const basis &b);
+    basis operator*(const basis &b) const;
+    basis &operator*=(const basis &b);
     basis &generate_basis(const int nphot, const int modes, const fock &head = fock());
     basis postselect(const fock &ancilla) const;
     state apply_func(const basis_func &f) const;
@@ -53,6 +56,8 @@ public:
     state &operator+=(const state &s);
     state operator-(const state &s) const {return *this + (-s);}
     state &operator-=(const state &s);
+    state operator*(const state &s) const;
+    state &operator*=(const state &s);
     state operator-() const;
     state operator*(complex_type x) const;
     state &operator*=(complex_type x);
