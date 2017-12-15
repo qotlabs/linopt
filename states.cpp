@@ -12,6 +12,14 @@ int fock::total() const
     return tot;
 }
 
+real_type fock::prod_fact() const
+{
+    real_type p = 1.;
+    for(auto iter = begin(); iter != end(); iter++)
+        p *= std::tgamma((*iter) + 1);
+    return p;
+}
+
 basis::basis():
     std::set<fock>() {}
 
