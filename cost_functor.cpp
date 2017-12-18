@@ -23,6 +23,8 @@ real_type stanisic_functor::operator()(const unitary_matrix::angles &a)
     {
         postselected = out.postselect(*anc);
         p = postselected.norm();
+        if(p == 0.)
+            continue;
         postselected /= p;
         p = p*p;
         for(size_t i = 0; i < target_states.size(); i++)
