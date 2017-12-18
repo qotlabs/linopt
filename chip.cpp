@@ -33,7 +33,7 @@ complex_type chip::calc_fock_amp(const fock &fout)
         for(int i = 0; i < fout[m]; i++)
             Uinout.row(k++) = Uin.row(m);
     complex_type perm = permanent(Uinout);
-    perm /= std::sqrt(fout.prod_fact() * input_state.prod_fact());
+    perm /= std::sqrt(fout.prod_fact() * input_prod_fact);
     return perm;
 }
 
@@ -74,6 +74,7 @@ state chip::output_state()
     if(uin_possibly_changed)
     {
         prepare_uin(U, input_state);
+        input_prod_fact = input_state.prod_fact();
         uin_possibly_changed = false;
     }
     return output_basis.apply_func(std::bind(&chip::calc_fock_amp,
