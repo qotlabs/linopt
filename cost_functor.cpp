@@ -9,8 +9,8 @@ cost_functor::cost_functor(const basis &full_basis,
     target_states(target_states),
     ancilla_basis(ancilla_basis)
 {
-    C.set_basis(full_basis);
-    C.input() = input_state;
+    C.output_basis() = full_basis;
+    C.input_state() = input_state;
 }
 
 real_type stanisic_functor::operator()(const unitary_matrix::angles &a)

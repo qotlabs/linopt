@@ -4,12 +4,7 @@
 using namespace linopt;
 
 chip::chip():
-    U(),
-    Uin(),
-    uin_possibly_changed(false),
-    Uinout(),
-    input_state(),
-    output_basis() {}
+    uin_possibly_changed(false) {}
 
 unitary_matrix &chip::prepare_uin(const unitary_matrix &u, const fock &fin)
 {
@@ -20,6 +15,7 @@ unitary_matrix &chip::prepare_uin(const unitary_matrix &u, const fock &fin)
     for(int m = 0; m < modes; m++)
         for(int i = 0; i < fin[m]; i++)
             Uin.col(k++) = u.col(m);
+    input_prod_fact = fin.prod_fact();
     return Uin;
 }
 
@@ -37,46 +33,45 @@ complex_type chip::calc_fock_amp(const fock &fout)
     return perm;
 }
 
-chip &chip::set_unitary(const unitary_matrix &u)
-{
-    U = u;
-    uin_possibly_changed = true;
-    return *this;
-}
-
 unitary_matrix &chip::unitary()
 {
     uin_possibly_changed = true;
     return U;
 }
 
-chip &chip::set_input(const fock &f)
+const unitary_matrix &chip::unitary() const
 {
-    input_state = f;
-    uin_possibly_changed = true;
-    return *this;
+    return U;
 }
 
-fock &chip::input()
+fock &chip::input_state()
 {
     uin_possibly_changed = true;
-    return input_state;
+    return _input_state;
 }
 
-chip &chip::set_basis(const basis &b)
+const fock &chip::input_state() const
 {
-    output_basis = b;
-    return *this;
+    return _input_state;
+}
+
+basis &chip::output_basis()
+{
+    return _output_basis;
+}
+
+const basis &chip::output_basis() const
+{
+    return _output_basis;
 }
 
 state chip::output_state()
 {
     if(uin_possibly_changed)
     {
-        prepare_uin(U, input_state);
-        input_prod_fact = input_state.prod_fact();
+        prepare_uin(U, _input_state);
         uin_possibly_changed = false;
     }
-    return output_basis.apply_func(std::bind(&chip::calc_fock_amp,
+    return _output_basis.apply_func(std::bind(&chip::calc_fock_amp,
                                              this, std::placeholders::_1));
 }

@@ -14,19 +14,20 @@ private:
     unitary_matrix Uin;
     bool uin_possibly_changed;
     unitary_matrix Uinout;
-    fock input_state;
+    fock _input_state;
     real_type input_prod_fact;
-    basis output_basis;
+    basis _output_basis;
     unitary_matrix &prepare_uin(const unitary_matrix &u, const fock &fin);
     complex_type calc_fock_amp(const fock &fout);
 
 public:
     chip();
-    chip &set_unitary(const unitary_matrix &u);
     unitary_matrix &unitary();
-    chip &set_input(const fock &f);
-    fock &input();
-    chip &set_basis(const basis &b);
+    const unitary_matrix &unitary() const;
+    fock &input_state();
+    const fock &input_state() const;
+    basis &output_basis();
+    const basis &output_basis() const;
     state output_state();
 };
 
