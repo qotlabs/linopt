@@ -47,33 +47,33 @@ complex_type linopt::permanent(const matrix_type &M)
     return perm;
 }
 
-unitary_matrix &unitary_matrix::hurwitz(const angles &a)
+unitary_matrix &unitary_matrix::hurwitz(const point &x)
 {
-    int N = std::sqrt(a.size());
-    assert(N*N == static_cast<int>(a.size()));
+    int N = std::sqrt(x.size());
+    assert(N*N == static_cast<int>(x.size()));
     if(cols() != N || rows() != N)
         resize(N, N);
     int i, j, k = 0;
     complex_type eii, eij;
     vector_type coli(N);
     real_type xi;
-    eii = std::polar(1., 2.*M_PI*a[k++]);
+    eii = std::polar(1., 2.*M_PI*x[k++]);
     setZero();
     diagonal().fill(eii);
     for(j = 1; j <= N-1; j++)
     {
         for(i = j - 1; i >= 1; i--)
         {
-            xi = std::pow(mod(a[k++], 1.), 1./(2.*(i + 1)));
-            eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*a[k++]);
+            xi = std::pow(mod(x[k++], 1.), 1./(2.*(i + 1)));
+            eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*x[k++]);
             eij = xi;
             coli = col(i);
             col(i) = col(i)*eii - col(j)*conj(eij);
             col(j) =   coli*eij + col(j)*conj(eii);
         }
-        xi = std::sqrt(mod(a[k++], 1.));
-        eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*a[k++]);
-        eij = std::polar(xi, 2.*M_PI*a[k++]);
+        xi = std::sqrt(mod(x[k++], 1.));
+        eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*x[k++]);
+        eij = std::polar(xi, 2.*M_PI*x[k++]);
         coli = col(i);
         col(i) = col(i)*eii - col(j)*conj(eij);
         col(j) =   coli*eij + col(j)*conj(eii);

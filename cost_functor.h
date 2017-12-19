@@ -18,14 +18,14 @@ public:
                  const basis &ancilla_basis,
                  const fock &input_state,
                  const std::vector<state> &target_states);
-    real_type operator()(const unitary_matrix::angles &a);
+    real_type operator()(const point &x);
 };
 
 class stanisic_functor: public cost_functor
 {
 public:
     using cost_functor::cost_functor;
-    real_type operator()(const unitary_matrix::angles &a);
+    real_type operator()(const point &x);
 };
 
 }

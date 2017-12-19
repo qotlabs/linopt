@@ -9,14 +9,14 @@ namespace linopt
 
 typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;
 typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
+typedef Eigen::Matrix<real_type, Eigen::Dynamic, 1> point;
 
 class unitary_matrix: public matrix_type
 {
 public:
     static constexpr real_type default_epsilon = 1e-15;
-    typedef std::vector<real_type> angles;
     using matrix_type::matrix_type;
-    unitary_matrix &hurwitz(const angles &a);
+    unitary_matrix &hurwitz(const point &x);
     bool is_column_unitary(real_type eps = default_epsilon) const;
     bool is_row_unitary(real_type eps = default_epsilon) const;
     bool is_unitary(real_type eps = default_epsilon) const;

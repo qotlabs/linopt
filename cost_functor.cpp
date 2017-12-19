@@ -13,9 +13,9 @@ cost_functor::cost_functor(const basis &full_basis,
     C.input_state() = input_state;
 }
 
-real_type stanisic_functor::operator()(const unitary_matrix::angles &a)
+real_type stanisic_functor::operator()(const point &x)
 {
-    C.unitary().hurwitz(a);
+    C.unitary().hurwitz(x);
     state out = C.output_state();
     state postselected;
     real_type p, res = 0.;
