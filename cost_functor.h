@@ -28,6 +28,13 @@ public:
     real_type operator()(const point &x);
 };
 
+class log_functor: public cost_functor
+{
+public:
+    using cost_functor::cost_functor;
+    real_type operator()(const point &x);
+};
+
 }
 
 #endif // COST_FUNCTOR_H

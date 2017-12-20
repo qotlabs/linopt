@@ -32,3 +32,26 @@ real_type stanisic_functor::operator()(const point &x)
     }
     return res;
 }
+
+real_type log_functor::operator()(const point &x)
+{
+    const real_type epsilon = 0.001;
+    C.unitary().hurwitz(x);
+    state out = C.output_state();
+    state postselected;
+    real_type p, res = 0.;
+    for(auto anc = ancilla_basis.begin(); anc != ancilla_basis.end(); anc++)
+    {
+        postselected = out.postselect(*anc);
+        p = postselected.norm();
+        if(p == 0.)
+            continue;
+        postselected /= p;
+        p = p*p;
+        for(size_t i = 0; i < target_states.size(); i++)
+        {
+            res += p*std::log(epsilon + 1. - std::norm(dot(postselected, target_states[i])))/std::log(epsilon);
+        }
+    }
+    return res;
+}
