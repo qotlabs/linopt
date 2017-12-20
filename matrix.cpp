@@ -64,14 +64,16 @@ unitary_matrix &unitary_matrix::hurwitz(const point &x)
     {
         for(i = j - 1; i >= 1; i--)
         {
-            xi = std::pow(mod(x[k++], 1.), 1./(2.*(i + 1)));
+            xi = pyramid(x[k++], 1.);
+            xi = std::pow(xi, 1./(2.*(i + 1)));
             eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*x[k++]);
             eij = xi;
             coli = col(i);
             col(i) = col(i)*eii - col(j)*conj(eij);
             col(j) =   coli*eij + col(j)*conj(eii);
         }
-        xi = std::sqrt(mod(x[k++], 1.));
+        xi = pyramid(x[k++], 1.);
+        xi = std::sqrt(xi);
         eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*x[k++]);
         eij = std::polar(xi, 2.*M_PI*x[k++]);
         coli = col(i);

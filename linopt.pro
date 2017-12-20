@@ -7,8 +7,7 @@ SOURCES += main.cpp \
     states.cpp \
     matrix.cpp \
     chip.cpp \
-    cost_functor.cpp \
-    optimization.cpp
+    cost_functor.cpp
 
 HEADERS += \
     states.h \
