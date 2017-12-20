@@ -3,10 +3,12 @@
 #include <fcntl.h>
 
 #include "linopt.h"
+#include "optimization.h"
 #include "cppoptlib/meta.h"
 #include "cppoptlib/problem.h"
 #include <cppoptlib/solver/bfgssolver.h>
 #include <cppoptlib/solver/neldermeadsolver.h>
+#include <cppoptlib/solver/conjugatedgradientdescentsolver.h>
 
 using namespace std;
 using namespace linopt;
@@ -24,24 +26,27 @@ int srandomdev(void)
     return seed;
 }
 
-class stanisic_problem : public Problem<real_type>
+class problem : public Problem<real_type>
 {
 private:
-    stanisic_functor sf;
+    log_functor f;
 public:
-    stanisic_problem(const basis &full_basis, const basis &ancilla_basis,
+    problem(const basis &full_basis, const basis &ancilla_basis,
                      const fock &input_state, const vector<state> &target_states):
-        sf(full_basis, ancilla_basis, input_state, target_states) {};
+        f(full_basis, ancilla_basis, input_state, target_states) {};
     real_type value(const TVector &x)
     {
-        real_type f = sf(x);
-        return -f;
+        real_type fval = f(x);
+        cout << fval << endl;
+        return -fval;
     }
 };
 
 int main()
 {
     srandomdev();
+    basis full_basis = basis(2, 4)*basis(2, 4);
+    basis ancilla_basis = basis(2, 4);
     fock input_state = {1, 1, 1, 1, 0, 0, 0, 0};
     vector<state> B(6);
     B[0][{1, 0, 1, 0}] =  M_SQRT1_2;
@@ -56,11 +61,11 @@ int main()
     B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
-    stanisic_problem cost_function(basis(2, 4)*basis(2, 4), basis(2, 4), input_state, B);
-    BfgsSolver<stanisic_problem> solver;
     point a(64);
     a = 0.5 * a.setRandom().array() + 0.5;
-    solver.minimize(cost_function, a);
-    cout << -cost_function(a) << endl;
+    stanisic_functor cf(full_basis, ancilla_basis, input_state, B);
+    stop_criterion crit(1000, 1e-2, 0, 1e-8, 0);
+    real_type val = bfgs(cf, a, crit);
+    cout << val << endl;
     return 0;
 }
