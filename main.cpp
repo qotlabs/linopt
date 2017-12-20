@@ -3,16 +3,11 @@
 #include <fcntl.h>
 
 #include "linopt.h"
-#include "optimization.h"
-#include "cppoptlib/meta.h"
-#include "cppoptlib/problem.h"
-#include <cppoptlib/solver/bfgssolver.h>
-#include <cppoptlib/solver/neldermeadsolver.h>
-#include <cppoptlib/solver/conjugatedgradientdescentsolver.h>
+#include "bfgs.h"
+#include "hco.h"
 
 using namespace std;
 using namespace linopt;
-using namespace cppoptlib;
 
 int srandomdev(void)
 {
@@ -25,22 +20,6 @@ int srandomdev(void)
     close(fd);
     return seed;
 }
-
-class problem : public Problem<real_type>
-{
-private:
-    log_functor f;
-public:
-    problem(const basis &full_basis, const basis &ancilla_basis,
-                     const fock &input_state, const vector<state> &target_states):
-        f(full_basis, ancilla_basis, input_state, target_states) {};
-    real_type value(const TVector &x)
-    {
-        real_type fval = f(x);
-        cout << fval << endl;
-        return -fval;
-    }
-};
 
 int main()
 {
@@ -65,7 +44,7 @@ int main()
     a = 0.5 * a.setRandom().array() + 0.5;
     stanisic_functor cf(full_basis, ancilla_basis, input_state, B);
     stop_criterion crit(1000, 1e-2, 0, 1e-8, 0);
-    real_type val = bfgs(cf, a, crit);
+    real_type val = hco(cf, a, crit);
     cout << val << endl;
     return 0;
 }

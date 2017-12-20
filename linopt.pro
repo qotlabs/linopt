@@ -15,9 +15,9 @@ HEADERS += \
     matrix.h \
     chip.h \
     cost_functor.h \
-    optimization.h
+    bfgs.h \
+    hco.h
 
-INCLUDEPATH += ../CppNumericalSolvers/include /usr/include/eigen3
 #QMAKE_CXXFLAGS_RELEASE += -g -pg
 #QMAKE_LFLAGS_RELEASE += -g -pg
 QMAKE_CXXFLAGS_RELEASE += -march=native -ffast-math -O3

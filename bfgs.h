@@ -72,20 +72,20 @@ public:
     real_type max_delta_x_norm;
     status check_convergence(
             int iter,
-            const point &grad,
+            real_type grad_norm,
             real_type f1,
             real_type f2,
-            const point &delta_x) const
+            real_type delta_x) const
     {
         if(iter >= max_iter)
             return ITER;
-        if(grad.norm() <= max_grad_norm)
+        if(grad_norm <= max_grad_norm)
             return GRAD_NORM;
         if(std::fabs(f2 - f1) <= max_delta_f_abs)
             return DELTA_F_ABS;
         if(std::fabs(f2/f1 - 1.) <= max_delta_f_rel)
             return DELTA_F_REL;
-        if(delta_x.norm() <= max_delta_x_norm)
+        if(delta_x <= max_delta_x_norm)
             return DELTA_X_NORM;
         return CONTINUE;
     }
@@ -128,7 +128,7 @@ real_type bfgs(functor &f, point &x, const stop_criterion &crit = stop_criterion
         rho = 1./y.dot(s);
         C = (id - rho*s*y.transpose())*C*(id - rho*y*s.transpose()) - rho*s*s.transpose();
     }
-    while(crit.check_convergence(i, df2, f1, f2, s) == stop_criterion::CONTINUE);
+    while(crit.check_convergence(i, df2.norm(), f1, f2, s.norm()) == stop_criterion::CONTINUE);
     x = x2;
     return f2;
 }
