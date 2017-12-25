@@ -5,7 +5,7 @@ CC := g++
 LDLIBS := -lm
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math \
           -Wall -Wextra -Wno-unused-result \
-		  -I /usr/include
+		  -I /usr/include -D _USE_MATH_DEFINES
 VPATH = .
 OBJS_MAIN := main.o
 TARGET := linopt
