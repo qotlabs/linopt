@@ -3,3 +3,9 @@
 *.dat
 *.pro.user*
 *.lib
+*.swp
+*.a
+*.d
+*.so
+
+linopt
