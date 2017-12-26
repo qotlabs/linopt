@@ -2,12 +2,13 @@ AR := ar
 ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
+LIBLINOPT_PATH := "../lib"
 LDLIBS := -lm
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-result \
 		  -I /usr/include -D_USE_MATH_DEFINES
-TARGET := liblinopt
-VPATH = .
+TARGET := linopt-wrap
+VPATH = . $(LIBLINOPT_PATH)
 
 SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))
 HDRS := $(wildcard $(addsuffix /*.h, $(VPATH)))
@@ -15,7 +16,7 @@ OBJS := $(notdir $(SRCS:.cpp=.o))
 
 .PHONY: all clean help static shared
 
-all:	$(TARGET).a
+all:	$(TARGET).so
 static: clean $(TARGET).a
 shared: clean $(TARGET).so
 
