@@ -42,6 +42,13 @@ void *stanisic_functor_constructor(int Mf, int Ma,
     return sf;
 }
 
+void stanisic_functor_destructor(void *functor)
+{
+    stanisic_functor *sf = static_cast<stanisic_functor *>(functor);
+	delete sf;
+	return;
+}
+
 double stanisic_functor_apply(void *functor, const double *x, int x_size)
 {
     stanisic_functor *sf = static_cast<stanisic_functor *>(functor);

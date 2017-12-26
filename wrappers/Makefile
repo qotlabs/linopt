@@ -2,7 +2,7 @@ AR := ar
 ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
-LIBLINOPT_PATH := "../lib"
+LIBLINOPT_PATH := ../lib
 LDLIBS := -lm
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-result \
