@@ -5,9 +5,9 @@
 #include <math.h>
 #include <ctime>
 
-#include "linopt.h"
-#include "bfgs.h"
-#include "hco.h"
+#include <linopt.h>
+#include <bfgs.h>
+#include <hco.h>
 
 using namespace std;
 using namespace linopt;
@@ -22,6 +22,20 @@ int srandomdev(void)
         srand((unsigned)time(0));
     close(fd);
     return seed;
+}
+
+real_type ackley(const point &x)
+{
+    real_type d = 0.;
+    real_type s = 0.;
+    for(int i = 0; i < x.size(); i++)
+    {
+        d += x[i]*x[i];
+        s += std::cos(2.*M_PI*x[i]);
+    }
+    s /= x.size();
+    d /= x.size();
+    return 20.*std::exp(-0.2*std::sqrt(d)) + std::exp(s) - 20 - M_E;
 }
 
 int main()
@@ -44,10 +58,18 @@ int main()
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
     point a(64);
-    a = 0.5 * a.setRandom().array() + 0.5;
+    //a = 0.5 * a.setRandom().array() + 0.5;
+    a = 10. * a.setRandom();
     stanisic_functor cf(full_basis, ancilla_basis, input_state, B);
-    stop_criterion crit(2000, 1e-4, 0, 1e-8, 0);
-    real_type val = bfgs(cf, a, crit);
+    stop_criterion crit(1000, 1e-4, 0, 1e-8, 0);
+    real_type val = bfgs(ackley, a, crit);
+    /*chip C;
+    C.unitary().hurwitz(a);
+    C.input_state() = input_state;
+    C.output_basis() = full_basis;
+    state out = C.output_state();
+    for(auto anc = ancilla_basis.begin(); anc != ancilla_basis.end(); anc++)
+        cout << out.postselect(*anc).normalize() << endl << "------------" << endl;*/
     cout << val << endl;
     return 0;
 }

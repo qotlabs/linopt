@@ -76,8 +76,8 @@ template<typename functor>
 real_type hco(functor &f, point &x, const stop_criterion &crit = stop_criterion())
 {
     const int dim = x.size();
-    const int N = 1000;
-    stop_criterion bfgs_stop(100, 1e-2, 0, 1e-5, 0);
+    const int N = 1;
+    stop_criterion bfgs_stop(1000, 0, 0, 1e-3, 0);
     point xbest = point::Ones(dim)/2.;
     real_type fbest = f(xbest);
     real_type fx;
@@ -90,7 +90,7 @@ real_type hco(functor &f, point &x, const stop_criterion &crit = stop_criterion(
         {
             x = hc.random_point();
             fx = f(x);
-            //std::cout << fx << std::endl;
+            std::cout << fx << std::endl;
             if(fx > fbest)
             {
                 xbest = x;
@@ -98,7 +98,7 @@ real_type hco(functor &f, point &x, const stop_criterion &crit = stop_criterion(
             }
         }
         fbest = bfgs(f, xbest, bfgs_stop);
-        //std::cout << "fbest = " << fbest << "\tr = " << hc.radius().norm() << std::endl;
+        std::cout << "fbest = " << fbest << "\tr = " << hc.radius().norm() << std::endl;
         s = ((xbest - hc.center()).cwiseQuotient(hc.radius())).norm();
         s /= 4.*std::sqrt(dim);
         s = 1. - 0.2*std::exp(-3.*s);
