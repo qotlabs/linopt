@@ -2,6 +2,7 @@
 *.cfg
 *.dat
 *.pro.user*
+*.creator.user
 *.lib
 *.swp
 *.a
