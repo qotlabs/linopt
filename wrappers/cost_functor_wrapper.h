@@ -20,8 +20,8 @@ void *stanisic_functor_constructor(
 																	// Expected size = ts_size1*ts_size2
 	int ts_size1, int ts_size2);	// Number of target states and nonzero amplitudes in target states respectively
 
+void *stanisic_functor_simple_constructor();
 void stanisic_functor_destructor(void *functor);
-
 double stanisic_functor_apply(void *functor, const double *x, int x_size);
 
 }

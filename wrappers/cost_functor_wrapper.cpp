@@ -1,4 +1,6 @@
 #include "cost_functor_wrapper.h"
+#include <vector>
+#include <math.h>
 #include <cost_functor.h>
 
 using namespace linopt;
@@ -40,6 +42,28 @@ void *stanisic_functor_constructor(int Mf, int Ma,
     }
 	stanisic_functor *sf = new stanisic_functor(fb, ab, is, ts);
     return sf;
+}
+
+void *stanisic_functor_simple_constructor()
+{
+	basis ancilla_basis(2, 4);
+	basis full_basis = ancilla_basis*ancilla_basis;
+	fock input_state = {1, 1, 1, 1, 0, 0, 0, 0};
+	std::vector<state> B(6);
+	B[0][{1, 0, 1, 0}] =  M_SQRT1_2;
+	B[0][{0, 1, 0, 1}] =  M_SQRT1_2;
+	B[1][{1, 0, 1, 0}] =  M_SQRT1_2;
+	B[1][{0, 1, 0, 1}] = -M_SQRT1_2;
+	B[2][{1, 0, 0, 1}] =  M_SQRT1_2;
+	B[2][{0, 1, 1, 0}] =  M_SQRT1_2;
+	B[3][{1, 0, 0, 1}] =  M_SQRT1_2;
+	B[3][{0, 1, 1, 0}] = -M_SQRT1_2;
+	B[4][{1, 1, 0, 0}] =  M_SQRT1_2;
+	B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
+	B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
+	B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
+	stanisic_functor *sf = new stanisic_functor(full_basis, ancilla_basis, input_state, B);
+	return sf;
 }
 
 void stanisic_functor_destructor(void *functor)
