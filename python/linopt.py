@@ -1,9 +1,11 @@
+#!/usr/bin/python3
+
 import ctypes
 import numpy as np
 from scipy import optimize
 import math
 
-linopt = ctypes.CDLL('linopt-wrap.so')
+linopt = ctypes.CDLL('../wrappers/linopt-wrap.so')
 
 linopt.stanisic_functor_constructor.argtypes = (ctypes.c_int, ctypes.c_int, # Number of full system and ancilla modes
 											ctypes.POINTER(ctypes.c_int), # Array of fock states, representing basis of the full system, Expected size = fb_size*Mf
@@ -55,13 +57,13 @@ def cost_function(x):
 	return -costfunc(sf,ar_ptr,ar_size)
 
 #BFGS
-#opt_val = optimize.minimize(cost_function, np.random.rand(64), method='BFGS', jac=False, tol=1e-3, callback=None, options=None)
+opt_val = optimize.minimize(cost_function, np.random.rand(64), method='BFGS', jac=False, tol=1e-3, callback=None, options=None)
 #Nelder-Mead
 #opt_val = optimize.minimize(cost_function, np.random.rand(64), method='Nelder-Mead',tol=1e-4)
 #differential evolution
 a = np.array([0,1])
 bounds = np.tile(a,(x_size,1))
-opt_val = optimize.differential_evolution(cost_function, bounds, strategy='best1bin', maxiter=1000, popsize=10, tol=0.01, mutation=(0.5, 1), recombination=0.7, seed=None, callback=None, disp=False, polish=True, init='latinhypercube', atol=0)
+#opt_val = optimize.differential_evolution(cost_function, bounds, strategy='best1bin', maxiter=1000, popsize=10, tol=0.01, mutation=(0.5, 1), recombination=0.7, seed=None, callback=None, disp=False, polish=True, init='latinhypercube', atol=0)
 
 print(opt_val.fun)
 

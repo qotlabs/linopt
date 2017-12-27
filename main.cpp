@@ -62,7 +62,7 @@ int main()
     a = 10. * a.setRandom();
     stanisic_functor cf(full_basis, ancilla_basis, input_state, B);
     stop_criterion crit(1000, 1e-4, 0, 1e-8, 0);
-    real_type val = bfgs(ackley, a, crit);
+    real_type val = bfgs(cf, a, crit);
     /*chip C;
     C.unitary().hurwitz(a);
     C.input_state() = input_state;
