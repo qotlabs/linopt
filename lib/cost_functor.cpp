@@ -15,7 +15,7 @@ cost_functor::cost_functor(const basis &full_basis,
 
 real_type stanisic_functor::operator()(const point &x)
 {
-    C.unitary().hurwitz(x);
+    C.unitary().exp_hermite(x);
     state out = C.output_state();
     state postselected;
     real_type p, res = 0.;
