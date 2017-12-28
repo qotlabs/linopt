@@ -1,6 +1,7 @@
 #include <cassert>
 #include <limits.h>
 #include <complex>
+#include <unsupported/Eigen/MatrixFunctions>
 #include "matrix.h"
 
 using namespace linopt;
@@ -49,7 +50,7 @@ complex_type linopt::permanent(const matrix_type &M)
 
 unitary_matrix &unitary_matrix::hurwitz(const point &x)
 {
-    int N = std::sqrt(x.size());
+    const int N = std::sqrt(x.size());
     assert(N*N == static_cast<int>(x.size()));
     if(cols() != N || rows() != N)
         resize(N, N);
@@ -80,6 +81,27 @@ unitary_matrix &unitary_matrix::hurwitz(const point &x)
         col(i) = col(i)*eii - col(j)*conj(eij);
         col(j) =   coli*eij + col(j)*conj(eii);
     }
+    return *this;
+}
+
+unitary_matrix &unitary_matrix::exp_hermite(const point &x)
+{
+    const int N = std::sqrt(x.size());
+    assert(N*N == static_cast<int>(x.size()));
+    unitary_matrix H(N, N);
+    int k = N;
+    for(int i = 0; i < N; i++)
+    {
+        H(i ,i) = x[i];
+        for(int j = i + 1; j < N; j++)
+        {
+            H(i, j) = complex_type(x[k],  x[k+1]);
+            H(j, i) = complex_type(x[k], -x[k+1]);
+            k += 2;
+        }
+    }
+    H *= complex_type(0, 1);
+    *this = H.exp();
     return *this;
 }
 

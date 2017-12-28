@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 #include "states.h"
 
 namespace linopt
@@ -17,6 +17,7 @@ public:
     static constexpr real_type default_epsilon = 1e-15;
     using matrix_type::matrix_type;
     unitary_matrix &hurwitz(const point &x);
+    unitary_matrix &exp_hermite(const point &x);
     bool is_column_unitary(real_type eps = default_epsilon) const;
     bool is_row_unitary(real_type eps = default_epsilon) const;
     bool is_unitary(real_type eps = default_epsilon) const;

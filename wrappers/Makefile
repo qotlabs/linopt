@@ -5,8 +5,9 @@ CC := g++
 LIBLINOPT_PATH := ../lib
 LDLIBS := -lm
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
-          -Wall -Wextra -Wno-unused-result \
-		  -I /usr/include -D_USE_MATH_DEFINES
+          -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
+		  -I /usr/include -I /usr/include/eigen3 \
+		  -D_USE_MATH_DEFINES
 TARGET := linopt-wrap
 VPATH = . $(LIBLINOPT_PATH)
 

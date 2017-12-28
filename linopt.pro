@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += main.cpp
 
+INCLUDEPATH += /usr/include/eigen3
 INCLUDEPATH += ./lib
 
 LIBS += -L../linopt/lib -llinopt

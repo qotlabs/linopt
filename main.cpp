@@ -62,7 +62,12 @@ int main()
     a = 10. * a.setRandom();
     stanisic_functor cf(full_basis, ancilla_basis, input_state, B);
     stop_criterion crit(1000, 1e-4, 0, 1e-8, 0);
-    real_type val = bfgs(cf, a, crit);
+    //real_type val = bfgs(cf, a, crit);
+    unitary_matrix U(2, 2);
+    point x(4);
+    x << 1, 2, 3, 4;
+    U.exp_hermite(x);
+    cout << U << endl;
     /*chip C;
     C.unitary().hurwitz(a);
     C.input_state() = input_state;
@@ -70,6 +75,6 @@ int main()
     state out = C.output_state();
     for(auto anc = ancilla_basis.begin(); anc != ancilla_basis.end(); anc++)
         cout << out.postselect(*anc).normalize() << endl << "------------" << endl;*/
-    cout << val << endl;
+    //cout << val << endl;
     return 0;
 }
