@@ -1,70 +1,38 @@
 #!/usr/bin/python3
 
-import ctypes
+import sys
+import linoptlib
 import numpy as np
 from scipy import optimize
-import math
+from sdaopt import sda
 
-linopt = ctypes.CDLL('../wrappers/linopt-wrap.so')
+# number of input/output modes of the linear optical interfermoter
+num_modes = 8
 
-linopt.stanisic_functor_constructor.argtypes = (ctypes.c_int, ctypes.c_int, # Number of full system and ancilla modes
-											ctypes.POINTER(ctypes.c_int), # Array of fock states, representing basis of the full system, Expected size = fb_size*Mf
-											ctypes.c_int, # Number of fock states in the full basis
-											ctypes.POINTER(ctypes.c_int), # Array of fock states, representing basis of the ancilla, Expected size = ab_size*Ma
-											ctypes.c_int, # Number of fock states in the ancilla basis
-											ctypes.POINTER(ctypes.c_int), # Input fock state. Expected size = Mf
-											ctypes.POINTER(ctypes.c_int), # Two dimensional array of fock states. First index - target state index,
-																			# second - fock state index in the given target state.
-																			# Expected size = ts_size1*ts_size2*(Mf-Ma)
-											ctypes.POINTER(ctypes.c_double), ctypes.POINTER(ctypes.c_double), # Arrays of target states amlitudes (real and imaginary part)
-																											# Expected size = ts_size1*ts_size2
-											ctypes.c_int, ctypes.c_int) #Number of target states and nonzero amplitudes in target states respectively
-linopt.stanisic_functor_constructor.restype = ctypes.c_void_p
+def print_fun(x, f, accepted):
+	print("at minimum %.4f accepted %d" % (f, int(accepted)))
 
-sf_constructor = linopt.stanisic_functor_simple_constructor
-sf_constructor.restype = ctypes.c_void_p
+# create a stanisic_functor python object
+#sf = linoptlib.sf_constructor()
+if sys.argv[1] == 'BFGS':
+	opt_val = optimize.minimize(linoptlib.cost_function, np.random.rand(num_modes**2), method='BFGS', jac=False, tol=1e-3, callback=None, options=None)
+elif sys.argv[1] == 'Nelder-Mead':
+	opt_val = optimize.minimize(linoptlib.cost_function, np.random.rand(num_modes**2), method='Nelder-Mead',tol=1e-4)
+elif sys.argv[1] == 'DiffEvol':
+	bounds = np.tile(np.array([0,1]),(unidim**2,1))
+	opt_val = optimize.differential_evolution(linoptlib.cost_function, bounds, strategy='best1bin', maxiter=1000, popsize=10, tol=0.01, mutation=(0.5, 1), recombination=0.7, seed=None, callback=None, disp=False, polish=True, init='latinhypercube', atol=0)
+elif sys.argv[1] == 'BasinHop':
+	opt_val = optimize.basinhopping(linoptlib.cost_function, np.random.rand(64), niter=1000, T=0.02, stepsize=0.1, minimizer_kwargs={"method":"BFGS"}, take_step=None, accept_test=None, callback=print_fun, interval=10, disp=False, niter_success=None, seed=None)
+elif sys.argv[1] == 'SDA':
+	opt_val = sda(linoptlib.cost_function, np.random.rand(64), bounds, maxiter=3000, minimizer_kwargs={"method":"BFGS"}, initial_temp=10, visit=2.62, accept=-10.0, maxfun=1e7, seed=None, pure_sa=True)
+else:
+	opt_val = 'Wrong method'
 
-sf_destructor = linopt.stanisic_functor_destructor
-sf_destructor.argtype = ctypes.c_void_p
+# print result
+if isinstance(opt_val,str):
+	print(opt_val)
+else:
+	print(opt_val.fun)
 
-costfunc = linopt.stanisic_functor_apply
-costfunc.argtypes = (ctypes.c_void_p, ctypes.POINTER(ctypes.c_double), ctypes.c_int)
-costfunc.restype = ctypes.c_double
-
-full_photon_number = 4 # number of photons evolving in the linear-optical network
-anc_photon_number = 2 # number of photons detected in the ancilla set of modes
-
-Mf = 8 # full number of modes
-Ma = 4 # ancilla number of modes
-
-full_dim = math.factorial(Mf+full_photon_number-1)/(math.factorial(full_photon_number)*math.factorial(Mf-1)) # full fock state dimension 
-anc_dim =math.factorial(Ma+anc_photon_number-1)/(math.factorial(anc_photon_number)*math.factorial(Ma-1)) # ancilla set dimension
-
-ifs_array = np.array([1, 1, 1, 1, 0, 0, 0, 0]) # input fock state array
-ifs_array_ptr = ifs_array.ctypes.data_as(ctypes.POINTER(ctypes.c_double)) # pointer to input fock state array
-
-x_array = np.random.rand(64)
-#x_array_ptr = x_array.ctypes.data_as(ctypes.POINTER(ctypes.c_double))
-x_size = x_array.size
-x_array_ptr = (ctypes.c_double * x_size)(*x_array)
-
-sf = sf_constructor()
-res = costfunc(sf,x_array_ptr,x_size)
-
-def cost_function(x):
-	ar_size = x.size
-	ar_ptr = (ctypes.c_double * ar_size)(*x)
-	return -costfunc(sf,ar_ptr,ar_size)
-
-#BFGS
-opt_val = optimize.minimize(cost_function, np.random.rand(64), method='BFGS', jac=False, tol=1e-3, callback=None, options=None)
-#Nelder-Mead
-#opt_val = optimize.minimize(cost_function, np.random.rand(64), method='Nelder-Mead',tol=1e-4)
-#differential evolution
-a = np.array([0,1])
-bounds = np.tile(a,(x_size,1))
-#opt_val = optimize.differential_evolution(cost_function, bounds, strategy='best1bin', maxiter=1000, popsize=10, tol=0.01, mutation=(0.5, 1), recombination=0.7, seed=None, callback=None, disp=False, polish=True, init='latinhypercube', atol=0)
-
-print(opt_val.fun)
-
-sf_destructor(sf)
+# release memory allocated for stanisic_functor object
+linoptlib.sf_destructor(linoptlib.sf)
