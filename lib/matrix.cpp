@@ -92,7 +92,7 @@ unitary_matrix &unitary_matrix::exp_hermite(const point &x)
     int k = N;
     for(int i = 0; i < N; i++)
     {
-        H(i ,i) = x[i];
+        H(i, i) = x[i];
         for(int j = i + 1; j < N; j++)
         {
             H(i, j) = complex_type(x[k],  x[k+1]);

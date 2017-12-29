@@ -8,5 +8,6 @@
 *.a
 *.d
 *.so
+*.pyc
 
 linopt
