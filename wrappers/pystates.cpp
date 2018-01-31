@@ -1,11 +1,15 @@
 #include <boost/python.hpp>
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include "../lib/states.h"
 
 using namespace boost::python;
 using namespace linopt;
 
 BOOST_PYTHON_MODULE(pystates)
-{
+{   
+    class_<std::vector<int>>("cvector")
+        .def(vector_indexing_suite<std::vector<int>>());
+
     class_ < fock, bases<std::vector<int> > >("fock")
 		.def(init<>())
         .def("total", &fock::total)

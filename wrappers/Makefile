@@ -3,12 +3,12 @@ ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
 LIBLINOPT_PATH := ../lib
-LDLIBS := -lm -lboost_python-py27 -lpython2.7
+LDLIBS := -lm -lboost_python-py35 -lpython3.5m
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
-		  -I /usr/include -I /usr/include/eigen3 -I/usr/include/python2.7 \
+		  -I /usr/include -I /usr/include/eigen3 -I/usr/include/python3.5 \
 		  -D_USE_MATH_DEFINES
-TARGET := linopt-wrap
+TARGET := pystates
 VPATH = . $(LIBLINOPT_PATH)
 
 SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))
