@@ -1,12 +1,13 @@
 #include <boost/python.hpp>
-#include "../../lib/states.h"
+#include "../lib/states.h"
 
 using namespace boost::python;
 using namespace linopt;
 
 BOOST_PYTHON_MODULE(pystates)
 {
-    class_ < fock, bases<std::vector<int> > >("fock", no_init)
+    class_ < fock, bases<std::vector<int> > >("fock")
+		.def(init<>())
         .def("total", &fock::total)
         .def("prod_fact", &fock::prod_fact)
         .def("__mul__", &fock::operator*, args( "f" ))

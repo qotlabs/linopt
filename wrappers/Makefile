@@ -3,10 +3,10 @@ ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
 LIBLINOPT_PATH := ../lib
-LDLIBS := -lm
+LDLIBS := -lm -lboost_python-py27 -lpython2.7
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
-		  -I /usr/include -I /usr/include/eigen3 \
+		  -I /usr/include -I /usr/include/eigen3 -I/usr/include/python2.7 \
 		  -D_USE_MATH_DEFINES
 TARGET := linopt-wrap
 VPATH = . $(LIBLINOPT_PATH)
@@ -26,7 +26,7 @@ $(TARGET).a:	$(OBJS)
 
 $(TARGET).so:	$(OBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
-
+	
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH)) -c -MMD $<
 include $(wildcard *.d)
