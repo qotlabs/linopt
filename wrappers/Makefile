@@ -36,7 +36,7 @@ doc:	doxygen.conf $(SRCS) $(HDRS)
 	$(DOXYGEN) $<
 
 clean:
-	$(RM) -r *.o *.d *.s *.a *.so* doc/
+	$(RM) -r *.o *.d *.s *.a *.so* $(LIBLINOPT_PATH)/*.o $(LIBLINOPT_PATH)/*.d doc/
 
 help:
 	@echo "Available commands:"
