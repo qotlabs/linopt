@@ -7,8 +7,9 @@ LDLIBS := -lm -lboost_python-py35 -lpython3.5m
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
 		  -I /usr/include -I /usr/include/eigen3 -I/usr/include/python3.5 \
-		  -D_USE_MATH_DEFINES
-TARGET := pystates
+		  -D_USE_MATH_DEFINES \
+		  -fpermissive
+TARGET := pylinopt
 VPATH = . $(LIBLINOPT_PATH)
 
 SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))
