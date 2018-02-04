@@ -14,9 +14,18 @@ using namespace linopt;
 
 // "thin wrappers" for methods with default arguments from class unitary_matrix
 unitary_matrix u;
-bool is_column_unitary_noargs() { return u.is_column_unitary();};
-bool is_row_unitary_noargs() { return u.is_row_unitary();};
-bool is_unitary_noargs() { return u.is_unitary();};
+bool is_column_unitary_noargs(const unitary_matrix &u)
+{
+	return u.is_column_unitary();
+}
+bool is_row_unitary_noargs(const unitary_matrix &u)
+{
+	return u.is_row_unitary();
+}
+bool is_unitary_noargs(const unitary_matrix &u)
+{
+	return u.is_unitary();
+}
 
 BOOST_PYTHON_MODULE(pylinopt)
 {   
@@ -35,14 +44,10 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def("is_row_unitary", is_row_unitary_noargs)
         .def("is_unitary", &unitary_matrix::is_unitary)
         .def("is_unitary", is_unitary_noargs)
-        .add_static_property("default_epsilon", make_getter(&unitary_matrix::default_epsilon));
+        .attr("default_epsilon") = unitary_matrix::default_epsilon;
 
     // exposing matrix functions
     def("permanent", permanent);
-    def("mod", mod);
-    //staticmethod("mod");
-    def("pyramid", pyramid);
-    //staticmethod("pyramid");
 
     // overloaded operator bindings for class state
     state (state::*unary_minus)() const = &state::operator-;
@@ -126,8 +131,7 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def("output_state", &chip::output_state);
 
     class_< cost_functor >("cost_functor", no_init)
-         .def(init<const basis&, const basis&, const fock&, const std::vector<state> >())
-         .def("__call__", &cost_functor::operator());
+         .def(init<const basis&, const basis&, const fock&, const std::vector<state> >());
 
     class_< stanisic_functor, bases<cost_functor> >("stanisic_functor", no_init)
          .def("__call__", &stanisic_functor::operator());
