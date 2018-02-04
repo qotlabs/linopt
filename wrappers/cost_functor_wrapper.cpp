@@ -5,7 +5,7 @@
 
 using namespace linopt;
 
-void *stanisic_functor_constructor(int Mf, int Ma,
+void *log_functor_constructor(int Mf, int Ma,
                              const int *full_basis,
                              int fb_size,
                              const int *ancilla_basis,
@@ -40,19 +40,19 @@ void *stanisic_functor_constructor(int Mf, int Ma,
         }
         ts[i] = s;
     }
-	stanisic_functor *sf = new stanisic_functor(fb, ab, is, ts);
+	log_functor *sf = new log_functor(fb, ab, is, ts);
     return sf;
 }
 
-void *stanisic_functor_simple_constructor()
+void *log_functor_simple_constructor()
 {
 	basis ancilla_basis(2, 4);
 	basis full_basis = basis(3, 6)*ancilla_basis;
 	fock input_state = {1, 1, 1, 0, 0, 0, 1, 1, 0, 0};
-	std::vector<state> B(20);
+	std::vector<state> B(1);
 	B[0][{1, 0, 1, 0, 1, 0}] = M_SQRT1_2;
 	B[0][{0, 1, 0, 1, 0, 1}] = M_SQRT1_2;
-	B[1][{1, 0, 1, 0, 0, 1}] = M_SQRT1_2;
+	/*B[1][{1, 0, 1, 0, 0, 1}] = M_SQRT1_2;
 	B[1][{0, 1, 0, 1, 1, 0}] = M_SQRT1_2;
 	B[2][{1, 0, 1, 1, 0, 0}] = M_SQRT1_2;
 	B[2][{0, 1, 0, 0, 1, 1}] = M_SQRT1_2;
@@ -89,21 +89,21 @@ void *stanisic_functor_simple_constructor()
 	B[18][{0, 0, 1, 0, 1, 1}] = M_SQRT1_2;
 	B[18][{1, 1, 0, 1, 0, 0}] = M_SQRT1_2;
 	B[19][{0, 0, 0, 1, 1, 1}] = M_SQRT1_2;
-	B[19][{1, 1, 1, 0, 0, 0}] = M_SQRT1_2;
-	stanisic_functor *sf = new stanisic_functor(full_basis, ancilla_basis, input_state, B);
+	B[19][{1, 1, 1, 0, 0, 0}] = M_SQRT1_2;*/
+	log_functor *sf = new log_functor(full_basis, ancilla_basis, input_state, B);
 	return sf;
 }
 
-void stanisic_functor_destructor(void *functor)
+void log_functor_destructor(void *functor)
 {
-    stanisic_functor *sf = static_cast<stanisic_functor *>(functor);
+    log_functor *sf = static_cast<log_functor *>(functor);
 	delete sf;
 	return;
 }
 
-double stanisic_functor_apply(void *functor, const double *x, int x_size)
+double log_functor_apply(void *functor, const double *x, int x_size)
 {
-    stanisic_functor *sf = static_cast<stanisic_functor *>(functor);
+    log_functor *sf = static_cast<log_functor *>(functor);
     Eigen::Map<const point> xmap(x, x_size);
     return sf->operator()(xmap);
 }

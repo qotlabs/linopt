@@ -14,7 +14,7 @@ def print_fun(x, f, accepted):
 
 # optimize interferometer's unitary using specified method
 if sys.argv[1] == 'BFGS':
-	opt_val = optimize.minimize(linoptlib.cost_function, 6*np.random.rand(num_modes**2) - 3, method='BFGS', jac=False, tol=None, callback=None, options={'gtol':1e-5, 'norm':1})
+	opt_val = optimize.minimize(linoptlib.cost_function, 6*np.random.rand(num_modes**2) - 3, method='BFGS', jac=False, tol=None, callback=None, options={'gtol':1e-5})
 elif sys.argv[1] == 'Nelder-Mead':
 	opt_val = optimize.minimize(linoptlib.cost_function, 6*np.random.rand(num_modes**2) - 3, method='Nelder-Mead', tol=1e-6, options={'maxfev':1e5})
 elif sys.argv[1] == 'DiffEvol':

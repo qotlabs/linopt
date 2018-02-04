@@ -4,7 +4,7 @@
 extern "C"
 {
 
-void *stanisic_functor_constructor(
+void *log_functor_constructor(
 	int Mf, int Ma,				// Number of full system and ancilla modes
     const int *full_basis,		// Array of fock states, representing basis of the full system
 								// Expected size = fb_size*Mf
@@ -20,9 +20,9 @@ void *stanisic_functor_constructor(
 																	// Expected size = ts_size1*ts_size2
 	int ts_size1, int ts_size2);	// Number of target states and nonzero amplitudes in target states respectively
 
-void *stanisic_functor_simple_constructor();
-void stanisic_functor_destructor(void *functor);
-double stanisic_functor_apply(void *functor, const double *x, int x_size);
+void *log_functor_simple_constructor();
+void log_functor_destructor(void *functor);
+double log_functor_apply(void *functor, const double *x, int x_size);
 
 }
 
