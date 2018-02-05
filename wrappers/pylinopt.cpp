@@ -10,8 +10,8 @@
 #include "../lib/cost_functor.h"
 
 /**** double-conversion helpers *****/
-#include "../../minieigen/src/double-conversion/double-conversion.h"
-#include "../../minieigen/src/visitors.hpp"
+#include "minieigen/src/double-conversion/double-conversion.h"
+#include "minieigen/src/visitors.hpp"
 
 using namespace boost::python;
 using namespace linopt;

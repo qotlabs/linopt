@@ -1,0 +1,3 @@
+[submodule "wrappers/minieigen"]
+	path = wrappers/minieigen
+	url = https://github.com/eudoxos/minieigen.git
