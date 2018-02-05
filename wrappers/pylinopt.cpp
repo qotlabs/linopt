@@ -140,7 +140,6 @@ BOOST_PYTHON_MODULE(pylinopt)
 
     class_< cost_functor >("cost_functor", no_init)
          .def(init<const basis&, const basis&, const fock&, const std::vector<state> >());
-         //.def("__call__", &cost_functor::operator());
 
     class_< stanisic_functor, bases<cost_functor> >("stanisic_functor", no_init)
          .def("__call__", &stanisic_functor::operator());
