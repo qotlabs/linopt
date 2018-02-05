@@ -3,10 +3,10 @@ ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
 LIBLINOPT_PATH := ../lib
-LDLIBS := -lm -lboost_python-py35 -lpython3.5m
+LDLIBS := -lm -lboost_python-py27 `pkg-config python --libs` -l"double-conversion" -L/usr/lib/python2.7/dist-packages -l:minieigen.so 
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
-		  -I /usr/include -I /usr/include/eigen3 -I/usr/include/python3.5 \
+		  -I /usr/include -I /usr/include/eigen3 `pkg-config python --cflags` \
 		  -D_USE_MATH_DEFINES \
 		  -fpermissive
 TARGET := pylinopt
