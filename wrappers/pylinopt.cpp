@@ -32,17 +32,16 @@ bool is_unitary_noargs(const unitary_matrix &u)
 
 BOOST_PYTHON_MODULE(pylinopt)
 {   
-    typedef double real_type;
-    typedef std::complex<real_type> complex_type;
-    //typedef MatrixVisitor< Eigen::Matrix< complex_type, Eigen::Dynamic, Eigen::Dynamic > > matrix_type;
-    //typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;
+    class_<matrix_type>("matrix_type", "XxX (dynamic-sized) float matrix. Constructed from list of rows (as VectorX).\n\nSupported operations (``m`` is a MatrixX, ``f`` if a float/int, ``v`` is a VectorX): ``-m``, ``m+m``, ``m+=m``, ``m-m``, ``m-=m``, ``m*f``, ``f*m``, ``m*=f``, ``m/f``, ``m/=f``, ``m*m``, ``m*=m``, ``m*v``, ``v*m``, ``m==m``, ``m!=m``.", init<>())
+        .def(MatrixVisitor<matrix_type>())
+    ;
 
-    class_<MatrixXcr>("MatrixX","XxX (dynamic-sized) float matrix. Constructed from list of rows (as VectorX).\n\nSupported operations (``m`` is a MatrixX, ``f`` if a float/int, ``v`` is a VectorX): ``-m``, ``m+m``, ``m+=m``, ``m-m``, ``m-=m``, ``m*f``, ``f*m``, ``m*=f``, ``m/f``, ``m/=f``, ``m*m``, ``m*=m``, ``m*v``, ``v*m``, ``m==m``, ``m!=m``.",py::init<>())
-        .def(MatrixVisitor<MatrixXcr>())
+    class_<point>("point", "Dynamic-sized float vector.\n\nSupported operations (``f`` if a float/int, ``v`` is a VectorX): ``-v``, ``v+v``, ``v+=v``, ``v-v``, ``v-=v``, ``v*f``, ``f*v``, ``v*=f``, ``v/f``, ``v/=f``, ``v==v``, ``v!=v``.\n\nImplicit conversion from sequence (list, tuple, ...) of X floats.", init<>())
+        .def(VectorVisitor<point>())
     ;
 
     // class matrix exposing
-    class_< unitary_matrix, bases<MatrixXcr> >("matrix")
+    class_< unitary_matrix, bases<matrix_type> >("unitary_matrix")
         .def(init<>())
         .def("hurwitz", &unitary_matrix::hurwitz, return_value_policy<copy_non_const_reference>())
         .def("exp_hermite", &unitary_matrix::exp_hermite, return_value_policy<copy_non_const_reference>())

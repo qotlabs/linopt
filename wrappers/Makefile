@@ -2,11 +2,16 @@ AR := ar
 ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
+PYTHON := python
 LIBLINOPT_PATH := ../lib
-LDLIBS := -lm -lboost_python-py27 `pkg-config python --libs` -l"double-conversion" -L/usr/lib/python2.7/dist-packages -l:minieigen.so 
-CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
-          -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
-		  -I /usr/include -I /usr/include/eigen3 `pkg-config python --cflags` \
+LDLIBS := -lm \
+		  $(shell $(PYTHON) -c "import sys; print '-lboost_python-py%d%d'%(sys.version_info[0],sys.version_info[1])") \
+		  $(shell pkg-config $(PYTHON) --libs)
+CFLAGS := -std=c++0x -O3 -march=native -ffast-math -fPIC \
+          -Wall -Wextra -Wno-unused-result -Wno-unused-parameter \
+		  -I /usr/include \
+		  $(shell pkg-config eigen3 --cflags) \
+		  $(shell pkg-config $(PYTHON) --cflags) \
 		  -D_USE_MATH_DEFINES \
 		  -fpermissive
 TARGET := pylinopt
@@ -25,9 +30,15 @@ shared: clean $(TARGET).so
 $(TARGET).a:	$(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(TARGET).so:	$(OBJS)
+$(TARGET).so:	$(OBJS) minieigen.a
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
-	
+
+MINIEIGEN_BUILD_DIR := minieigen/build/temp.linux-x86_64-2.7/src
+MINIEIGEN_OBJS := $(shell find $(MINIEIGEN_BUILD_DIR) -type f -name '*.o')
+
+minieigen.a: $(MINIEIGEN_OBJS)
+	$(AR) $(ARFLAGS) $@ $^
+
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH)) -c -MMD $<
 include $(wildcard *.d)
