@@ -24,11 +24,6 @@ OBJS := $(notdir $(SRCS:.cpp=.o))
 .PHONY: all clean help static shared
 
 all:	$(TARGET).so
-static: clean $(TARGET).a
-shared: clean $(TARGET).so
-
-$(TARGET).a:	$(OBJS)
-	$(AR) $(ARFLAGS) $@ $^
 
 $(TARGET).so:	$(OBJS) minieigen.a
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
@@ -40,7 +35,7 @@ minieigen.a: $(MINIEIGEN_OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH)) -c -MMD $<
+	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH) minieigen/src minieigen/src/double-conversion minieigen) -c -MMD $<
 include $(wildcard *.d)
 
 doc:	doxygen.conf $(SRCS) $(HDRS)
@@ -52,10 +47,7 @@ clean:
 help:
 	@echo "Available commands:"
 	@echo "    help - display this help message."
-	@echo "    $(TARGET).a - build static version of the library."
 	@echo "    $(TARGET).so - build shared version of the library."
-	@echo "    static - full rebuild of the static version."
-	@echo "    shared - full rebuild of the shared version."
 	@echo "    doc - build documentation using doxygen."
 	@echo "    clean - clean build files."
 
