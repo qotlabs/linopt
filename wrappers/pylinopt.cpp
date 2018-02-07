@@ -12,6 +12,7 @@
 #include "../lib/chip.h"
 #include "../lib/cost_functor.h"
 
+#include "minieigen/src/common.hpp"
 #include "minieigen/src/visitors.hpp"
 
 using namespace boost::python;
@@ -47,6 +48,8 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def(init<>())
         .def(MatrixVisitor<matrix_type>())
     ;
+
+	def("float2str", &doubleToShortest, (arg("f"), arg("pad")=0), "Return the shortest string representation of *f* which will is equal to *f* when converted back to float. This function is only useful in Python prior to 3.0; starting from that version, standard string conversion does just that.");
 
     // class matrix exposing
     class_< unitary_matrix, bases<matrix_type> >("unitary_matrix")
