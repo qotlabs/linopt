@@ -49,10 +49,10 @@ void *log_functor_simple_constructor()
 	basis ancilla_basis(2, 4);
 	basis full_basis = basis(3, 6)*ancilla_basis;
 	fock input_state = {1, 1, 1, 0, 0, 0, 1, 1, 0, 0};
-	std::vector<state> B(1);
+    std::vector<state> B(20);
 	B[0][{1, 0, 1, 0, 1, 0}] = M_SQRT1_2;
 	B[0][{0, 1, 0, 1, 0, 1}] = M_SQRT1_2;
-	/*B[1][{1, 0, 1, 0, 0, 1}] = M_SQRT1_2;
+    B[1][{1, 0, 1, 0, 0, 1}] = M_SQRT1_2;
 	B[1][{0, 1, 0, 1, 1, 0}] = M_SQRT1_2;
 	B[2][{1, 0, 1, 1, 0, 0}] = M_SQRT1_2;
 	B[2][{0, 1, 0, 0, 1, 1}] = M_SQRT1_2;
@@ -89,7 +89,7 @@ void *log_functor_simple_constructor()
 	B[18][{0, 0, 1, 0, 1, 1}] = M_SQRT1_2;
 	B[18][{1, 1, 0, 1, 0, 0}] = M_SQRT1_2;
 	B[19][{0, 0, 0, 1, 1, 1}] = M_SQRT1_2;
-	B[19][{1, 1, 1, 0, 0, 0}] = M_SQRT1_2;*/
+    B[19][{1, 1, 1, 0, 0, 0}] = M_SQRT1_2;
 	log_functor *sf = new log_functor(full_basis, ancilla_basis, input_state, B);
 	return sf;
 }
