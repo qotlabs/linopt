@@ -6,7 +6,7 @@ PYTHON := python
 LIBLINOPT_PATH := ../lib
 MINIEIGEN_DCONV_PATH := ./minieigen/src/double-conversion
 LDLIBS := -lm \
-		  $(shell $(PYTHON) -c "import sys; print '-lboost_python-py%d%d'%(sys.version_info[0],sys.version_info[1])") \
+		  $(shell $(PYTHON) -c "import sys; print('-lboost_python-py%d%d'%(sys.version_info[0],sys.version_info[1]))") \
 		  $(shell pkg-config $(PYTHON) --libs)
 CFLAGS := -std=c++0x -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-parameter -Wno-int-in-bool-context\
