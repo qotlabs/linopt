@@ -18,6 +18,128 @@
 using namespace boost::python;
 using namespace linopt;
 
+// __repr__ and __str__ methods for class "fock"
+std::string fock_str(fock& _state)
+{   
+    std::stringstream buffer;
+
+    if(_state.size() > 0)
+    {
+       buffer << "[";
+       std::copy(_state.begin(), _state.end()-1, std::ostream_iterator<int>(buffer, ", "));
+       buffer << _state.back() << "]"; 
+    }
+    else
+    {
+        buffer << "Empty fock";
+    }
+    return buffer.str();
+}
+
+std::string fock_repr(fock& _state)
+{   
+    std::stringstream buffer;
+
+    if(_state.size() > 0)
+    {
+        buffer << "Fock state: [";
+        std::copy(_state.begin(), _state.end()-1, std::ostream_iterator<int>(buffer, ", "));
+        buffer << _state.back() << "]";
+    }
+    else
+    {
+        buffer << "Empty fock";
+    }
+    
+    return buffer.str();
+}
+
+// __repr__ and __str__ methods for class "basis"
+std::string basis_str(basis& bas)
+{   
+    std::stringstream buffer;
+
+    if(bas.size() > 0)
+    {
+        buffer << "{ ";
+        for (const fock& el : bas)
+        {
+            buffer << el << ' ';
+        }
+        buffer << " }"; 
+    }
+    else
+    {
+        buffer << "Empty basis";
+    }
+    
+    return buffer.str();
+}
+
+std::string basis_repr(basis& bas)
+{   
+    std::stringstream buffer;
+
+    if(bas.size() > 0)
+    {
+        buffer << "Fock state basis: { ";
+        for (const fock& el : bas)
+        {
+            buffer << el << ' ';
+        }
+        buffer << " }";   
+    }
+    else
+    {
+        buffer << "Empty basis";
+    }
+    
+    return buffer.str();
+}
+
+// __repr__ and __str__ methods for class "state"
+std::string state_str(state& sta)
+{
+    std::stringstream buffer;
+
+    if(sta.size() > 0)
+    {
+        buffer << "{ ";
+        for(auto it = sta.cbegin(); it != sta.cend(); ++it)
+        {
+            buffer << it->first << ": " << it->second;
+        }
+        buffer << " }";    
+    }
+    else
+    {
+        buffer << "Empty state";
+    }
+    
+    return buffer.str();
+}
+
+std::string state_repr(state& sta)
+{
+    std::stringstream buffer;
+
+    if(sta.size() > 0)
+    {
+        buffer << "Fock state coefficients: { ";
+        for(auto it = sta.cbegin(); it != sta.cend(); ++it)
+        {
+            buffer << it->first << ": " << it->second;
+        }
+        buffer << " }";    
+    }
+    else
+    {
+        buffer << "Empty state";
+    }
+    
+    return buffer.str();
+}
+
 // "thin wrappers" for methods with default arguments from class unitary_matrix
 bool is_column_unitary_noargs(const unitary_matrix &u)
 { 
@@ -30,6 +152,9 @@ bool is_row_unitary_noargs(const unitary_matrix &u)
 bool is_unitary_noargs(const unitary_matrix &u)
 { 
     return u.is_unitary();
+}
+basis& generate_basis(const basis &b, const int nphot, const int modes, const fock &head){
+    return b.generate_basis( nphot, modes, head);
 }
 
 BOOST_PYTHON_MODULE(pylinopt)
@@ -84,6 +209,8 @@ BOOST_PYTHON_MODULE(pylinopt)
     // fock class exposing
     class_ < fock, bases<std::vector<int> > >("fock")
 		.def(init<>())
+        .def("__str__", fock_str)
+        .def("__repr__", fock_repr)
         .def("total", &fock::total)
         .def("prod_fact", &fock::prod_fact)
         .def("__mul__", &fock::operator*)
@@ -99,6 +226,8 @@ BOOST_PYTHON_MODULE(pylinopt)
     class_< state, bases<std::map<fock, complex_type> > >("state")
         .def(init<>())
         .def(init<const state&>())
+        .def("__str__", state_str)
+        .def("__repr__", state_repr)
         .def("__add__", &state::operator+)
         .def("__iadd__", &state::operator+=, return_value_policy<copy_non_const_reference>())
         .def("__sub__", unary_minus)
@@ -120,18 +249,20 @@ BOOST_PYTHON_MODULE(pylinopt)
     // class std::set<fock> declaration (class basis inherits from this class)
     // used custom "set_indexing_suite.h" and "list_indexing_suite.h" libraries to expose std::set to python correctly
     // downloaded from: https://github.com/Microsoft/bond/blob/master/python/inc/bond/python/set_indexing_suite.h
-    // 
     class_< std::set<fock> >("csetfock")
         .def(set_indexing_suite<std::set<fock>>());
 
     class_< basis, bases< std::set<fock> > >("basis")
         .def(init<>())
         .def(init<const basis&>())
+        .def("__str__", basis_str)
+        .def("__repr__", basis_repr)
         .def("__add__", &basis::operator+)
         .def("__iadd__", &basis::operator+=, return_value_policy<copy_non_const_reference>())
         .def("__mul__", &basis::operator*)
         .def("__imul__", &basis::operator*=, return_value_policy<copy_non_const_reference>())
-        .def("generate_basis", &basis::generate_basis, return_value_policy<copy_non_const_reference>())
+        // .def("generate_basis", &basis::generate_basis, return_value_policy<copy_non_const_reference>())
+        .def("generate_basis", generate_basis, return_value_policy<copy_non_const_reference>())
         .def("postselect", &basis::postselect)
         .def("apply_func", &basis::apply_func)
     ;
