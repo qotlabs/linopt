@@ -1,5 +1,7 @@
+#!/usr/bin/python
+
 import sys
-sys.path.insert(0, '/home/dave/c++/linopt/wrappers')
+sys.path.insert(0, '../wrappers')
 
 from math import sqrt
 
@@ -56,12 +58,13 @@ postselected = state()
 p, res = 0, 0
 
 for anc in ancilla_basis:
-    postselected = c.output_state().postselect(anc)
-    p = postselected.norm()
-    if p == 0:
-        continue
-    postselected /= p
-    p = p*p
-    for target_state in state_list:
-        res += p * abs(postselected.dot(target_state))**10
-    print(res)
+	print('Just before output_state() call')
+	postselected = c.output_state().postselect(anc)
+	p = postselected.norm()
+	if p == 0:
+		continue
+	postselected /= p
+	p = p*p
+	for target_state in state_list:
+		res += p * abs(postselected.dot(target_state))**10
+	print(res)
