@@ -269,21 +269,24 @@ BOOST_PYTHON_MODULE(pylinopt)
 
     // overloaded method bindings for class chip
     unitary_matrix& (chip::*unitary)() = &chip::unitary;
-    const unitary_matrix& (chip::*const_unitary)() const = &chip::unitary;
+    // const unitary_matrix& (chip::*const_unitary)() const = &chip::unitary;
     fock& (chip::*input_state)() = &chip::input_state;
-    const fock& (chip::*const_input_state)() const = &chip::input_state;
+    // const fock& (chip::*const_input_state)() const = &chip::input_state;
     basis& (chip::*output_basis)() = &chip::output_basis;
-    const basis& (chip::*const_output_basis)() const = &chip::output_basis;
+    // const basis& (chip::*const_output_basis)() const = &chip::output_basis;
 
     class_< chip >("chip")
         .def(init<>())
-        .def("unitary", unitary, return_value_policy<copy_non_const_reference>())
-        .def("unitary", const_unitary, return_value_policy<copy_const_reference>())
-        .def("input_state", input_state, return_value_policy<copy_non_const_reference>())
-        .def("input_state", const_input_state, return_value_policy<copy_const_reference>())
-        .def("output_basis", output_basis, return_value_policy<copy_non_const_reference>())
-        .def("output_basis", const_output_basis, return_value_policy<copy_const_reference>())
+        // .def("unitary", unitary, return_value_policy<copy_non_const_reference>())
+        // .def("unitary", const_unitary, return_value_policy<copy_const_reference>())
+        // .def("input_state", input_state, return_value_policy<copy_non_const_reference>())
+        // .def("input_state", const_input_state, return_value_policy<copy_const_reference>())
+        // .def("output_basis", output_basis, return_value_policy<copy_non_const_reference>())
+        // .def("output_basis", const_output_basis, return_value_policy<copy_const_reference>())
         .def("output_state", &chip::output_state)
+        .add_property("input_state", make_function(input_state, return_value_policy<copy_non_const_reference>()), &chip::set_input_state)
+        .add_property("output_basis", make_function(output_basis, return_value_policy<copy_non_const_reference>()), &chip::set_output_basis)
+        .add_property("unitary", make_function(unitary, return_value_policy<copy_non_const_reference>()), &chip::set_unitary)
     ;
 
     class_< cost_functor >("cost_functor", no_init)

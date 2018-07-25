@@ -29,6 +29,9 @@ public:
     basis &output_basis();
     const basis &output_basis() const;
     state output_state();
+    void set_input_state(const fock &fin);
+    void set_output_basis(const basis &bout);
+    void set_unitary(const unitary_matrix &u);
 };
 
 }

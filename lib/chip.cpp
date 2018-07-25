@@ -75,3 +75,18 @@ state chip::output_state()
     return _output_basis.apply_func(std::bind(&chip::calc_fock_amp,
                                              this, std::placeholders::_1));
 }
+
+void chip::set_input_state(const fock &fin)
+{
+    _input_state = fin;
+}
+
+void chip::set_output_basis(const basis &bout)
+{
+    _output_basis = bout;
+}
+
+void chip::set_unitary(const unitary_matrix &u)
+{
+    U = u;
+}
