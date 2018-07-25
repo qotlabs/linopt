@@ -58,7 +58,6 @@ postselected = state()
 p, res = 0, 0
 
 for anc in ancilla_basis:
-	print('Just before output_state() call')
 	postselected = c.output_state().postselect(anc)
 	p = postselected.norm()
 	if p == 0:
