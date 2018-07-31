@@ -128,7 +128,7 @@ std::string state_repr(state& sta)
         buffer << "Fock state coefficients: { ";
         for(auto it = sta.cbegin(); it != sta.cend(); ++it)
         {
-            buffer << it->first << ": " << it->second;
+            buffer << it->first << ": " << it->second << " ";
         }
         buffer << " }";    
     }
@@ -139,6 +139,49 @@ std::string state_repr(state& sta)
     
     return buffer.str();
 }
+
+// fock to list conversion functions
+list fock_to_list(const fock &f)
+{
+    list l;
+    for (unsigned int i = 0; i < f.size(); ++i)
+        l.append(f[i]);
+    return l;
+}
+
+void list_to_fock(fock &f, const list &l)
+{
+    f = {};
+    if(len(l) > 0)
+    {
+        for (int i = 0; i < len(l); ++i)
+            f.push_back(extract<double>(l[i]));
+    }
+}
+
+// state to dict conversion
+dict state_to_dict(const state &s)
+{
+    dict d;
+    for(auto iter = s.begin(); iter != s.end(); ++iter)
+        d[iter -> first] = iter->second;
+    return d;
+}
+
+void dict_to_state(state &s, const dict &d)
+{
+    list keys = d.keys();
+    for(int i = 0; i < len(keys); ++i)
+    {
+        s[extract<fock>(keys[i])] = extract<complex_type>(d[keys[i]]);
+    }
+}
+
+//basis to set conversion
+// set basis_to_set(const basis &b)
+// {
+//     set s;
+// }
 
 // "thin wrappers" for methods with default arguments from class unitary_matrix
 bool is_column_unitary_noargs(const unitary_matrix &u)
@@ -206,7 +249,7 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def(vector_indexing_suite<std::vector<int>>())
     ;
 
-    // fock class exposing
+    // expose class fock
     class_ < fock, bases<std::vector<int> > >("fock")
 		.def(init<>())
         .def("__str__", fock_str)
@@ -215,6 +258,7 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def("prod_fact", &fock::prod_fact)
         .def("__mul__", &fock::operator*)
         .def("__imul__", &fock::operator*=, return_value_policy<copy_non_const_reference>())
+        .add_property("as_list", fock_to_list, list_to_fock)
     ;
 
     // std::map<fock, complex_type> class declaration (class state inherits from this class)
@@ -222,7 +266,7 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def(map_indexing_suite<std::map<fock, complex_type>>())
     ;
 
-    // class state exposing
+    // expose class state
     class_< state, bases<std::map<fock, complex_type> > >("state")
         .def(init<>())
         .def(init<const state&>())
@@ -244,6 +288,7 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def("dot", &state::dot)
         .def("postselect", &state::postselect)
         .def("get_basis", &state::get_basis)
+        .add_property("as_dict", state_to_dict, dict_to_state)
     ;
 
     // class std::set<fock> declaration (class basis inherits from this class)

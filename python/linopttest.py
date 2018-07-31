@@ -4,6 +4,7 @@ import sys
 sys.path.insert(0, '../wrappers')
 
 from math import sqrt
+import numpy as np
 
 from minieigen import *
 from pylinopt import *
@@ -46,6 +47,7 @@ state_list[5][fock_list[4]] =  1/sqrt(2)
 state_list[5][fock_list[5]] = -1/sqrt(2)
 
 v = VectorX.Random(64)
+v[:] = np.random.rand(64,1)
 u = unitary_matrix()
 
 c = chip()
