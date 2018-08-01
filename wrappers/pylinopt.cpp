@@ -177,11 +177,40 @@ void dict_to_state(state &s, const dict &d)
     }
 }
 
-//basis to set conversion
-// set basis_to_set(const basis &b)
-// {
-//     set s;
-// }
+//basis to list conversion
+list basis_to_list(const basis &b)
+{
+    list s;
+    for(auto iter : b)
+        s.append(iter);
+    return s;
+}
+
+void list_to_basis(basis &b, const list &l)
+{
+    // The code doesn't work
+    // Need to understand and implement this:
+    // https://stackoverflow.com/questions/15842126/feeding-a-python-list-into-a-function-taking-in-a-vector-with-boost-python#15940413
+
+    // b = {};
+    // if(len(l) > 0)
+    // {
+    //     fock* f;
+    //     for (int i = 0; i < len(l); ++i)
+    //     {
+    //         for(int j = 0; j < len(l[i]); ++j)
+    //         {
+    //             extract<double> extractor(l[i][j]);
+    //             if (extractor.check())
+    //             {
+    //                 double v = extractor();
+    //                 f->push_back(v);
+    //             }
+    //         }
+    //         b.insert(*f);
+    //     }
+    // }
+}
 
 // "thin wrappers" for methods with default arguments from class unitary_matrix
 bool is_column_unitary_noargs(const unitary_matrix &u)
@@ -310,6 +339,7 @@ BOOST_PYTHON_MODULE(pylinopt)
         .def("generate_basis", generate_basis, return_value_policy<copy_non_const_reference>())
         .def("postselect", &basis::postselect)
         .def("apply_func", &basis::apply_func)
+        .add_property("as_list", basis_to_list, list_to_basis)
     ;
 
     // overloaded method bindings for class chip
