@@ -140,6 +140,11 @@ std::string state_repr(state& sta)
     return buffer.str();
 }
 
+// For proper iterable python objects conversion
+// need to understand and implement this:
+// https://stackoverflow.com/questions/15842126/feeding-a-python-list-into-a-function-taking-in-a-vector-with-boost-python#15940413
+
+
 // fock to list conversion functions
 list fock_to_list(const fock &f)
 {
@@ -188,28 +193,12 @@ list basis_to_list(const basis &b)
 
 void list_to_basis(basis &b, const list &l)
 {
-    // The code doesn't work
-    // Need to understand and implement this:
-    // https://stackoverflow.com/questions/15842126/feeding-a-python-list-into-a-function-taking-in-a-vector-with-boost-python#15940413
-
-    // b = {};
-    // if(len(l) > 0)
-    // {
-    //     fock* f;
-    //     for (int i = 0; i < len(l); ++i)
-    //     {
-    //         for(int j = 0; j < len(l[i]); ++j)
-    //         {
-    //             extract<double> extractor(l[i][j]);
-    //             if (extractor.check())
-    //             {
-    //                 double v = extractor();
-    //                 f->push_back(v);
-    //             }
-    //         }
-    //         b.insert(*f);
-    //     }
-    // }
+    b = {};
+    if(len(l) > 0)
+    {
+        for (int i = 0; i < len(l); ++i)
+            b.insert(extract<fock>(l[i]));
+    }
 }
 
 // "thin wrappers" for methods with default arguments from class unitary_matrix
