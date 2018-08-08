@@ -9,7 +9,7 @@ namespace linopt
 
 typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;
 typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
-typedef Eigen::Matrix<real_type, Eigen::Dynamic, 1> point;
+typedef std::vector<real_type> point;
 
 class unitary_matrix: public matrix_type
 {

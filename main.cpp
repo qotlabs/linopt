@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <math.h>
 #include <ctime>
+#include <random>
 
 #include <linopt.h>
 
@@ -26,7 +27,7 @@ real_type ackley(const point &x)
 {
     real_type d = 0.;
     real_type s = 0.;
-    for(int i = 0; i < x.size(); i++)
+	for(unsigned i = 0; i < x.size(); i++)
     {
         d += x[i]*x[i];
         s += std::cos(2.*M_PI*x[i]);
@@ -55,9 +56,12 @@ int main()
     B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
     B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
-    point a(64);
-    //a = 0.5 * a.setRandom().array() + 0.5;
-	a = 10. * a.setRandom();
+	point a(64);
+	random_device rand_dev;
+	mt19937 rand_gen(rand_dev());
+	uniform_real_distribution<real_type> distribution(0., 1.);
+	for(unsigned i = 0; i < a.size(); i++)
+		a[i] = distribution(rand_gen);
 	chip C;
     C.unitary().hurwitz(a);
     C.input_state() = input_state;
