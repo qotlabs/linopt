@@ -6,8 +6,6 @@
 #include <ctime>
 
 #include <linopt.h>
-#include <bfgs.h>
-#include <hco.h>
 
 using namespace std;
 using namespace linopt;
@@ -59,17 +57,13 @@ int main()
     B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
     point a(64);
     //a = 0.5 * a.setRandom().array() + 0.5;
-    a = 10. * a.setRandom();
-    stanisic_functor cf(full_basis, ancilla_basis, input_state, B);
-    stop_criterion crit(1000, 1e-4, 0, 1e-8, 0);
-    real_type val = bfgs(cf, a, crit);
-    /*chip C;
+	a = 10. * a.setRandom();
+	chip C;
     C.unitary().hurwitz(a);
     C.input_state() = input_state;
-    C.output_basis() = full_basis;
-    state out = C.output_state();
+	C.output_basis() = full_basis;
+	state out = C.output_state();
     for(auto anc = ancilla_basis.begin(); anc != ancilla_basis.end(); anc++)
-        cout << out.postselect(*anc).normalize() << endl << "------------" << endl;*/
-    //cout << val << endl;
+		cout << out.postselect(*anc).normalize() << endl;
     return 0;
 }

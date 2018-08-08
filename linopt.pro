@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++11
+CONFIG += console c++0x
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -13,5 +13,5 @@ LIBS += -L../linopt/lib -llinopt
 #QMAKE_CXXFLAGS_RELEASE += -g -pg
 #QMAKE_LFLAGS_RELEASE += -g -pg
 QMAKE_LFLAGS += -fopenmp
-QMAKE_CXXFLAGS += -fopenmp
-QMAKE_CXXFLAGS_RELEASE += -march=native -ffast-math -O3
+QMAKE_CXXFLAGS += -fopenmp -march=native
+QMAKE_CXXFLAGS_RELEASE += -fopenmp -march=native -ffast-math -O3
