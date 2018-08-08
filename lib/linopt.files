@@ -1,5 +1,5 @@
-chip.cpp
-chip.h
+circuit.cpp
+circuit.h
 cost_functor.cpp
 cost_functor.h
 linopt.h

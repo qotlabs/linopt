@@ -1,5 +1,5 @@
-#ifndef CHIP_H
-#define CHIP_H
+#ifndef CIRCUIT_H
+#define CIRCUIT_H
 
 #include "states.h"
 #include "matrix.h"
@@ -7,7 +7,7 @@
 namespace linopt
 {
 
-class chip
+class circuit
 {
 private:
     unitary_matrix U;
@@ -21,7 +21,7 @@ private:
     complex_type calc_fock_amp(const fock &fout);
 
 public:
-    chip();
+	circuit();
     unitary_matrix &unitary();
     const unitary_matrix &unitary() const;
     fock &input_state();
@@ -36,4 +36,4 @@ public:
 
 }
 
-#endif // CHIP_H
+#endif // CIRCUIT_H

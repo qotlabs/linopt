@@ -1,7 +1,7 @@
 #ifndef COST_FUNCTOR_H
 #define COST_FUNCTOR_H
 
-#include "chip.h"
+#include "circuit.h"
 #include <vector>
 
 namespace linopt
@@ -12,7 +12,7 @@ class cost_functor
 protected:
     std::vector<state> target_states;
     basis ancilla_basis;
-    chip C;
+    circuit C;
 public:
     cost_functor(const basis &full_basis,
                  const basis &ancilla_basis,

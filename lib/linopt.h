@@ -3,7 +3,7 @@
 
 #include "states.h"
 #include "matrix.h"
-#include "chip.h"
+#include "circuit.h"
 #include "cost_functor.h"
 
 #endif // LINOPT_H

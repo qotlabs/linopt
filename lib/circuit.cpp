@@ -1,12 +1,12 @@
-#include "chip.h"
+#include "circuit.h"
 #include <functional>
 
 using namespace linopt;
 
-chip::chip():
+circuit::circuit():
     uin_possibly_changed(false) {}
 
-unitary_matrix &chip::prepare_uin(const unitary_matrix &u, const fock &fin)
+unitary_matrix &circuit::prepare_uin(const unitary_matrix &u, const fock &fin)
 {
     int tot = fin.total();
     int modes = fin.size();
@@ -19,7 +19,7 @@ unitary_matrix &chip::prepare_uin(const unitary_matrix &u, const fock &fin)
     return Uin;
 }
 
-complex_type chip::calc_fock_amp(const fock &fout)
+complex_type circuit::calc_fock_amp(const fock &fout)
 {
     int tot = fout.total();
     int modes = fout.size();
@@ -33,60 +33,60 @@ complex_type chip::calc_fock_amp(const fock &fout)
     return perm;
 }
 
-unitary_matrix &chip::unitary()
+unitary_matrix &circuit::unitary()
 {
     uin_possibly_changed = true;
     return U;
 }
 
-const unitary_matrix &chip::unitary() const
+const unitary_matrix &circuit::unitary() const
 {
     return U;
 }
 
-fock &chip::input_state()
+fock &circuit::input_state()
 {
     uin_possibly_changed = true;
     return _input_state;
 }
 
-const fock &chip::input_state() const
+const fock &circuit::input_state() const
 {
     return _input_state;
 }
 
-basis &chip::output_basis()
+basis &circuit::output_basis()
 {
     return _output_basis;
 }
 
-const basis &chip::output_basis() const
+const basis &circuit::output_basis() const
 {
     return _output_basis;
 }
 
-state chip::output_state()
+state circuit::output_state()
 {
     if(uin_possibly_changed)
     {
         prepare_uin(U, _input_state);
         uin_possibly_changed = false;
     }
-    return _output_basis.apply_func(std::bind(&chip::calc_fock_amp,
+	return _output_basis.apply_func(std::bind(&circuit::calc_fock_amp,
                                              this, std::placeholders::_1));
 }
 
-void chip::set_input_state(const fock &fin)
+void circuit::set_input_state(const fock &fin)
 {
 	this->input_state() = fin;
 }
 
-void chip::set_output_basis(const basis &bout)
+void circuit::set_output_basis(const basis &bout)
 {
 	this->output_basis() = bout;
 }
 
-void chip::set_unitary(const unitary_matrix &u)
+void circuit::set_unitary(const unitary_matrix &u)
 {
 	this->unitary() = u;
 }

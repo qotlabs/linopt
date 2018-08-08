@@ -62,7 +62,7 @@ int main()
 	uniform_real_distribution<real_type> distribution(0., 1.);
 	for(unsigned i = 0; i < a.size(); i++)
 		a[i] = distribution(rand_gen);
-	chip C;
+	circuit C;
     C.unitary().hurwitz(a);
     C.input_state() = input_state;
 	C.output_basis() = full_basis;
