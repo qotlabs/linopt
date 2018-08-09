@@ -75,18 +75,17 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c, 
 	# 			if len(input_fock.as_list) != (len(anc.as_list) + len(key.as_list)):
 	# 				raise ValueError('Number of input modes is inconsistent with total output number of modes')   
 
-	v = VectorX(random_vector)
-	u.exp_hermite(v)
-
+	#v = VectorX(random_vector)
 	c.input_state = input_fock
 	c.output_basis = full_basis
-	c.unitary = u.exp_hermite(v)
+	c.unitary = u.exp_hermite(random_vector)
 	postselected = state()
+	out_state = c.output_state()
 
 	p, res = 0, 0 
 
 	for anc in ancilla:
-		postselected = c.output_state().postselect(anc)
+		postselected = out_state.postselect(anc)
 		p = postselected.norm()
 		if p == 0:
 			continue

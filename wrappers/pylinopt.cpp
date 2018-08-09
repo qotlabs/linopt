@@ -140,11 +140,6 @@ std::string state_repr(state& sta)
 	return buffer.str();
 }
 
-// For proper iterable python objects conversion
-// need to understand and implement this:
-// https://stackoverflow.com/questions/15842126/feeding-a-python-list-into-a-function-taking-in-a-vector-with-boost-python#15940413
-
-
 // fock to list conversion functions
 list fock_to_list(const fock &f)
 {
@@ -214,16 +209,89 @@ bool is_unitary_noargs(const unitary_matrix &u)
 { 
 	return u.is_unitary();
 }
-basis& generate_basis(const basis &b, const int nphot, const int modes, const fock &head){
-	return b.generate_basis( nphot, modes, head);
+basis& generate_basis(const basis &b, const int nphot, const int modes){
+	return b.generate_basis( nphot, modes);
 }
+
+// the code below is borrowed from stackoverflow answer 
+// https://stackoverflow.com/questions/15842126/feeding-a-python-list-into-a-function-taking-in-a-vector-with-boost-python
+
+/// @brief Type that allows for registration of conversions from
+///        python iterable types.
+struct iterable_converter
+{
+  /// @note Registers converter from a python interable type to the
+  ///       provided type.
+  template <typename Container>
+  iterable_converter&
+  from_python()
+  {
+    converter::registry::push_back(
+      &iterable_converter::convertible,
+      &iterable_converter::construct<Container>,
+      boost::python::type_id<Container>());
+
+    // Support chaining.
+    return *this;
+  }
+
+  /// @brief Check if PyObject is iterable.
+  static void* convertible(PyObject* object)
+  {
+    return PyObject_GetIter(object) ? object : NULL;
+  }
+
+  /// @brief Convert iterable PyObject to C++ container type.
+  ///
+  /// Container Concept requirements:
+  ///
+  ///   * Container::value_type is CopyConstructable.
+  ///   * Container can be constructed and populated with two iterators.
+  ///     I.e. Container(begin, end)
+  template <typename Container>
+  static void construct(
+    PyObject* object,
+    converter::rvalue_from_python_stage1_data* data)
+  {
+    namespace python = boost::python;
+    // Object is a borrowed reference, so create a handle indicting it is
+    // borrowed for proper reference counting.
+    python::handle<> handle(python::borrowed(object));
+
+    // Obtain a handle to the memory block that the converter has allocated
+    // for the C++ type.
+    typedef python::converter::rvalue_from_python_storage<Container>
+                                                                storage_type;
+    void* storage = reinterpret_cast<storage_type*>(data)->storage.bytes;
+
+    typedef python::stl_input_iterator<typename Container::value_type>
+                                                                    iterator;
+
+    // Allocate the C++ type into the converter's memory block, and assign
+    // its handle to the converter's convertible variable.  The C++
+    // container is populated by passing the begin and end iterators of
+    // the python object to the container's constructor.
+    new (storage) Container(
+      iterator(python::object(handle)), // begin
+      iterator());                      // end
+    data->convertible = storage;
+  }
+};
+
+// ------------------------- end of stackoverflow code ---------------------------------------
 
 BOOST_PYTHON_MODULE(pylinopt)
 {   
-	class_<point>("point")
-		.def(init<>())
-		.def(VectorVisitor<point>())
-	;
+	// class_<point>("point")
+	// 	.def(init<>())
+	// 	.def(VectorVisitor<point>())
+	// ;
+
+	// Register interable conversions.
+	iterable_converter()
+    // Built-in type.
+    .from_python<std::vector<double> >()
+    ;
 
 	class_<vector_type>("vector_type")
 		.def(init<>())
@@ -254,14 +322,6 @@ BOOST_PYTHON_MODULE(pylinopt)
 	// exposing matrix functions
 	def("permanent", permanent);
 
-	// overloaded operator bindings for class state
-	state (state::*unary_minus)() const = &state::operator-;
-	state (state::*binary_minus)(const state &) const = &state::operator-;
-	state (state::*state_mul)(const state &) const = &state::operator*;
-	state (state::*complex_mul)(complex_type) const = &state::operator*;
-	state& (state::*state_imul)(const state &) = &state::operator*=;
-	state& (state::*complex_imul)(complex_type) = &state::operator*=;
-
 	// std::vector<int> class declaration (class fock inherits from this class)
 	class_<std::vector<int>>("cvector")
 		.def(vector_indexing_suite<std::vector<int>>())
@@ -284,23 +344,36 @@ BOOST_PYTHON_MODULE(pylinopt)
 		.def(map_indexing_suite<std::map<fock, complex_type>>())
 	;
 
+	// overloaded operator bindings for class state
+	state (state::*unary_plus)(const state &) const 	= &state::operator+;
+	state& (state::*state_iadd)(const state &) 			= &state::operator+=;
+	state (state::*unary_minus)() const 				= &state::operator-;
+	state (state::*binary_minus)(const state &) const 	= &state::operator-;
+	state& (state::*state_isub)(const state &) 			= &state::operator-=;
+	state (state::*state_mul)(const state &) const 		= &state::operator*;
+	state (state::*complex_mul)(complex_type) const 	= &state::operator*;
+	state& (state::*state_imul)(const state &) 			= &state::operator*=;
+	state& (state::*complex_imul)(complex_type) 		= &state::operator*=;
+	state (state::*complex_div)(complex_type) const 	= &state::operator/;
+	state& (state::*complex_idiv)(complex_type) 		= &state::operator/=;
+
 	// expose class state
 	class_< state, bases<std::map<fock, complex_type> > >("state")
 		.def(init<>())
 		.def(init<const state&>())
 		.def("__str__", state_str)
 		.def("__repr__", state_repr)
-		.def("__add__", &state::operator+)
-		.def("__iadd__", &state::operator+=, return_value_policy<copy_non_const_reference>())
+		.def("__add__", unary_plus)
+		.def("__iadd__", state_iadd, return_value_policy<copy_non_const_reference>())
 		.def("__sub__", unary_minus)
 		.def("__sub__", binary_minus)
-		.def("__isub__", &state::operator-=, return_value_policy<copy_non_const_reference>())
+		.def("__isub__", state_isub, return_value_policy<copy_non_const_reference>())
 		.def("__mul__", state_mul)
 		.def("__mul__", complex_mul)
 		.def("__imul__", state_imul, return_value_policy<copy_non_const_reference>())
 		.def("__imul__", complex_imul, return_value_policy<copy_non_const_reference>())
-		.def("__div__", &state::operator/)
-		.def("__idiv__", &state::operator/=, return_value_policy<copy_non_const_reference>())
+		.def("__div__", complex_div)
+		.def("__itruediv__", complex_idiv, return_value_policy<copy_non_const_reference>())
 		.def("norm", &state::norm)
 		.def("normalize", &state::normalize, return_value_policy<copy_non_const_reference>())
 		.def("dot", &state::dot)
@@ -351,17 +424,5 @@ BOOST_PYTHON_MODULE(pylinopt)
 		.add_property("input_state", make_function(input_state, return_value_policy<copy_non_const_reference>()), &circuit::set_input_state)
 		.add_property("output_basis", make_function(output_basis, return_value_policy<copy_non_const_reference>()), &circuit::set_output_basis)
 		.add_property("unitary", make_function(unitary, return_value_policy<copy_non_const_reference>()), &circuit::set_unitary)
-	;
-
-	class_< cost_functor >("cost_functor", no_init)
-		 .def(init<const basis&, const basis&, const fock&, const std::vector<state> >())
-	;
-
-	class_< stanisic_functor, bases<cost_functor> >("stanisic_functor", no_init)
-		 .def("__call__", &stanisic_functor::operator())
-	;
-
-	class_< log_functor, bases<cost_functor> >("log_functor", no_init)
-		 .def("__call__", &log_functor::operator())
 	;
 }

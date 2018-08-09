@@ -8,17 +8,13 @@ import linopttools as lot
 
 from math import sqrt
 
-from minieigen import *
+#from minieigen import *
 from pylinopt import *
 
 from scipy.optimize import minimize
 
-f,g = fock(), fock()
-logical_basis = basis()
-logical_basis.generate_basis(2,4,f)
-ancilla_basis = basis()
-ancilla_basis.generate_basis(2,4,g)
-full_basis = basis()
+logical_basis, ancilla_basis = basis().generate_basis(2,4), basis().generate_basis(2,4)
+
 full_basis = ancilla_basis*logical_basis
 
 in_state = fock()
@@ -50,10 +46,10 @@ state_list[4][fock_list[5]] =  1/sqrt(2)
 state_list[5][fock_list[4]] =  1/sqrt(2)
 state_list[5][fock_list[5]] = -1/sqrt(2)
 
-r = random.sample(xrange(0,100), 64)
+r = random.sample(range(100), 64)
 r = [float(x)/100 for x in r]
 
-c = chip()
+c = circuit()
 u = unitary_matrix()
 
 #a = lot.cf_inner_product(r, in_state, state_list, ancilla_basis)
