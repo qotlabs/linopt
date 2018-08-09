@@ -35,8 +35,8 @@ real_type stanisic_functor::operator()(const point &x)
 
 real_type log_functor::operator()(const point &x)
 {
-    const real_type epsilon = 1e-2;
-    C.unitary().hurwitz(x);
+	const real_type epsilon = 1e-2;
+	C.unitary().hurwitz(x);
 	state out = C.output_state();
 	state postselected;
 	real_type p, res = 0.;
@@ -50,7 +50,7 @@ real_type log_functor::operator()(const point &x)
 		p = p*p;
 		for(size_t i = 0; i < target_states.size(); i++)
 		{
-            res += epsilon*p/(1. + epsilon - std::norm(dot(postselected, target_states[i])));
+			res += epsilon*p/(1. + epsilon - std::norm(dot(postselected, target_states[i])));
 		}
 	}
 	return res;
