@@ -289,9 +289,9 @@ BOOST_PYTHON_MODULE(pylinopt)
 
 	// Register interable conversions.
 	iterable_converter()
-    // Built-in type.
-    .from_python<std::vector<double> >()
-    ;
+	// Built-in type.
+	.from_python<std::vector<double> >()
+	;
 
 	class_<vector_type>("vector_type")
 		.def(init<>())
@@ -405,12 +405,12 @@ BOOST_PYTHON_MODULE(pylinopt)
 	;
 
 	// overloaded method bindings for class circuit
-	unitary_matrix& (circuit::*unitary)() = &circuit::unitary;
-	// const unitary_matrix& (circuit::*const_unitary)() const = &circuit::unitary;
-	fock& (circuit::*input_state)() = &circuit::input_state;
-	// const fock& (circuit::*const_input_state)() const = &circuit::input_state;
-	basis& (circuit::*output_basis)() = &circuit::output_basis;
-	// const basis& (circuit::*const_output_basis)() const = &circuit::output_basis;
+	// unitary_matrix& (circuit::*unitary)() = &circuit::unitary;
+	const unitary_matrix& (circuit::*const_unitary)() const = &circuit::unitary;
+	// fock& (circuit::*input_state)() = &circuit::input_state;
+	const fock& (circuit::*const_input_state)() const = &circuit::input_state;
+	// basis& (circuit::*output_basis)() = &circuit::output_basis;
+	const basis& (circuit::*const_output_basis)() const = &circuit::output_basis;
 
 	class_< circuit >("circuit")
 		.def(init<>())
@@ -421,8 +421,8 @@ BOOST_PYTHON_MODULE(pylinopt)
 		// .def("output_basis", output_basis, return_value_policy<copy_non_const_reference>())
 		// .def("output_basis", const_output_basis, return_value_policy<copy_const_reference>())
 		.def("output_state", &circuit::output_state)
-		.add_property("input_state", make_function(input_state, return_value_policy<copy_non_const_reference>()), &circuit::set_input_state)
-		.add_property("output_basis", make_function(output_basis, return_value_policy<copy_non_const_reference>()), &circuit::set_output_basis)
-		.add_property("unitary", make_function(unitary, return_value_policy<copy_non_const_reference>()), &circuit::set_unitary)
+		.add_property("input_state", make_function(const_input_state, return_value_policy<copy_const_reference>()), &circuit::set_input_state)
+		.add_property("output_basis", make_function(const_output_basis, return_value_policy<copy_const_reference>()), &circuit::set_output_basis)
+		.add_property("unitary", make_function(const_unitary, return_value_policy<copy_const_reference>()), &circuit::set_unitary)
 	;
 }

@@ -82,10 +82,12 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c, 
 	postselected = state()
 	out_state = c.output_state()
 
-	p, res = 0, 0 
+	p, res = 0, 0
+
+	out_postselect = out_state.postselect
 
 	for anc in ancilla:
-		postselected = out_state.postselect(anc)
+		postselected = out_postselect(anc)
 		p = postselected.norm()
 		if p == 0:
 			continue
