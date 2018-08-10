@@ -11,21 +11,21 @@ typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMa
 typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
 typedef std::vector<real_type> point;
 
-class unitary_matrix: public matrix_type
-{
-public:
-	static constexpr real_type default_epsilon = 1e-15;
-	using matrix_type::matrix_type;
-	unitary_matrix &hurwitz(const point &x);
-	unitary_matrix &exp_hermite(const point &x);
-	bool is_column_unitary(real_type eps = default_epsilon) const;
-	bool is_row_unitary(real_type eps = default_epsilon) const;
-	bool is_unitary(real_type eps = default_epsilon) const;
-};
+const real_type default_epsilon = 1e-15;
+
+void hurwitz_parametrization(matrix_type &M, const point &x);
+matrix_type hurwitz_parametrization(const point &x);
+void exp_hermite_parametrization(matrix_type &M, const point &x);
+matrix_type exp_hermite_parametrization(const point &x);
+
+bool is_column_unitary(const matrix_type &M, real_type eps = default_epsilon);
+bool is_row_unitary(const matrix_type &M, real_type eps = default_epsilon);
+bool is_unitary(const matrix_type &M, real_type eps = default_epsilon);
 
 complex_type permanent(const matrix_type &M);
 
-static inline real_type mod(real_type x, real_type a)
+template<typename T>
+static inline T mod(T x, T a)
 {
 	x = std::fmod(x, a);
 	return (x < 0) ? x + a : x;

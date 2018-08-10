@@ -10,20 +10,20 @@ namespace linopt
 class circuit
 {
 private:
-	unitary_matrix U;
-	unitary_matrix Uin;
+	matrix_type U;
+	matrix_type Uin;
 	bool uin_possibly_changed;
-	unitary_matrix Uinout;
+	matrix_type Uinout;
 	fock _input_state;
 	real_type input_prod_fact;
 	basis _output_basis;
-	unitary_matrix &prepare_uin(const unitary_matrix &u, const fock &fin);
+	matrix_type &prepare_uin(const matrix_type &u, const fock &fin);
 	complex_type calc_fock_amp(const fock &fout);
 
 public:
 	circuit();
-	unitary_matrix &unitary();
-	const unitary_matrix &unitary() const;
+	matrix_type &unitary();
+	const matrix_type &unitary() const;
 	fock &input_state();
 	const fock &input_state() const;
 	basis &output_basis();
@@ -31,7 +31,7 @@ public:
 	state output_state();
 	void set_input_state(const fock &fin);
 	void set_output_basis(const basis &bout);
-	void set_unitary(const unitary_matrix &u);
+	void set_unitary(const matrix_type &u);
 };
 
 }

@@ -48,19 +48,19 @@ complex_type linopt::permanent(const matrix_type &M)
 	return perm;
 }
 
-unitary_matrix &unitary_matrix::hurwitz(const point &x)
+void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 {
 	const int N = std::sqrt(x.size());
 	assert(N*N == static_cast<int>(x.size()));
-	if(cols() != N || rows() != N)
-		resize(N, N);
+	if(M.cols() != N || M.rows() != N)
+		M.resize(N, N);
 	int i, j, k = 0;
 	complex_type eii, eij;
 	vector_type coli(N);
 	real_type xi;
 	eii = std::polar(1., 2.*M_PI*x[k++]);
-	setZero();
-	diagonal().fill(eii);
+	M.setZero();
+	M.diagonal().fill(eii);
 	for(j = 1; j <= N-1; j++)
 	{
 		for(i = j - 1; i >= 1; i--)
@@ -69,26 +69,33 @@ unitary_matrix &unitary_matrix::hurwitz(const point &x)
 			xi = std::pow(xi, 1./(2.*(i + 1)));
 			eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*x[k++]);
 			eij = xi;
-			coli = col(i);
-			col(i) = col(i)*eii - col(j)*conj(eij);
-			col(j) =   coli*eij + col(j)*conj(eii);
+			coli = M.col(i);
+			M.col(i) = M.col(i)*eii - M.col(j)*conj(eij);
+			M.col(j) =     coli*eij + M.col(j)*conj(eii);
 		}
 		xi = pyramid(x[k++], 1.);
 		xi = std::sqrt(xi);
 		eii = std::polar(std::sqrt(1. - xi*xi), 2.*M_PI*x[k++]);
 		eij = std::polar(xi, 2.*M_PI*x[k++]);
-		coli = col(i);
-		col(i) = col(i)*eii - col(j)*conj(eij);
-		col(j) =   coli*eij + col(j)*conj(eii);
+		coli = M.col(i);
+		M.col(i) = M.col(i)*eii - M.col(j)*conj(eij);
+		M.col(j) =     coli*eij + M.col(j)*conj(eii);
 	}
-	return *this;
+	return;
 }
 
-unitary_matrix &unitary_matrix::exp_hermite(const point &x)
+matrix_type linopt::hurwitz_parametrization(const point &x)
+{
+	matrix_type M;
+	hurwitz_parametrization(M, x);
+	return M;
+}
+
+void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 {
 	const int N = std::sqrt(x.size());
 	assert(N*N == static_cast<int>(x.size()));
-	unitary_matrix H(N, N);
+	matrix_type H(N, N);
 	int k = N;
 	for(int i = 0; i < N; i++)
 	{
@@ -101,24 +108,31 @@ unitary_matrix &unitary_matrix::exp_hermite(const point &x)
 		}
 	}
 	H *= complex_type(0, 1);
-	*this = H.exp();
-	return *this;
+	M = H.exp();
+	return;
 }
 
-bool unitary_matrix::is_column_unitary(real_type eps) const
+matrix_type linopt::exp_hermite_parametrization(const point &x)
 {
-	return (this->adjoint() * (*this)).isIdentity(eps);
+	matrix_type M;
+	exp_hermite_parametrization(M, x);
+	return M;
 }
 
-bool unitary_matrix::is_row_unitary(real_type eps) const
+bool linopt::is_column_unitary(const matrix_type &M, real_type eps)
 {
-	return ((*this) * this->adjoint()).isIdentity(eps);
+	return (M.adjoint() * M).isIdentity(eps);
 }
 
-bool unitary_matrix::is_unitary(real_type eps) const
+bool linopt::is_row_unitary(const matrix_type &M, real_type eps)
 {
-	if(cols() != rows())
+	return (M * M.adjoint()).isIdentity(eps);
+}
+
+bool linopt::is_unitary(const matrix_type &M, real_type eps)
+{
+	if(M.cols() != M.rows())
 		return false;
 	else
-		return is_column_unitary(eps) && is_row_unitary(eps);
+		return is_column_unitary(M, eps) && is_row_unitary(M, eps);
 }

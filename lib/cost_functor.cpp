@@ -15,7 +15,8 @@ cost_functor::cost_functor(const basis &full_basis,
 
 real_type stanisic_functor::operator()(const point &x)
 {
-	C.unitary().exp_hermite(x);
+
+	C.unitary() = exp_hermite_parametrization(x);
 	state out = C.output_state();
 	state postselected;
 	real_type p, res = 0.;
@@ -36,7 +37,7 @@ real_type stanisic_functor::operator()(const point &x)
 real_type log_functor::operator()(const point &x)
 {
 	const real_type epsilon = 1e-2;
-	C.unitary().hurwitz(x);
+	C.unitary() = hurwitz_parametrization(x);
 	state out = C.output_state();
 	state postselected;
 	real_type p, res = 0.;

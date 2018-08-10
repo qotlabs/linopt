@@ -6,7 +6,7 @@ using namespace linopt;
 circuit::circuit():
 	uin_possibly_changed(false) {}
 
-unitary_matrix &circuit::prepare_uin(const unitary_matrix &u, const fock &fin)
+matrix_type &circuit::prepare_uin(const matrix_type &u, const fock &fin)
 {
 	int tot = fin.total();
 	int modes = fin.size();
@@ -33,13 +33,13 @@ complex_type circuit::calc_fock_amp(const fock &fout)
 	return perm;
 }
 
-unitary_matrix &circuit::unitary()
+matrix_type &circuit::unitary()
 {
 	uin_possibly_changed = true;
 	return U;
 }
 
-const unitary_matrix &circuit::unitary() const
+const matrix_type &circuit::unitary() const
 {
 	return U;
 }
@@ -86,7 +86,7 @@ void circuit::set_output_basis(const basis &bout)
 	this->output_basis() = bout;
 }
 
-void circuit::set_unitary(const unitary_matrix &u)
+void circuit::set_unitary(const matrix_type &u)
 {
 	this->unitary() = u;
 }
