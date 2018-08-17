@@ -50,9 +50,9 @@ r = random.sample(range(100), 64)
 r = [float(x)/100 for x in r]
 
 c = circuit()
-u = unitary_matrix()
+#u = unitary_matrix()
 
 #a = lot.cf_inner_product(r, in_state, state_list, ancilla_basis)
-a = minimize(lot.cf_inner_product, r, args = (in_state, state_list, ancilla_basis, full_basis, c, u), \
+a = minimize(lot.cf_inner_product, r, args = (in_state, state_list, ancilla_basis, full_basis, c), \
     method='BFGS', tol=None, options={'gtol':1e-5})
 print(a)

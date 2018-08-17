@@ -197,21 +197,37 @@ void list_to_basis(basis &b, const list &l)
 }
 
 // "thin wrappers" for methods with default arguments from class unitary_matrix
-bool is_column_unitary_noargs(const unitary_matrix &u)
-{ 
-	return u.is_column_unitary();
-}
-bool is_row_unitary_noargs(const unitary_matrix &u)
-{ 
-	return u.is_row_unitary();
-}
-bool is_unitary_noargs(const unitary_matrix &u)
-{ 
-	return u.is_unitary();
-}
-basis& generate_basis(const basis &b, const int nphot, const int modes){
+// bool is_column_unitary_noargs(const matrix_type &M)
+// { 
+// 	return u.is_column_unitary();
+// }
+// bool is_row_unitary_noargs(const matrix_type &M)
+// { 
+// 	return u.is_row_unitary();
+// }
+// bool is_unitary_noargs(const matrix_type &M)
+// { 
+// 	return u.is_unitary();
+// }
+basis& generate_basis(const basis &b, const int nphot, const int modes)
+{
 	return b.generate_basis( nphot, modes);
 }
+
+void (*hurwitz_twoargs)(matrix_type &M, const point &x) = &hurwitz_parametrization;
+matrix_type (*hurwitz_onearg)(const point &x) = &hurwitz_parametrization;
+void (*exp_hermite_twoargs)(matrix_type &M, const point &x) = &exp_hermite_parametrization;
+matrix_type (*exp_hermite_onearg)(const point &x) = &exp_hermite_parametrization;
+
+// matrix_type hurwitz_parametrization_wrap(const point &x)
+// {
+// 	return hurwitz_parametrization(x);
+// }
+
+// matrix_type exp_hermite_parametrization_wrap(const point &x)
+// {
+// 	return exp_hermite_parametrization(x);
+// }
 
 // the code below is borrowed from stackoverflow answer 
 // https://stackoverflow.com/questions/15842126/feeding-a-python-list-into-a-function-taking-in-a-vector-with-boost-python
@@ -305,22 +321,12 @@ BOOST_PYTHON_MODULE(pylinopt)
 
 	def("float2str", &doubleToShortest, (arg("f"), arg("pad")=0), "Return the shortest string representation of *f* which will is equal to *f* when converted back to float. This function is only useful in Python prior to 3.0; starting from that version, standard string conversion does just that.");
 
-	// class matrix exposing
-	class_< unitary_matrix, bases<matrix_type> >("unitary_matrix")
-		.def(init<>())
-		.def("hurwitz", &unitary_matrix::hurwitz, return_value_policy<copy_non_const_reference>())
-		.def("exp_hermite", &unitary_matrix::exp_hermite, return_value_policy<copy_non_const_reference>())
-		.def("is_column_unitary", &unitary_matrix::is_column_unitary)
-		.def("is_column_unitary", is_column_unitary_noargs)
-		.def("is_row_unitary", &unitary_matrix::is_row_unitary)
-		.def("is_row_unitary", is_row_unitary_noargs)
-		.def("is_unitary", &unitary_matrix::is_unitary)
-		.def("is_unitary", is_unitary_noargs)
-		.attr("default_epsilon") = unitary_matrix::default_epsilon
-	;
-
 	// exposing matrix functions
 	def("permanent", permanent);
+	def("hurwitz", hurwitz_onearg);
+	def("hurwitz", hurwitz_twoargs);
+	def("exp_hermite", exp_hermite_onearg);
+	def("exp_hermite", exp_hermite_twoargs);
 
 	// std::vector<int> class declaration (class fock inherits from this class)
 	class_<std::vector<int>>("cvector")
@@ -406,7 +412,7 @@ BOOST_PYTHON_MODULE(pylinopt)
 
 	// overloaded method bindings for class circuit
 	// unitary_matrix& (circuit::*unitary)() = &circuit::unitary;
-	const unitary_matrix& (circuit::*const_unitary)() const = &circuit::unitary;
+	const matrix_type& (circuit::*const_unitary)() const = &circuit::unitary;
 	// fock& (circuit::*input_state)() = &circuit::input_state;
 	const fock& (circuit::*const_input_state)() const = &circuit::input_state;
 	// basis& (circuit::*output_basis)() = &circuit::output_basis;

@@ -3,7 +3,7 @@ from pylinopt import *
 from minieigen import *
 from math import sqrt
 
-def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c, u):
+def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
 	"""
 	The function computes the figure of merit of the output state optimization
 	routine accounting both for fidelity of the output state and the target
@@ -78,7 +78,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c, 
 	#v = VectorX(random_vector)
 	c.input_state = input_fock
 	c.output_basis = full_basis
-	c.unitary = u.exp_hermite(random_vector)
+	c.unitary = exp_hermite(random_vector)
 	postselected = state()
 	out_state = c.output_state()
 
