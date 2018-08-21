@@ -7,8 +7,9 @@ LIBLINOPT_PATH := ../lib
 MINIEIGEN_DCONV_PATH := ./minieigen/src/double-conversion
 LDLIBS := -lm \
 		  $(shell $(PYTHON) -c "import sys; print('-lboost_python-py%d%d'%(sys.version_info[0],sys.version_info[1]))") \
-		  $(shell pkg-config $(PYTHON) --libs)
-CFLAGS := -std=c++0x -O3 -march=native -ffast-math -fPIC \
+		  $(shell pkg-config $(PYTHON) --libs) \
+		  -L ${LIBLINOPT_PATH} -llinopt
+CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-parameter -Wno-int-in-bool-context\
           -I /usr/include \
           $(shell pkg-config eigen3 --cflags) \
@@ -16,7 +17,7 @@ CFLAGS := -std=c++0x -O3 -march=native -ffast-math -fPIC \
           -D_USE_MATH_DEFINES \
           -fpermissive
 TARGET := pylinopt
-VPATH = . $(LIBLINOPT_PATH)
+VPATH = .
 
 SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))
 HDRS := $(wildcard $(addsuffix /*.h, $(VPATH)))
@@ -30,7 +31,10 @@ OBJS += $(notdir $(DCONV_SRCS:.cc=.o))
 
 all:	$(TARGET).so
 
-$(TARGET).so:	$(OBJS)
+$(LIBLINOPT_PATH)/liblinopt.a:	..
+	$(MAKE) -C $(LIBLINOPT_PATH) static
+
+$(TARGET).so:	$(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
 
 %.o: %.cpp
@@ -45,7 +49,6 @@ doc:	doxygen.conf $(SRCS) $(HDRS)
 
 clean:
 	$(RM) -r *.o *.d *.s *.a *.so* doc/
-	$(MAKE) -C $(LIBLINOPT_PATH) clean
 
 help:
 	@echo "Available commands:"
