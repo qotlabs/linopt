@@ -223,10 +223,10 @@ basis& generate_basis(const basis &b, const int nphot, const int modes)
 	return b.generate_basis( nphot, modes);
 }
 
-void (*hurwitz_twoargs)(matrix_type &M, const point &x) = &hurwitz_parametrization;
-matrix_type (*hurwitz_onearg)(const point &x) = &hurwitz_parametrization;
-void (*exp_hermite_twoargs)(matrix_type &M, const point &x) = &exp_hermite_parametrization;
-matrix_type (*exp_hermite_onearg)(const point &x) = &exp_hermite_parametrization;
+// void (*hurwitz_twoargs)(matrix_type &M, const point &x) = &hurwitz_parametrization;
+// matrix_type (*hurwitz_onearg)(const point &x) = &hurwitz_parametrization;
+// void (*exp_hermite_twoargs)(matrix_type &M, const point &x) = &exp_hermite_parametrization;
+// matrix_type (*exp_hermite_onearg)(const point &x) = &exp_hermite_parametrization;
 
 // matrix_type hurwitz_parametrization_wrap(const point &x)
 // {
@@ -305,7 +305,10 @@ matrix_type (*exp_hermite_onearg)(const point &x) = &exp_hermite_parametrization
 
 // ------------------------- end of stackoverflow code ---------------------------------------
 
-PYBIND11_MODULE(pylinopt, m)
+PYBIND11_MAKE_OPAQUE(std::vector<real_type>);
+PYBIND11_MAKE_OPAQUE(std::vector<complex_type>);
+
+PYBIND11_PLUGIN(pylinopt)
 {   
 	// Py_Initialize();
 	// np::initialize();
@@ -327,15 +330,14 @@ PYBIND11_MODULE(pylinopt, m)
 
 	// def("float2str", &doubleToShortest, (arg("f"), arg("pad")=0), "Return the shortest string representation of *f* which will is equal to *f* when converted back to float. This function is only useful in Python prior to 3.0; starting from that version, standard string conversion does just that.");
 
-	PYBIND11_MAKE_OPAQUE(std::vector<real_type>);
-	PYBIND11_MAKE_OPAQUE(std::vector<complex_type>);
+	py::module m("pylinopt", "documentation string");
 
 	// exposing matrix functions
 	m.def("permanent", &permanent);
-	m.def("hurwitz", &hurwitz_onearg);
-	m.def("hurwitz", &hurwitz_twoargs);
-	m.def("exp_hermite", &exp_hermite_onearg);
-	m.def("exp_hermite", &exp_hermite_twoargs);
+	m.def("hurwitz", (matrix_type (*)(const point &x)) &hurwitz_parametrization);
+	m.def("hurwitz", (void (*)(matrix_type &M, const point &x)) &hurwitz_parametrization);
+	m.def("exp_hermite", (matrix_type (*)(const point &x)) &exp_hermite_parametrization);
+	m.def("exp_hermite", (void (*)(matrix_type &M, const point &x)) &exp_hermite_parametrization);
 
 	// std::vector<int> class declaration (class fock inherits from this class)
 	// class_<std::vector<int>>("cvector")
@@ -343,8 +345,8 @@ PYBIND11_MODULE(pylinopt, m)
 	// ;
 
 	// expose class fock
-	py::class_< fock, bases<std::vector<int> > >(m, "fock")
-		.def(init<>())
+	py::class_< fock, std::vector<int> >(m, "fock")
+		.def(py::init<>())
 		.def("__str__", &fock_str)
 		.def("__repr__", &fock_repr)
 		.def("total", &fock::total)
@@ -373,9 +375,9 @@ PYBIND11_MODULE(pylinopt, m)
 	// state& (state::*complex_idiv)(complex_type) 		= &state::operator/=;
 
 	// expose class state
-	py::class_< state, bases<std::map<fock, complex_type> > >(m, "state")
-		.def(init<>())
-		.def(init<const state&>())
+	py::class_< state, std::map<fock, complex_type> >(m, "state")
+		.def(py::init<>())
+		.def(py::init<const state&>())
 		.def("__str__", &state_str)
 		.def("__repr__", &state_repr)
 		.def("__add__", (state (state::*)(const state &) const) &state::operator+)
@@ -403,9 +405,9 @@ PYBIND11_MODULE(pylinopt, m)
 	// class_< std::set<fock> >("csetfock")
 	// 	.def(set_indexing_suite<std::set<fock>>());
 
-	py::class_< basis, bases< std::set<fock> > >(m, "basis")
-		.def(init<>())
-		.def(init<const basis&>())
+	py::class_< basis, std::set<fock> >(m, "basis")
+		.def(py::init<>())
+		.def(py::init<const basis&>())
 		.def("__str__", &basis_str)
 		.def("__repr__", &basis_repr)
 		.def("__add__", &basis::operator+)
@@ -424,7 +426,7 @@ PYBIND11_MODULE(pylinopt, m)
 	// const basis& (circuit::*const_output_basis)() const = &circuit::output_basis;
 
 	py::class_< circuit >(m, "circuit")
-		.def(init<>())
+		.def(py::init<>())
 		.def("output_state", &circuit::output_state)
 		.def_property("input_state",
 						py::cpp_function((const fock& (circuit::*)() const) &circuit::input_state, py::return_value_policy::copy),
