@@ -2,6 +2,7 @@
 #include <Eigen/Dense>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 
 // #include <boost/python.hpp>
 // #include <boost/python/numpy.hpp>
@@ -305,6 +306,7 @@ basis& generate_basis(const basis &b, const int nphot, const int modes)
 
 // ------------------------- end of stackoverflow code ---------------------------------------
 
+PYBIND11_MAKE_OPAQUE(std::vector<int>);
 PYBIND11_MAKE_OPAQUE(std::vector<real_type>);
 PYBIND11_MAKE_OPAQUE(std::vector<complex_type>);
 
@@ -340,9 +342,7 @@ PYBIND11_PLUGIN(pylinopt)
 	m.def("exp_hermite", (void (*)(matrix_type &M, const point &x)) &exp_hermite_parametrization);
 
 	// std::vector<int> class declaration (class fock inherits from this class)
-	// class_<std::vector<int>>("cvector")
-	// 	.def(vector_indexing_suite<std::vector<int>>())
-	// ;
+	py::bind_vector<std::vector<int>>(m, "VectorInt");
 
 	// expose class fock
 	py::class_< fock, std::vector<int> >(m, "fock")
@@ -374,6 +374,8 @@ PYBIND11_PLUGIN(pylinopt)
 	// state (state::*complex_div)(complex_type) const 	= &state::operator/;
 	// state& (state::*complex_idiv)(complex_type) 		= &state::operator/=;
 
+	py::bind_map<std::map<fock, complex_type>>(m, "FockComplex");
+
 	// expose class state
 	py::class_< state, std::map<fock, complex_type> >(m, "state")
 		.def(py::init<>())
@@ -399,26 +401,20 @@ PYBIND11_PLUGIN(pylinopt)
 		//.def_property("as_dict", &state_to_dict, &dict_to_state)
 	;
 
-	// class std::set<fock> declaration (class basis inherits from this class)
-	// used custom "set_indexing_suite.h" and "list_indexing_suite.h" libraries to expose std::set to python correctly
-	// downloaded from: https://github.com/Microsoft/bond/blob/master/python/inc/bond/python/set_indexing_suite.h
-	// class_< std::set<fock> >("csetfock")
-	// 	.def(set_indexing_suite<std::set<fock>>());
-
-	py::class_< basis, std::set<fock> >(m, "basis")
-		.def(py::init<>())
-		.def(py::init<const basis&>())
-		.def("__str__", &basis_str)
-		.def("__repr__", &basis_repr)
-		.def("__add__", &basis::operator+)
-		.def("__iadd__", &basis::operator+=, py::return_value_policy::copy)
-		.def("__mul__", &basis::operator*)
-		.def("__imul__", &basis::operator*=, py::return_value_policy::copy)
-		.def("generate_basis", &generate_basis, py::return_value_policy::copy)
-		.def("postselect", &basis::postselect)
-		.def("apply_func", &basis::apply_func)
-		//.def_property("as_list", &basis_to_list, &list_to_basis)
-	;
+	// py::class_< basis, std::set<fock> >(m, "basis")
+	// 	.def(py::init<>())
+	// 	.def(py::init<const basis&>())
+	// 	.def("__str__", &basis_str)
+	// 	.def("__repr__", &basis_repr)
+	// 	.def("__add__", &basis::operator+)
+	// 	.def("__iadd__", &basis::operator+=, py::return_value_policy::copy)
+	// 	.def("__mul__", &basis::operator*)
+	// 	.def("__imul__", &basis::operator*=, py::return_value_policy::copy)
+	// 	.def("generate_basis", &generate_basis, py::return_value_policy::copy)
+	// 	.def("postselect", &basis::postselect)
+	// 	.def("apply_func", &basis::apply_func)
+	// 	//.def_property("as_list", &basis_to_list, &list_to_basis)
+	// ;
 
 	// overloaded method bindings for class circuit
 	// const matrix_type& (circuit::*const_unitary)() const = &circuit::unitary;
