@@ -26,7 +26,7 @@ OBJS := $(notdir $(SRCS:.cpp=.o))
 all:	$(TARGET).so
 
 $(LIBLINOPT_PATH)/liblinopt.a:
-	$(MAKE) -C $(LIBLINOPT_PATH) static
+	$(MAKE) -C $(LIBLINOPT_PATH)
 
 $(TARGET).so:	$(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
