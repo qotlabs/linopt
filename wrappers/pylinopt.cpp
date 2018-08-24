@@ -197,6 +197,23 @@ matrix_type exp_hermite(const py::array_t<double> array)
 	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
 	return exp_hermite_parametrization(vec);
 }
+
+matrix_type hurwitz(const py::array_t<double> array)
+{
+	point vec(array.size());
+	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
+	return hurwitz_parametrization(vec);
+}
+
+void exp_hermite(matrix_type &M, const py::array_t<double> array)
+{
+	M = exp_hermite(array);
+}
+
+void hurwitz(matrix_type &M, const py::array_t<double> array)
+{
+	M = hurwitz(array);
+}
 // "thin wrappers" for methods with default arguments from class unitary_matrix
 // bool is_column_unitary_noargs(const matrix_type &M)
 // { 
@@ -246,10 +263,10 @@ PYBIND11_PLUGIN(pylinopt)
 
 	// exposing matrix functions
 	m.def("permanent", &permanent);
-	m.def("hurwitz", (matrix_type (*)(const point &x)) &hurwitz_parametrization);
-	m.def("hurwitz", (void (*)(matrix_type &M, const point &x)) &hurwitz_parametrization);
-	m.def("exp_hermite", exp_hermite);
-	m.def("exp_hermite", (void (*)(matrix_type &M, const point &x)) &exp_hermite_parametrization);
+	m.def("hurwitz", (matrix_type (*)(const py::array_t<double> array)) &hurwitz);
+	m.def("hurwitz", (void (*)(matrix_type &M, const py::array_t<double> array)) &hurwitz);
+	m.def("exp_hermite", (matrix_type (*)(const py::array_t<double> array)) &exp_hermite);
+	m.def("exp_hermite", (void (*)(matrix_type &M, const py::array_t<double> array)) &exp_hermite);
 
 	// std::vector<int> class declaration (class fock inherits from this class)
 	py::bind_vector<std::vector<int>>(m, "VectorInt");
