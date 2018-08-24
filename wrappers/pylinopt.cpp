@@ -3,6 +3,7 @@
 #include <pybind11/stl.h>
 #include <pybind11/stl_bind.h>
 #include <pybind11/eigen.h>
+#include <pybind11/numpy.h>
 #include "../lib/linopt.h"
 
 using namespace linopt;
@@ -131,65 +132,71 @@ std::string state_repr(state& sta)
 }
 
 // fock to list conversion functions
-// py::list fock_to_list(const fock &f)
-// {
-// 	py::list l;
-// 	for (unsigned int i = 0; i < f.size(); ++i)
-// 		l.append(f[i]);
-// 	return l;
-// }
+py::list fock_to_list(const fock &f)
+{
+	py::list l;
+	for (unsigned int i = 0; i < f.size(); ++i)
+		l.append(f[i]);
+	return l;
+}
 
-// void list_to_fock(fock &f, const py::list &l)
-// {
-// 	f = {};
-// 	if(len(l) > 0)
-// 	{
-// 		for (int i = 0; i < len(l); ++i)
-// 			f.push_back(py::cast<double>(l[i]));
-// 	}
-// }
+void list_to_fock(fock &f, const py::list &l)
+{
+	f = {};
+	if(l.size() > 0)
+	{
+		for (unsigned int i = 0; i < l.size(); ++i)
+			f.push_back(py::cast<double>(l[i]));
+	}
+}
 
 // state to dict conversion
-// py::dict state_to_dict(const state &s)
-// {
-// 	py::dict d;
-// 	for(auto iter = s.begin(); iter != s.end(); ++iter)
-// 	{
-// 		d.first = iter -> first;
-// 		d.second = iter -> second;
-// 		//d[iter -> first] = iter->second;
-// 	}
-// 	return d;
-// }
+py::dict state_to_dict(const state &s)
+{
+	py::dict d;
+	for(auto iter = s.begin(); iter != s.end(); ++iter)
+	{
+		d[py::make_tuple(fock_to_list(iter -> first))] = iter -> second;
+		//d.second = iter -> second;
+		//d[iter -> first] = iter->second;
+	}
+	return d;
+}
 
-// void dict_to_state(state &s, const py::dict &d)
-// {
-// 	//py::list keys = d.keys();
-// 	for(auto item : d)
-// 	{
-// 		s[py::cast<fock>(item.first)] = py::cast<complex_type>(item.second);
-// 	}
-// }
+void dict_to_state(state &s, const py::dict &d)
+{
+	//py::list keys = d.keys();
+	for(auto item : d)
+	{
+		s[py::cast<fock>(item.first)] = py::cast<complex_type>(item.second);
+	}
+}
 
-//basis to list conversion
-// py::list basis_to_list(const basis &b)
-// {
-// 	py::list s;
-// 	for(auto iter : b)
-// 		s.append(iter);
-// 	return s;
-// }
+// basis to list conversion
+py::list basis_to_list(const basis &b)
+{
+	py::list s;
+	for(auto iter : b)
+		s.append(iter);
+	return s;
+}
 
-// void list_to_basis(basis &b, const py::list &l)
-// {
-// 	b = {};
-// 	if(len(l) > 0)
-// 	{
-// 		for (int i = 0; i < len(l); ++i)
-// 			b.insert(py::cast<fock>(l[i]));
-// 	}
-// }
+void list_to_basis(basis &b, const py::list &l)
+{
+	b = {};
+	if(l.size() > 0)
+	{
+		for (unsigned int i = 0; i < l.size(); ++i)
+			b.insert(py::cast<fock>(l[i]));
+	}
+}
 
+matrix_type exp_hermite(const py::array_t<double> array)
+{
+	point vec(array.size());
+	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
+	return exp_hermite_parametrization(vec);
+}
 // "thin wrappers" for methods with default arguments from class unitary_matrix
 // bool is_column_unitary_noargs(const matrix_type &M)
 // { 
@@ -210,7 +217,7 @@ basis& generate_basis(basis &b, const int nphot, const int modes)
 }
 
 PYBIND11_MAKE_OPAQUE(std::vector<int>);
-PYBIND11_MAKE_OPAQUE(std::vector<real_type>);
+PYBIND11_MAKE_OPAQUE(std::vector<double>);
 PYBIND11_MAKE_OPAQUE(std::vector<complex_type>);
 
 PYBIND11_PLUGIN(pylinopt)
@@ -241,7 +248,7 @@ PYBIND11_PLUGIN(pylinopt)
 	m.def("permanent", &permanent);
 	m.def("hurwitz", (matrix_type (*)(const point &x)) &hurwitz_parametrization);
 	m.def("hurwitz", (void (*)(matrix_type &M, const point &x)) &hurwitz_parametrization);
-	m.def("exp_hermite", (matrix_type (*)(const point &x)) &exp_hermite_parametrization);
+	m.def("exp_hermite", exp_hermite);
 	m.def("exp_hermite", (void (*)(matrix_type &M, const point &x)) &exp_hermite_parametrization);
 
 	// std::vector<int> class declaration (class fock inherits from this class)
@@ -256,7 +263,7 @@ PYBIND11_PLUGIN(pylinopt)
 		.def("prod_fact", &fock::prod_fact)
 		.def("__mul__", &fock::operator*)
 		.def("__imul__", &fock::operator*=, py::return_value_policy::copy)
-		//.def_property("as_list", &fock_to_list, &list_to_fock)
+		.def_property("as_list", &fock_to_list, &list_to_fock)
 	;
 
 	py::bind_map<std::map<fock, complex_type>>(m, "MapFockComplex");
@@ -283,23 +290,23 @@ PYBIND11_PLUGIN(pylinopt)
 		.def("dot", &state::dot)
 		.def("postselect", &state::postselect)
 		.def("get_basis", &state::get_basis)
-		//.def_property("as_dict", &state_to_dict, &dict_to_state)
+		.def_property("as_dict", &state_to_dict, &dict_to_state)
 	;
 
-	// py::class_< basis, std::set<fock> >(m, "basis")
-	// 	.def(py::init<>())
-	// 	.def(py::init<const basis&>())
-	// 	.def("__str__", &basis_str)
-	// 	.def("__repr__", &basis_repr)
-	// 	.def("__add__", &basis::operator+)
-	// 	.def("__iadd__", &basis::operator+=, py::return_value_policy::copy)
-	// 	.def("__mul__", &basis::operator*)
-	// 	.def("__imul__", &basis::operator*=, py::return_value_policy::copy)
-	// 	.def("generate_basis", &generate_basis, py::return_value_policy::copy)
-	// 	.def("postselect", &basis::postselect)
-	// 	.def("apply_func", &basis::apply_func)
-	// 	//.def_property("as_list", &basis_to_list, &list_to_basis)
-	// ;
+	py::class_< basis >(m, "basis")
+		.def(py::init<>())
+		.def(py::init<const basis&>())
+		.def("__str__", &basis_str)
+		.def("__repr__", &basis_repr)
+		.def("__add__", &basis::operator+)
+		.def("__iadd__", &basis::operator+=, py::return_value_policy::copy)
+		.def("__mul__", &basis::operator*)
+		.def("__imul__", &basis::operator*=, py::return_value_policy::copy)
+		.def("generate_basis", &generate_basis, py::return_value_policy::copy)
+		.def("postselect", &basis::postselect)
+		.def("apply_func", &basis::apply_func)
+		.def_property("as_list", &basis_to_list, &list_to_basis)
+	;
 
 	// overloaded method bindings for class circuit
 	// const matrix_type& (circuit::*const_unitary)() const = &circuit::unitary;

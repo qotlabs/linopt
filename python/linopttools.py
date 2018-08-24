@@ -86,7 +86,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
 
 	out_postselect = out_state.postselect
 
-	for anc in ancilla:
+	for anc in ancilla.as_list:
 		postselected = out_postselect(anc)
 		p = postselected.norm()
 		if p == 0:
