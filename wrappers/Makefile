@@ -4,7 +4,6 @@ DOXYGEN := doxygen
 CC := g++
 PYTHON := python3
 LIBLINOPT_PATH := ../lib
-MINIEIGEN_DCONV_PATH := ./minieigen/src/double-conversion
 LDLIBS := -lm \
 		  $(shell pkg-config $(PYTHON) --libs) \
 		  -L ${LIBLINOPT_PATH} -llinopt 
@@ -22,15 +21,11 @@ SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))
 HDRS := $(wildcard $(addsuffix /*.h, $(VPATH)))
 OBJS := $(notdir $(SRCS:.cpp=.o))
 
-DCONV_SRCS := $(wildcard $(addsuffix /*.cc, $(MINIEIGEN_DCONV_PATH)))
-DCONV_SRCS := $(filter-out %test.cc, $(DCONV_SRCS))
-OBJS += $(notdir $(DCONV_SRCS:.cc=.o))
-
 .PHONY: all clean doc help
 
 all:	$(TARGET).so
 
-$(LIBLINOPT_PATH)/liblinopt.a:	..
+$(LIBLINOPT_PATH)/liblinopt.a:
 	$(MAKE) -C $(LIBLINOPT_PATH) static
 
 $(TARGET).so:	$(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
@@ -39,9 +34,6 @@ $(TARGET).so:	$(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH)) -c -MMD $<
 include $(wildcard *.d)
-
-%.o: $(MINIEIGEN_DCONV_PATH)/%.cc
-	$(CC) $(CFLAGS) -c $<
 
 doc:	doxygen.conf $(SRCS) $(HDRS)
 	$(DOXYGEN) $<
