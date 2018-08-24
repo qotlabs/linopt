@@ -219,7 +219,7 @@ std::string state_repr(state& sta)
 // { 
 // 	return u.is_unitary();
 // }
-basis& generate_basis(const basis &b, const int nphot, const int modes)
+basis& generate_basis(basis &b, const int nphot, const int modes)
 {
 	return b.generate_basis( nphot, modes);
 }
@@ -434,4 +434,5 @@ PYBIND11_PLUGIN(pylinopt)
 						py::cpp_function((const matrix_type& (circuit::*)() const) &circuit::unitary, py::return_value_policy::copy),
 						&circuit::set_unitary)
 	;
+	return m.ptr();
 }
