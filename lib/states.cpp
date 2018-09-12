@@ -7,13 +7,13 @@ using namespace linopt;
 int fock::total() const
 {
 	int tot = 0;
-	for(auto iter = begin(); iter != end(); iter++)
-		tot += *iter;
+	for(auto &n: *this)
+		tot += n;
 	return tot;
 }
 
-static const int factorial_precomputed[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880,\
-							   3628800, 39916800, 479001600};
+static constexpr int factorial_precomputed[] = {
+	1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600};
 
 static inline real_type factorial(int n)
 {
@@ -23,8 +23,8 @@ static inline real_type factorial(int n)
 real_type fock::prod_fact() const
 {
 	real_type p = 1.;
-	for(auto iter = begin(); iter != end(); iter++)
-		p *= factorial(*iter);
+	for(auto &n: *this)
+		p *= factorial(n);
 	return p;
 }
 
@@ -70,9 +70,9 @@ basis &basis::operator+=(const basis &b)
 basis basis::operator*(const basis &b) const
 {
 	basis newb;
-	for(auto f1 = begin(); f1 != end(); f1++)
-		for(auto f2 = b.begin(); f2 != b.end(); f2++)
-			newb.insert(newb.end(), (*f1) * (*f2));
+	for(auto &f1: *this)
+		for(auto &f2: b)
+			newb.insert(newb.end(), f1 * f2);
 	return newb;
 }
 
@@ -102,11 +102,11 @@ basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 basis basis::postselect(const fock &ancilla) const
 {
 	basis b;
-	for(auto fp = begin(); fp != end(); fp++)
+	for(auto &fp: *this)
 	{
-		if(std::equal(ancilla.rbegin(), ancilla.rend(), fp->rbegin()))
+		if(std::equal(ancilla.rbegin(), ancilla.rend(), fp.rbegin()))
 			b.insert(b.end(),
-					 fock(fp->begin(), fp->end() - ancilla.size()));
+					 fock(fp.begin(), fp.end() - ancilla.size()));
 	}
 	return b;
 }
@@ -114,8 +114,8 @@ basis basis::postselect(const fock &ancilla) const
 state basis::apply_func(const basis_func &f) const
 {
 	state s;
-	for(auto iter = begin(); iter != end(); iter++)
-		s.insert(s.end(), state_element(*iter, f(*iter)));
+	for(auto &elem: *this)
+		s.insert(s.end(), state_element(elem, f(elem)));
 	return s;
 }
 
@@ -158,24 +158,24 @@ state state::operator+(const state &s) const
 
 state &state::operator+=(const state &s)
 {
-	for(auto iter = s.begin(); iter != s.end(); iter++)
-		(*this)[iter->first] += iter->second;
+	for(auto &elem: s)
+		(*this)[elem.first] += elem.second;
 	return *this;
 }
 
 state &state::operator-=(const state &s)
 {
-	for(auto iter = s.begin(); iter != s.end(); iter++)
-		(*this)[iter->first] -= iter->second;
+	for(auto &elem: s)
+		(*this)[elem.first] -= elem.second;
 	return *this;
 }
 
 state state::operator*(const state &s) const
 {
 	state snew;
-	for(auto a = begin(); a != end(); a++)
-		for(auto b = s.begin(); b != s.end(); b++)
-			snew.insert(snew.end(), state_element(a->first * b->first, a->second * b->second));
+	for(auto &a: *this)
+		for(auto &b: s)
+			snew.insert(snew.end(), state_element(a.first * b.first, a.second * b.second));
 	return snew;
 }
 
@@ -188,8 +188,8 @@ state &state::operator*=(const state &s)
 state state::operator-() const
 {
 	state s = *this;
-	for(auto iter = s.begin(); iter != s.end(); iter++)
-		iter->second = -iter->second;
+	for(auto &elem: s)
+		elem.second = -elem.second;
 	return s;
 }
 
@@ -206,8 +206,8 @@ state linopt::operator*(complex_type x, const state &s)
 
 state &state::operator*=(complex_type x)
 {
-	for(auto iter = begin(); iter != end(); iter++)
-		iter->second *= x;
+	for(auto &elem: *this)
+		elem.second *= x;
 	return *this;
 }
 
@@ -219,16 +219,16 @@ state state::operator/(complex_type x) const
 
 state &state::operator/=(complex_type x)
 {
-	for(auto iter = begin(); iter != end(); iter++)
-		iter->second /= x;
+	for(auto &elem: *this)
+		elem.second /= x;
 	return *this;
 }
 
 real_type state::norm() const
 {
 	real_type n = 0.;
-	for(auto iter = begin(); iter != end(); iter++)
-		n += std::norm(iter->second);
+	for(auto &elem: *this)
+		n += std::norm(elem.second);
 	return sqrt(n);
 }
 
@@ -271,11 +271,11 @@ state state::postselect(const fock &ancilla) const
 {
 	state s;
 	auto asize = ancilla.size();
-	for(auto iter = begin(); iter != end(); iter++)
+	for(auto &elem: *this)
 	{
-		const fock &f = iter->first;
+		const fock &f = elem.first;
 		if(std::equal(ancilla.rbegin(), ancilla.rend(), f.rbegin()))
-			s.emplace_hint(s.end(), fock(f.begin(), f.end() - asize), iter->second);
+			s.emplace_hint(s.end(), fock(f.begin(), f.end() - asize), elem.second);
 	}
 	return s;
 }
@@ -283,8 +283,8 @@ state state::postselect(const fock &ancilla) const
 basis state::get_basis() const
 {
 	basis b;
-	for(auto iter = begin(); iter != end(); iter++)
-		b.insert(b.end(), iter->first);
+	for(auto &elem: *this)
+		b.insert(b.end(), elem.first);
 	return b;
 }
 
