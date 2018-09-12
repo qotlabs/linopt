@@ -104,9 +104,8 @@ basis basis::postselect(const fock &ancilla) const
 	basis b;
 	for(auto &fp: *this)
 	{
-		if(std::equal(ancilla.rbegin(), ancilla.rend(), fp.rbegin()))
-			b.insert(b.end(),
-					 fock(fp.begin(), fp.end() - ancilla.size()));
+		if(std::equal(ancilla.begin(), ancilla.end(), fp.begin()))
+			b.insert(b.end(), fock(fp.begin() + ancilla.size(), fp.end()));
 	}
 	return b;
 }
@@ -271,13 +270,42 @@ state state::postselect(const fock &ancilla) const
 {
 	state s;
 	auto asize = ancilla.size();
+	bool found = false;
 	for(auto &elem: *this)
 	{
 		const fock &f = elem.first;
-		if(std::equal(ancilla.rbegin(), ancilla.rend(), f.rbegin()))
-			s.emplace_hint(s.end(), fock(f.begin(), f.end() - asize), elem.second);
+		const complex_type &amp = elem.second;
+		if(std::equal(ancilla.begin(), ancilla.end(), f.begin()))
+		{
+			s.emplace_hint(s.end(), fock(f.begin() + asize, f.end()), amp);
+			found = true;
+		}
+		else if(found)
+		{
+			break;
+		}
 	}
 	return s;
+}
+
+std::map<fock, state> state::postselect(int modes) const
+{
+	std::map<fock, state> res;
+	const fock &f = (*this->begin()).first;
+	fock anc(f.begin(), f.begin() + modes);
+	state *s = &res[anc];
+	for(auto &elem: *this)
+	{
+		const fock &f = elem.first;
+		const complex_type &amp = elem.second;
+		if(!std::equal(anc.begin(), anc.end(), f.begin()))
+		{
+			anc.assign(f.begin(), f.begin() + modes);
+			s = &res[anc];
+		}
+		s->emplace_hint(s->end(), fock(f.begin() + modes, f.end()), amp);
+	}
+	return res;
 }
 
 basis state::get_basis() const

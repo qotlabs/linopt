@@ -67,6 +67,7 @@ public:
 	state &normalize();
 	complex_type dot(const state &s) const;
 	state postselect(const fock &ancilla) const;
+	std::map<fock, state> postselect(int modes) const;
 	basis get_basis() const;
 };
 
