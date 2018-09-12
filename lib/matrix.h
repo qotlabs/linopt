@@ -31,13 +31,6 @@ static inline T mod(T x, T a)
 	return (x < 0) ? x + a : x;
 }
 
-static inline real_type pyramid(real_type x, real_type a)
-{
-	x = std::fabs(x);
-	x = ((unsigned)(x/a) & 1) ? -x : x;
-	return mod(x, a);
-}
-
 }
 
 #endif // MATRIX_H
