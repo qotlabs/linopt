@@ -322,10 +322,17 @@ std::ostream& print_array(std::ostream &stream, const T &a,
 						  const char *delim = ", ",
 						  const char *b2 = "}")
 {
-	stream << b1;
-	for(auto iter = a.begin(); iter != --a.end(); iter++)
-		stream << *iter << delim;
-	stream << *(--a.end()) << b2;
+	if(a.empty())
+	{
+		stream << b1 << b2;
+	}
+	else
+	{
+		stream << b1;
+		for(auto iter = a.begin(); iter != --a.end(); iter++)
+			stream << *iter << delim;
+		stream << *(--a.end()) << b2;
+	}
 	return stream;
 }
 
