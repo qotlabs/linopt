@@ -305,7 +305,7 @@ PYBIND11_PLUGIN(pylinopt)
 		.def("norm", &state::norm)
 		.def("normalize", &state::normalize, py::return_value_policy::copy)
 		.def("dot", &state::dot)
-		.def("postselect", &state::postselect)
+		.def("postselect", (state (state::*)(const fock&) const) &state::postselect)
 		.def("get_basis", &state::get_basis)
 		.def_property("as_dict", &state_to_dict, &dict_to_state)
 	;
