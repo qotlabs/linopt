@@ -40,19 +40,10 @@ fock &fock::operator*=(const fock &f)
 	return *this;
 }
 
-basis::basis():
-	std::set<fock>() {}
-
-basis::basis(const basis &b):
-	std::set<fock>(b) {}
-
-basis::basis(std::initializer_list<fock> il):
-	std::set<fock>(il) {}
-
-basis::basis(int nphot, int modes, const fock &head):
+basis::basis(int nphot, int modes):
 	basis()
 {
-	generate_basis(nphot, modes, head);
+	generate_basis(nphot, modes);
 }
 
 basis basis::operator+(const basis &b) const
