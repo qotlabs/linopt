@@ -1,3 +1,4 @@
+types.h
 circuit.cpp
 circuit.h
 cost_functor.cpp

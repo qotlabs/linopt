@@ -6,20 +6,10 @@
 #include <map>
 #include <ostream>
 #include <initializer_list>
-#include <functional>
-#include <complex>
+#include "types.h"
 
 namespace linopt
 {
-
-class fock;
-class basis;
-class state;
-
-typedef double real_type;
-typedef std::complex<real_type> complex_type;
-typedef std::pair<fock, complex_type> state_element;
-typedef std::function<complex_type(const fock&)> basis_func;
 
 class fock : private std::vector<int>
 {

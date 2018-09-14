@@ -2,14 +2,11 @@
 #define MATRIX_H
 
 #include <Eigen/Dense>
+#include "types.h"
 #include "states.h"
 
 namespace linopt
 {
-
-typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;
-typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
-typedef std::vector<real_type> point;
 
 const real_type default_epsilon = 1e-15;
 
