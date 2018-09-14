@@ -23,8 +23,6 @@ public:
 	using vector::const_iterator;
 	using vector::reverse_iterator;
 	using vector::const_reverse_iterator;
-	using vector::pointer;
-	using vector::reference;
 
 	using vector::begin;
 	using vector::end;
@@ -35,9 +33,9 @@ public:
 	using vector::crbegin;
 	using vector::crend;
 
+	using vector::empty;
 	using vector::size;
 	using vector::resize;
-	using vector::empty;
 	using vector::operator[];
 	using vector::assign;
 	using vector::push_back;
@@ -85,14 +83,39 @@ inline bool operator>=(const fock &f, const fock &g)
 	return !(f < g);
 }
 
-class basis : public std::set<fock>
+class basis : private std::set<fock>
 {
 	typedef std::set<fock> base_class;
 public:
+	typedef std::set<fock> set_class; //In principle this can be different from base_class
+
+	using base_class::iterator;
+	using base_class::const_iterator;
+	using base_class::reverse_iterator;
+	using base_class::const_reverse_iterator;
+
+	using base_class::begin;
+	using base_class::end;
+	using base_class::rbegin;
+	using base_class::rend;
+	using base_class::cbegin;
+	using base_class::cend;
+	using base_class::crbegin;
+	using base_class::crend;
+
+	using base_class::empty;
+	using base_class::size;
+	using base_class::insert;
+	using base_class::erase;
+	using base_class::clear;
+	using base_class::find;
+
+	using base_class::operator=;
 	basis(): base_class() {}
-	basis(const basis &b): base_class(b) {}
+	basis(const set_class &s): base_class(s) {}
 	basis(std::initializer_list<fock> il): base_class(il) {}
 	explicit basis(int nphot, int modes);
+
 	basis operator+(const basis &b) const;
 	basis &operator+=(const basis &b);
 	basis operator*(const basis &b) const;
@@ -102,11 +125,39 @@ public:
 	state apply_func(const basis_func &f) const;
 };
 
-class state : public std::map<fock, complex_type>
+class state : private std::map<fock, complex_type>
 {
+	typedef std::map<fock, complex_type> base_class;
 public:
-	state();
-	state(const state &s);
+	typedef std::pair<fock, complex_type> element;
+	typedef std::map<fock, complex_type> map_class; //In principle this can be different from base_class
+
+	using base_class::iterator;
+	using base_class::const_iterator;
+	using base_class::reverse_iterator;
+	using base_class::const_reverse_iterator;
+
+	using base_class::begin;
+	using base_class::end;
+	using base_class::rbegin;
+	using base_class::rend;
+	using base_class::cbegin;
+	using base_class::cend;
+	using base_class::crbegin;
+	using base_class::crend;
+
+	using base_class::empty;
+	using base_class::size;
+	using base_class::operator[];
+	using base_class::insert;
+	using base_class::erase;
+	using base_class::clear;
+	using base_class::find;
+
+	using base_class::operator=;
+	state(): base_class() {}
+	state(const map_class &m): base_class(m) {}
+
 	state operator+(const state &s) const;
 	state &operator+=(const state &s);
 	state operator-(const state &s) const {return *this + (-s);}
@@ -133,7 +184,7 @@ complex_type dot(const state &a, const state &b);
 
 std::ostream &operator<<(std::ostream &stream, const linopt::fock &f);
 std::ostream &operator<<(std::ostream &stream, const linopt::basis &b);
-std::ostream &operator<<(std::ostream &stream, const linopt::state_element &e);
+std::ostream &operator<<(std::ostream &stream, const linopt::state::element &e);
 std::ostream &operator<<(std::ostream &stream, const linopt::state &s);
 
 #endif // STATES_H

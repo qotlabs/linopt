@@ -105,15 +105,9 @@ state basis::apply_func(const basis_func &f) const
 {
 	state s;
 	for(auto &elem: *this)
-		s.insert(s.end(), state_element(elem, f(elem)));
+		s.insert(s.end(), state::element(elem, f(elem)));
 	return s;
 }
-
-state::state():
-	std::map<fock, complex_type>() {}
-
-state::state(const state &s):
-	std::map<fock, complex_type>(s) {}
 
 state state::operator+(const state &s) const
 {
@@ -129,7 +123,7 @@ state state::operator+(const state &s) const
 		}
 		else if(a->first == b->first)
 		{
-			snew.insert(snew.end(), state_element(a->first, a->second + b->second));
+			snew.insert(snew.end(), state::element(a->first, a->second + b->second));
 			a++;
 			b++;
 		}
@@ -165,7 +159,7 @@ state state::operator*(const state &s) const
 	state snew;
 	for(auto &a: *this)
 		for(auto &b: s)
-			snew.insert(snew.end(), state_element(a.first * b.first, a.second * b.second));
+			snew.insert(snew.end(), state::element(a.first * b.first, a.second * b.second));
 	return snew;
 }
 
@@ -327,7 +321,7 @@ std::ostream& print_array(std::ostream &stream, const T &a,
 	return stream;
 }
 
-std::ostream& operator<<(std::ostream &stream, const linopt::state_element &e)
+std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)
 {
 	stream << e.first << " = " << e.second;
 	return stream;

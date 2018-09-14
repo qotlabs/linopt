@@ -15,8 +15,6 @@ typedef std::complex<real_type> complex_type;
 class fock;
 class basis;
 class state;
-
-typedef std::pair<fock, complex_type> state_element;
 typedef std::function<complex_type(const fock&)> basis_func;
 
 typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;

@@ -247,18 +247,6 @@ PYBIND11_PLUGIN(pylinopt)
 	// .from_python<std::vector<double> >()
 	// ;
 
-	// class_<vector_type>("vector_type")
-	// 	.def(init<>())
-	// 	.def(VectorVisitor<vector_type>())
-	// ;
-
-	// class_<matrix_type>("matrix_type")
-	// 	.def(init<>())
-	// 	.def(MatrixVisitor<matrix_type>())
-	// ;
-
-	// def("float2str", &doubleToShortest, (arg("f"), arg("pad")=0), "Return the shortest string representation of *f* which will is equal to *f* when converted back to float. This function is only useful in Python prior to 3.0; starting from that version, standard string conversion does just that.");
-
 	py::module m("pylinopt", "documentation string");
 
 	// exposing matrix functions
