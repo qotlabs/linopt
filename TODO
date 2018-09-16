@@ -1,0 +1,6 @@
+1. Finish wrappers for fock, basis, state, circuit classes
+2. Documentation
+3. Exceptions
+4. Usage of Eigen::Ref
+5. Move semantics in C++
+6. Pass by reference in Python
