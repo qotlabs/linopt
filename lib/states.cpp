@@ -1,3 +1,4 @@
+#include "misc.h"
 #include "states.h"
 
 #include <algorithm>
@@ -299,26 +300,6 @@ basis state::get_basis() const
 	for(auto &elem: *this)
 		b.insert(b.end(), elem.first);
 	return b;
-}
-
-template<typename T>
-std::ostream& print_array(std::ostream &stream, const T &a,
-						  const char *b1 = "{",
-						  const char *delim = ", ",
-						  const char *b2 = "}")
-{
-	if(a.empty())
-	{
-		stream << b1 << b2;
-	}
-	else
-	{
-		stream << b1;
-		for(auto iter = a.begin(); iter != --a.end(); iter++)
-			stream << *iter << delim;
-		stream << *(--a.end()) << b2;
-	}
-	return stream;
 }
 
 std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)

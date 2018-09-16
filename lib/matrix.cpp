@@ -2,6 +2,7 @@
 #include <limits.h>
 #include <complex>
 #include <unsupported/Eigen/MatrixFunctions>
+#include "misc.h"
 #include "matrix.h"
 
 using namespace linopt;

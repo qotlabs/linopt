@@ -21,13 +21,6 @@ bool is_unitary(const matrix_type &M, real_type eps = default_epsilon);
 
 complex_type permanent(const matrix_type &M);
 
-template<typename T>
-static inline T mod(T x, T a)
-{
-	x = std::fmod(x, a);
-	return (x < 0) ? x + a : x;
-}
-
 }
 
 #endif // MATRIX_H
