@@ -33,10 +33,13 @@ public:
 	using vector::crbegin;
 	using vector::crend;
 
+	using vector::front;
+	using vector::back;
+	using vector::operator[];
+
 	using vector::empty;
 	using vector::size;
 	using vector::resize;
-	using vector::operator[];
 	using vector::assign;
 	using vector::push_back;
 	using vector::pop_back;
