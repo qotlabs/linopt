@@ -5,121 +5,71 @@
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include "../lib/linopt.h"
+#include "../lib/misc.h"
 
 using namespace linopt;
 namespace py = pybind11;
 
 // __repr__ and __str__ methods for class "fock"
-std::string fock_str(fock& f)
+std::string fock_str(const fock &f)
 {   
-	std::stringstream buffer;
-	if(f.size() > 0)
-	{
-	   buffer << "[";
-	   std::copy(f.begin(), f.end()-1, std::ostream_iterator<int>(buffer, ", "));
-	   buffer << f.back() << "]";
-	}
-	else
-	{
-		buffer << "Empty fock";
-	}
-	return buffer.str();
+	std::stringstream ss;
+	print_array(ss, f, "[", ",", "]");
+	return ss.str();
 }
 
-std::string fock_repr(fock& f)
-{   
-	std::stringstream buffer;
-	if(f.size() > 0)
-	{
-		buffer << "fock([";
-		std::copy(f.begin(), f.end()-1, std::ostream_iterator<int>(buffer, ", "));
-		buffer << f.back() << "])";
-	}
-	else
-	{
-		buffer << "fock()";
-	}
-	return buffer.str();
+std::string fock_repr(const fock &f)
+{
+	return "fock(" + fock_str(f) + ")";
 }
 
 // __repr__ and __str__ methods for class "basis"
-std::string basis_str(basis& basis)
-{   
-	std::stringstream buffer;
-	if(basis.size() > 0)
+std::string basis_str(const basis &b)
+{
+	std::string str;
+	if(!b.empty())
 	{
-		buffer << "{ ";
-		for (const fock& el : basis)
-		{
-			buffer << el << ' ';
-		}
-		buffer << " }"; 
+		str = "{";
+		for(auto iter = b.begin(); iter != --b.end(); ++iter)
+			str += fock_str(*iter) + ", ";
+		str += fock_str(*(--b.end()));
+		str += "}";
 	}
 	else
 	{
-		buffer << "Empty basis";
+		str = "{}";
 	}
-	return buffer.str();
+	return str;
 }
 
-std::string basis_repr(basis& bas)
+std::string basis_repr(const basis &b)
 {   
-	std::stringstream buffer;
-	if(bas.size() > 0)
-	{
-		buffer << "basis([";
-		for (const fock& el : bas)
-		{
-			buffer << el << ' ';
-		}
-		buffer << "])";
-	}
-	else
-	{
-		buffer << "basis()";
-	}
-	return buffer.str();
+	return "basis(" + basis_str(b) + ")";
 }
 
 // __repr__ and __str__ methods for class "state"
-std::string state_str(state& sta)
+std::string state_str(const state &s)
 {
-	std::stringstream buffer;
-	if(sta.size() > 0)
+	std::stringstream ss;
+	if(!s.empty())
 	{
-		buffer << "{ ";
-		for(auto it = sta.cbegin(); it != sta.cend(); ++it)
-		{
-			buffer << it->first << ": " << it->second;
-		}
-		buffer << " }";    
+		ss << "{";
+		for(auto iter = s.begin(); iter != --s.end(); ++iter)
+			ss << fock_str(iter->first) << ": " << iter->second << ", ";
+		auto iter = --s.end();
+		ss << fock_str(iter->first) << ": " << iter->second;
+		ss << "}";
 	}
 	else
 	{
-		buffer << "Empty state";
+		ss << "{}";
 	}
-	return buffer.str();
+	return ss.str();
 }
 
-std::string state_repr(state& sta)
+std::string state_repr(const state &s)
 {
-	std::stringstream buffer;
-
-	if(sta.size() > 0)
-	{
-		buffer << "state({";
-		for(auto it = sta.cbegin(); it != sta.cend(); ++it)
-		{
-			buffer << it->first << ": " << it->second << " ";
-		}
-		buffer << "})";
-	}
-	else
-	{
-		buffer << "state()";
-	}
-	
-	return buffer.str();
+	return "state(" + state_str(s) + ")";
 }
 
 // fock to list conversion functions
@@ -182,34 +132,34 @@ std::string state_repr(state& sta)
 //	}
 //}
 
-matrix_type exp_hermite(const py::array_t<double> array)
-{
-	point vec(array.size());
-	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
-	return exp_hermite_parametrization(vec);
-}
+//matrix_type exp_hermite(const py::array_t<double> array)
+//{
+//	point vec(array.size());
+//	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
+//	return exp_hermite_parametrization(vec);
+//}
 
-matrix_type hurwitz(const py::array_t<double> array)
-{
-	point vec(array.size());
-	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
-	return hurwitz_parametrization(vec);
-}
+//matrix_type hurwitz(const py::array_t<double> array)
+//{
+//	point vec(array.size());
+//	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
+//	return hurwitz_parametrization(vec);
+//}
 
-void exp_hermite(matrix_type &M, const py::array_t<double> array)
-{
-	M = exp_hermite(array);
-}
+//void exp_hermite(matrix_type &M, const py::array_t<double> array)
+//{
+//	M = exp_hermite(array);
+//}
 
-void hurwitz(matrix_type &M, const py::array_t<double> array)
-{
-	M = hurwitz(array);
-}
+//void hurwitz(matrix_type &M, const py::array_t<double> array)
+//{
+//	M = hurwitz(array);
+//}
 
-basis& generate_basis(basis &b, const int nphot, const int modes)
-{
-	return b.generate_basis(nphot, modes);
-}
+//basis& generate_basis(basis &b, const int nphot, const int modes)
+//{
+//	return b.generate_basis(nphot, modes);
+//}
 
 //PYBIND11_MAKE_OPAQUE(fock::vector)
 //PYBIND11_MAKE_OPAQUE(point)
@@ -237,18 +187,23 @@ PYBIND11_MODULE(pylinopt, m)
 		 "Internally the function uses Glynn formula with Gray code summation technique.\n"
 		 "Complexity is O(n*2^n).",
 		 py::arg("M"))
+
 	.def("is_column_unitary", &is_column_unitary,
 		 "Checks whether a matrix M is column unitary within accuracy eps.",
 		 py::arg("M"), py::arg("eps") = default_epsilon)
+
 	.def("is_row_unitary", &is_row_unitary,
 		 "Checks whether a matrix M is row unitary within accuracy eps.",
 		 py::arg("M"), py::arg("eps") = default_epsilon)
+
 	.def("is_unitary", &is_unitary,
 		 "Checks whether a square matrix M is unitary within accuracy eps.",
 		 py::arg("M"), py::arg("eps") = default_epsilon)
+
 	.def("hurwitz", (matrix_type (*)(const point &x)) &hurwitz_parametrization,
 		 "Hurwitz parametrization of a unitary matrix.",
 		 py::arg("x"))
+
 	.def("exp_hermite", (matrix_type (*)(const point &x)) &exp_hermite_parametrization,
 		 "Exponential Hermitian parametrization of a unitary matrix.\n"
 		 "The resulting matrix is, U = exp(j*H(x)).",
@@ -256,23 +211,26 @@ PYBIND11_MODULE(pylinopt, m)
 	;
 
 	// Fock
-//	py::class_<fock>(m, "fock")
-//		.def(py::init<>())
-//		.def("__str__", &fock_str)
-//		.def("__repr__", &fock_repr)
-//		.def("total", &fock::total)
-//		.def("prod_fact", &fock::prod_fact)
+	py::class_<fock>(m, "fock")
+		.def(py::init<>())
+		.def(py::init<const fock &>())
+		.def(py::init<const fock::vector_class &>())
+		.def("__str__", &fock_str)
+		.def("__repr__", &fock_repr)
+		.def("total", &fock::total)
+		.def("prod_fact", &fock::prod_fact)
 //		.def("__mul__", &fock::operator*)
 //		.def("__imul__", &fock::operator*=, py::return_value_policy::copy)
 //		.def_property("as_list", &fock_to_list, &list_to_fock)
-//	;
+	;
 
 	// Basis
-//	py::class_<basis>(m, "basis")
-//		.def(py::init<>())
-//		.def(py::init<const basis&>())
-//		.def("__str__", &basis_str)
-//		.def("__repr__", &basis_repr)
+	py::class_<basis>(m, "basis")
+		.def(py::init<>())
+		.def(py::init<const basis &>())
+		.def(py::init<const basis::set_class &>())
+		.def("__str__", &basis_str)
+		.def("__repr__", &basis_repr)
 //		.def("__add__", &basis::operator+)
 //		.def("__iadd__", &basis::operator+=, py::return_value_policy::copy)
 //		.def("__mul__", &basis::operator*)
@@ -281,14 +239,15 @@ PYBIND11_MODULE(pylinopt, m)
 //		.def("postselect", &basis::postselect)
 //		.def("apply_func", &basis::apply_func)
 //		.def_property("as_list", &basis_to_list, &list_to_basis)
-//	;
+	;
 
 	// State
-//	py::class_<state>(m, "state")
-//		.def(py::init<>())
-//		.def(py::init<const state&>())
-//		.def("__str__", &state_str)
-//		.def("__repr__", &state_repr)
+	py::class_<state>(m, "state")
+		.def(py::init<>())
+		.def(py::init<const state &>())
+		.def(py::init<const state::map_class &>())
+		.def("__str__", &state_str)
+		.def("__repr__", &state_repr)
 //		.def("__add__", (state (state::*)(const state &) const) &state::operator+)
 //		.def("__iadd__", (state& (state::*)(const state &)) &state::operator+=, py::return_value_policy::copy)
 //		.def("__sub__", (state (state::*)() const) &state::operator-)
@@ -306,7 +265,7 @@ PYBIND11_MODULE(pylinopt, m)
 //		.def("postselect", (state (state::*)(const fock&) const) &state::postselect)
 //		.def("get_basis", &state::get_basis)
 //		.def_property("as_dict", &state_to_dict, &dict_to_state)
-//	;
+	;
 
 	// Circuit
 //	py::class_<circuit>(m, "circuit")

@@ -1,6 +1,5 @@
 import random
 from pylinopt import *
-from minieigen import *
 from math import sqrt
 
 def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):

@@ -13,41 +13,42 @@ namespace linopt
 
 class fock : private std::vector<int>
 {
+	typedef std::vector<int> base_class;
 public:
-	typedef std::vector<int> vector;
+	typedef std::vector<int> vector_class; //In principle this can be different from base_class
 
-	using vector::vector;
-	using vector::operator=;
+	using base_class::base_class;
+	using base_class::operator=;
 
-	using vector::iterator;
-	using vector::const_iterator;
-	using vector::reverse_iterator;
-	using vector::const_reverse_iterator;
+	using base_class::iterator;
+	using base_class::const_iterator;
+	using base_class::reverse_iterator;
+	using base_class::const_reverse_iterator;
 
-	using vector::begin;
-	using vector::end;
-	using vector::rbegin;
-	using vector::rend;
-	using vector::cbegin;
-	using vector::cend;
-	using vector::crbegin;
-	using vector::crend;
+	using base_class::begin;
+	using base_class::end;
+	using base_class::rbegin;
+	using base_class::rend;
+	using base_class::cbegin;
+	using base_class::cend;
+	using base_class::crbegin;
+	using base_class::crend;
 
-	using vector::front;
-	using vector::back;
-	using vector::operator[];
+	using base_class::front;
+	using base_class::back;
+	using base_class::operator[];
 
-	using vector::empty;
-	using vector::size;
-	using vector::resize;
-	using vector::assign;
-	using vector::push_back;
-	using vector::pop_back;
-	using vector::insert;
-	using vector::erase;
-	using vector::clear;
+	using base_class::empty;
+	using base_class::size;
+	using base_class::resize;
+	using base_class::assign;
+	using base_class::push_back;
+	using base_class::pop_back;
+	using base_class::insert;
+	using base_class::erase;
+	using base_class::clear;
 
-	fock(const vector &v): vector(v) {}
+	fock(const vector_class &v): base_class(v) {}
 	int total() const;
 	real_type prod_fact() const;
 	fock operator*(const fock &f) const;
