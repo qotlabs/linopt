@@ -39,10 +39,6 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
 						the states, where 3 or 4 photons populate either ancilla or logical subsystem
 						are irrelevant to the problem being solved
 
-		c:				an instanc of the class "chip"
-
-		u:				an instance of the class "unitary_matrix"
-
 	Returns:
 		A float value computed accroding to the formula () accounting both for the fidelity
 		of the linear optical transformation and the success probability.
@@ -75,6 +71,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
 	# 				raise ValueError('Number of input modes is inconsistent with total output number of modes')   
 
 	#v = VectorX(random_vector)
+	c.circuit()
 	c.input_state = input_fock
 	c.output_basis = full_basis
 	c.unitary = exp_hermite(random_vector)
