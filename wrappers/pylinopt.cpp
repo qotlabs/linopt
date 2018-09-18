@@ -26,24 +26,24 @@ std::string fock_repr(const fock &f)
 // __repr__ and __str__ methods for class "basis"
 std::string basis_str(const basis &b)
 {
-	std::string str;
+	std::stringstream ss;
 	if(!b.empty())
 	{
-		str = "{";
+		ss << "{";
 		for(auto iter = b.begin(); iter != --b.end(); ++iter)
-			str += fock_str(*iter) + ", ";
-		str += fock_str(*(--b.end()));
-		str += "}";
+			print_array(ss, *iter, "(", ",", ")") << ", ";
+		print_array(ss, *(--b.end()), "(", ",", ")");
+		ss << "}";
 	}
 	else
 	{
-		str = "{}";
+		ss << "{}";
 	}
-	return str;
+	return ss.str();
 }
 
 std::string basis_repr(const basis &b)
-{   
+{
 	return "basis(" + basis_str(b) + ")";
 }
 
@@ -55,9 +55,14 @@ std::string state_str(const state &s)
 	{
 		ss << "{";
 		for(auto iter = s.begin(); iter != --s.end(); ++iter)
-			ss << fock_str(iter->first) << ": " << iter->second << ", ";
+		{
+			print_array(ss, iter->first, "(", ",", ")") << ": ";
+			print_complex(ss, iter->second);
+			ss << ", ";
+		}
 		auto iter = --s.end();
-		ss << fock_str(iter->first) << ": " << iter->second;
+		print_array(ss, iter->first, "(", ",", ")") << ": ";
+		print_complex(ss, iter->second);
 		ss << "}";
 	}
 	else
@@ -229,6 +234,8 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::init<>())
 		.def(py::init<const basis &>())
 		.def(py::init<const basis::set_class &>())
+		.def(py::init<int, int>(),
+			 py::arg("nphot"), py::arg("modes"))
 		.def("__str__", &basis_str)
 		.def("__repr__", &basis_repr)
 //		.def("__add__", &basis::operator+)
@@ -281,6 +288,9 @@ PYBIND11_MODULE(pylinopt, m)
 //					  py::cpp_function((const matrix_type& (circuit::*)() const) &circuit::unitary, py::return_value_policy::copy),
 //					  &circuit::set_unitary)
 //	;
+
+	py::implicitly_convertible<fock::vector_class, fock>();
+
 #if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2
 	return m.ptr();
 #endif

@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <ostream>
+#include "types.h"
 
 namespace linopt
 {
@@ -33,6 +34,8 @@ std::ostream& print_array(std::ostream &stream, const T &a,
 	}
 	return stream;
 }
+
+std::ostream& print_complex(std::ostream &stream, const complex_type &x);
 
 }
 

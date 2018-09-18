@@ -6,7 +6,7 @@ PYTHON := python3
 LIBLINOPT_PATH := ../lib
 LDLIBS := -lm \
 		  $(shell pkg-config $(PYTHON) --libs) \
-		  -L ${LIBLINOPT_PATH} -llinopt 
+		  -L ${LIBLINOPT_PATH} -llinopt
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-parameter -Wno-int-in-bool-context\
           -I /usr/include \
