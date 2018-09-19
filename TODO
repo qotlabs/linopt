@@ -1,4 +1,7 @@
 1. Finish wrappers for fock, basis, state, circuit classes
+1.1. Return value policy
+1.2. Wrap using
+1.3. Iterators
 2. Documentation
 3. Exceptions
 4. Usage of Eigen::Ref
