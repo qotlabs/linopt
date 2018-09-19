@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, '../wrappers')
 from pylinopt import *
 import numpy as np
-import linopttools as lot
+import tools as lot
 from math import sqrt
 
 
