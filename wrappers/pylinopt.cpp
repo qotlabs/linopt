@@ -1,7 +1,7 @@
 #include <iterator>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
+#include <pybind11/operators.h>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include "../lib/linopt.h"
@@ -86,16 +86,6 @@ std::string state_repr(const state &s)
 //	return l;
 //}
 
-//void list_to_fock(fock &f, const py::list &l)
-//{
-//	f = {};
-//	if(l.size() > 0)
-//	{
-//		for (unsigned int i = 0; i < l.size(); ++i)
-//			f.push_back(py::cast<double>(l[i]));
-//	}
-//}
-
 // state to dict conversion
 //py::dict state_to_dict(const state &s)
 //{
@@ -109,15 +99,6 @@ std::string state_repr(const state &s)
 //	return d;
 //}
 
-//void dict_to_state(state &s, const py::dict &d)
-//{
-//	//py::list keys = d.keys();
-//	for(auto item : d)
-//	{
-//		s[py::cast<fock>(item.first)] = py::cast<complex_type>(item.second);
-//	}
-//}
-
 // basis to list conversion
 //py::list basis_to_list(const basis &b)
 //{
@@ -126,48 +107,6 @@ std::string state_repr(const state &s)
 //		s.append(iter);
 //	return s;
 //}
-
-//void list_to_basis(basis &b, const py::list &l)
-//{
-//	b = {};
-//	if(l.size() > 0)
-//	{
-//		for (unsigned int i = 0; i < l.size(); ++i)
-//			b.insert(py::cast<fock>(l[i]));
-//	}
-//}
-
-//matrix_type exp_hermite(const py::array_t<double> array)
-//{
-//	point vec(array.size());
-//	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
-//	return exp_hermite_parametrization(vec);
-//}
-
-//matrix_type hurwitz(const py::array_t<double> array)
-//{
-//	point vec(array.size());
-//	std::memcpy(vec.data(),array.data(),array.size()*sizeof(double));
-//	return hurwitz_parametrization(vec);
-//}
-
-//void exp_hermite(matrix_type &M, const py::array_t<double> array)
-//{
-//	M = exp_hermite(array);
-//}
-
-//void hurwitz(matrix_type &M, const py::array_t<double> array)
-//{
-//	M = hurwitz(array);
-//}
-
-//basis& generate_basis(basis &b, const int nphot, const int modes)
-//{
-//	return b.generate_basis(nphot, modes);
-//}
-
-//PYBIND11_MAKE_OPAQUE(fock::vector)
-//PYBIND11_MAKE_OPAQUE(point)
 
 static const auto docstr =
 	"Linear optics circuit calculator.";
@@ -181,9 +120,6 @@ PYBIND11_MODULE(pylinopt, m)
 {
 	m.doc() = docstr;
 #endif
-
-//	py::bind_vector<fock::vector>(m, "fock_vector");
-//	py::bind_vector<point>(m, "point");
 
 	// Matrix functions
 	m
@@ -220,12 +156,37 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::init<>())
 		.def(py::init<const fock &>())
 		.def(py::init<const fock::vector_class &>())
+
 		.def("__str__", &fock_str)
 		.def("__repr__", &fock_repr)
-		.def("total", &fock::total)
-		.def("prod_fact", &fock::prod_fact)
-//		.def("__mul__", &fock::operator*)
-//		.def("__imul__", &fock::operator*=, py::return_value_policy::copy)
+
+		.def(py::self < py::self)
+		.def(py::self <= py::self)
+		.def(py::self == py::self)
+		.def(py::self != py::self)
+		.def(py::self >= py::self)
+		.def(py::self > py::self)
+
+		.def("__len__", [](const fock &f) { return f.size(); })
+
+		.def("__iter__", [](fock &f) { return py::make_iterator(f.begin(), f.end()); },
+			 py::keep_alive<0, 1>())
+
+		.def("__getitem__", [](const fock &f, int i) { return f[i]; })
+
+		.def("__setitem__", [](fock &f, int i, int val) { return f[i] = val; })
+
+		.def("total", &fock::total,
+			 "Calculates the total number of photons in all modes.")
+
+		.def("prod_fact", &fock::prod_fact,
+			 "Calculates product of factorials of ocupation numbers.")
+
+		.def(py::self * py::self,
+			 "Calculates a tensor product of two Fock states.")
+		.def(py::self *= py::self,
+			 "Effectively equivalent to f1 = f1 * f2.")
+
 //		.def_property("as_list", &fock_to_list, &list_to_fock)
 	;
 
@@ -236,15 +197,38 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::init<const basis::set_class &>())
 		.def(py::init<int, int>(),
 			 py::arg("nphot"), py::arg("modes"))
+
 		.def("__str__", &basis_str)
 		.def("__repr__", &basis_repr)
-//		.def("__add__", &basis::operator+)
-//		.def("__iadd__", &basis::operator+=, py::return_value_policy::copy)
-//		.def("__mul__", &basis::operator*)
-//		.def("__imul__", &basis::operator*=, py::return_value_policy::copy)
-//		.def("generate_basis", &generate_basis, py::return_value_policy::copy)
-//		.def("postselect", &basis::postselect)
-//		.def("apply_func", &basis::apply_func)
+
+		.def("__len__", [](const basis &b) { return b.size(); })
+
+		.def("__iter__", [](basis &b) { return py::make_iterator(b.begin(), b.end()); },
+			 py::keep_alive<0, 1>())
+
+		.def(py::self + py::self,
+			 "Returns a basis which is a union of Fock states from both bases.")
+		.def(py::self += py::self,
+			 "Effectively equivalent to b1 = b1 + b2.")
+
+		.def(py::self * py::self,
+			 "Calculates a tensor product of two bases.\n"
+			 "Returns a basis consisting of all possible elementwise tensor "
+			 "products of elements of the bases.")
+		.def(py::self *= py::self,
+			 "Effectively equivalent to b1 = b1*b2.")
+
+		.def("postselect", &basis::postselect,
+			 "Returns a postselected basis after observing ancilla 'anc'.\n"
+			 "Ancilla is assumed to occupy the first modes.",
+			 py::arg("anc"))
+
+		.def("apply_func", &basis::apply_func,
+			 "Applies a function 'func' to all Fock states of the basis to "
+			 "compute corresponding amplitude and returns the corresponding "
+			 "state.",
+			 py::arg("func"))
+
 //		.def_property("as_list", &basis_to_list, &list_to_basis)
 	;
 
@@ -253,43 +237,93 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::init<>())
 		.def(py::init<const state &>())
 		.def(py::init<const state::map_class &>())
+
 		.def("__str__", &state_str)
 		.def("__repr__", &state_repr)
-//		.def("__add__", (state (state::*)(const state &) const) &state::operator+)
-//		.def("__iadd__", (state& (state::*)(const state &)) &state::operator+=, py::return_value_policy::copy)
-//		.def("__sub__", (state (state::*)() const) &state::operator-)
-//		.def("__sub__", (state (state::*)(const state &) const) &state::operator-)
-//		.def("__isub__", (state& (state::*)(const state &)) &state::operator-=, py::return_value_policy::copy)
-//		.def("__mul__", (state (state::*)(const state &) const) &state::operator*)
-//		.def("__mul__", (state (state::*)(complex_type) const) 	&state::operator*)
-//		.def("__imul__", (state& (state::*)(const state &)) &state::operator*=, py::return_value_policy::copy)
-//		.def("__imul__", (state& (state::*)(complex_type)) &state::operator*=, py::return_value_policy::copy)
-//		.def("__div__", (state (state::*)(complex_type) const) &state::operator/)
-//		.def("__itruediv__", (state& (state::*)(complex_type)) &state::operator/=, py::return_value_policy::copy)
-//		.def("norm", &state::norm)
-//		.def("normalize", &state::normalize, py::return_value_policy::copy)
-//		.def("dot", &state::dot)
-//		.def("postselect", (state (state::*)(const fock&) const) &state::postselect)
-//		.def("get_basis", &state::get_basis)
+
+		.def(py::self + py::self,
+			 "Adds two states, i.e., calculates their superposition.")
+		.def(py::self += py::self,
+			 "Effectively equivalent to s1 = s1 + s2.")
+
+		.def(py::self - py::self,
+			 "Substracts two states.")
+		.def(py::self -= py::self,
+			 "Effectively equivalent to s1 = s1 - s2.")
+
+		.def(-py::self,
+			 "Negates amplitudes of the state.")
+
+		.def(py::self * py::self,
+			 "Returns a tensor product of two states.")
+		.def(py::self *= py::self,
+			 "Effectively equivalent to s1 = s1 * s2.")
+
+		.def(py::self * complex_type(),
+			 "Multiplies a state by a complex number.")
+		.def(py::self *= complex_type(),
+			 "Effectively equivalent to s = s * z.")
+
+		 .def(py::self / complex_type(),
+			  "Divides a state by a complex number.")
+		 .def(py::self /= complex_type(),
+			  "Effectively equivalent to s = s / z.")
+
+		.def("norm", &state::norm,
+			 "Returns norm of the state.")
+
+		.def("normalize", &state::normalize,
+			 "Normalizes the state to have unit norm.")
+
+		.def("dot", &state::dot,
+			 "Calculates a dot (scalar) product.")
+
+		.def("postselect", (state (state::*)(const fock&) const) &state::postselect,
+			 "",
+			 py::arg("anc"))
+
+		.def("postselect", (std::map<fock, state> (state::*)(int) const) &state::postselect,
+			 "",
+			 py::arg("modes"))
+
+		.def("get_basis", &state::get_basis,
+			 "Returns basis of the state.")
+
 //		.def_property("as_dict", &state_to_dict, &dict_to_state)
 	;
 
-	// Circuit
-//	py::class_<circuit>(m, "circuit")
-//		.def(py::init<>())
-//		.def("output_state", &circuit::output_state)
-//		.def_property("input_state",
-//					  py::cpp_function((const fock& (circuit::*)() const) &circuit::input_state, py::return_value_policy::copy),
-//					  &circuit::set_input_state)
-//		.def_property("output_basis",
-//					  py::cpp_function((const basis& (circuit::*)() const) &circuit::output_basis, py::return_value_policy::copy),
-//					  &circuit::set_output_basis)
-//		.def_property("unitary",
-//					  py::cpp_function((const matrix_type& (circuit::*)() const) &circuit::unitary, py::return_value_policy::copy),
-//					  &circuit::set_unitary)
-//	;
+	m
+	.def("__mul__", (state (*)(complex_type, const state &)) &operator*,
+		 "Multiplies a state by a complex number.",
+		 py::arg("z"), py::arg("s"))
+	.def("dot", &dot,
+		 "Calculates a dot (scalar) product of two states.",
+		 py::arg("s1"), py::arg("s2"))
+	;
 
+	// Implicit conversions
 	py::implicitly_convertible<fock::vector_class, fock>();
+	py::implicitly_convertible<basis::set_class, basis>();
+	py::implicitly_convertible<state::map_class, state>();
+
+	// Circuit
+	py::class_<circuit>(m, "circuit")
+		.def(py::init<>())
+
+		.def("output_state", &circuit::output_state)
+
+		.def_property("input_state",
+					  py::cpp_function((const fock& (circuit::*)() const) &circuit::input_state, py::return_value_policy::copy),
+					  &circuit::set_input_state)
+
+		.def_property("output_basis",
+					  py::cpp_function((const basis& (circuit::*)() const) &circuit::output_basis, py::return_value_policy::copy),
+					  &circuit::set_output_basis)
+
+		.def_property("unitary",
+					  py::cpp_function((const matrix_type& (circuit::*)() const) &circuit::unitary, py::return_value_policy::copy),
+					  &circuit::set_unitary)
+	;
 
 #if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2
 	return m.ptr();

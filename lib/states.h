@@ -16,6 +16,8 @@ class fock : private std::vector<int>
 	typedef std::vector<int> base_class;
 public:
 	typedef std::vector<int> vector_class; //In principle this can be different from base_class
+	typedef int value_type;
+	typedef int& reference;
 
 	using base_class::base_class;
 	using base_class::operator=;
@@ -92,6 +94,8 @@ class basis : private std::set<fock>
 	typedef std::set<fock> base_class;
 public:
 	typedef std::set<fock> set_class; //In principle this can be different from base_class
+	typedef fock value_type;
+	typedef fock& reference;
 
 	using base_class::iterator;
 	using base_class::const_iterator;
@@ -135,6 +139,8 @@ class state : private std::map<fock, complex_type>
 public:
 	typedef std::pair<fock, complex_type> element;
 	typedef std::map<fock, complex_type> map_class; //In principle this can be different from base_class
+	typedef complex_type value_type;
+	typedef complex_type& reference;
 
 	using base_class::iterator;
 	using base_class::const_iterator;
