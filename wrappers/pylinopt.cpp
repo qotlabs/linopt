@@ -264,9 +264,9 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::self *= complex_type(),
 			 "Effectively equivalent to s = s * z.")
 
-		 .def(py::self / complex_type(),
+		.def(py::self / complex_type(),
 			  "Divides a state by a complex number.")
-		 .def(py::self /= complex_type(),
+		.def(py::self /= complex_type(),
 			  "Effectively equivalent to s = s / z.")
 
 		.def("norm", &state::norm,

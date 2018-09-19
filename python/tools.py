@@ -2,7 +2,7 @@ import random
 from pylinopt import *
 from math import sqrt
 
-def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
+def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
 	"""
 	The function computes the figure of merit of the output state optimization
 	routine accounting both for fidelity of the output state and the target
@@ -71,7 +71,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
 	# 				raise ValueError('Number of input modes is inconsistent with total output number of modes')   
 
 	#v = VectorX(random_vector)
-	c.circuit()
+	c = circuit()
 	c.input_state = input_fock
 	c.output_basis = full_basis
 	c.unitary = exp_hermite(random_vector)
@@ -82,7 +82,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis, c):
 
 	out_postselect = out_state.postselect
 
-	for anc in ancilla.as_list:
+	for anc in ancilla:
 		postselected = out_postselect(anc)
 		p = postselected.norm()
 		if p == 0:
