@@ -76,7 +76,7 @@ basis &basis::operator*=(const basis &b)
 
 basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 {
-	if(static_cast<int>(head.size()) == modes)
+	if(head.size() == modes)
 	{
 		if(nphot == 0)
 			this->insert(this->end(), head);

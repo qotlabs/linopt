@@ -2,8 +2,11 @@
 1.1. Return value policy
 1.2. Wrap using
 1.3. Iterators
+1.4. Slice
+1.5. Fock +
 2. Documentation
 3. Exceptions
+====GitHub release here====
 4. Usage of Eigen::Ref
 5. Move semantics in C++
 6. Pass by reference in Python

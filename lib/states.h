@@ -41,7 +41,7 @@ public:
 	using base_class::operator[];
 
 	using base_class::empty;
-	using base_class::size;
+	int size() const { return base_class::size(); }
 	using base_class::resize;
 	using base_class::assign;
 	using base_class::push_back;
@@ -112,7 +112,7 @@ public:
 	using base_class::crend;
 
 	using base_class::empty;
-	using base_class::size;
+	int size() const { return base_class::size(); }
 	using base_class::insert;
 	using base_class::erase;
 	using base_class::clear;
@@ -157,7 +157,7 @@ public:
 	using base_class::crend;
 
 	using base_class::empty;
-	using base_class::size;
+	int size() const { return base_class::size(); }
 	using base_class::operator[];
 	using base_class::insert;
 	using base_class::erase;
@@ -167,6 +167,7 @@ public:
 	using base_class::operator=;
 	state(): base_class() {}
 	state(const map_class &m): base_class(m) {}
+	state(const fock &f): base_class() { (*this)[f] = 1; }
 
 	state operator+(const state &s) const;
 	state &operator+=(const state &s);
@@ -184,6 +185,7 @@ public:
 	complex_type dot(const state &s) const;
 	state postselect(const fock &ancilla) const;
 	std::map<fock, state> postselect(int modes) const;
+	std::map<fock, state> postselect(const basis &b) const; // TODO
 	basis get_basis() const;
 };
 

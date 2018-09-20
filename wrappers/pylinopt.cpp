@@ -12,7 +12,7 @@ namespace py = pybind11;
 
 // __repr__ and __str__ methods for class "fock"
 std::string fock_str(const fock &f)
-{   
+{
 	std::stringstream ss;
 	print_array(ss, f, "[", ",", "]");
 	return ss.str();
@@ -77,36 +77,15 @@ std::string state_repr(const state &s)
 	return "state(" + state_str(s) + ")";
 }
 
-// fock to list conversion functions
-//py::list fock_to_list(const fock &f)
-//{
-//	py::list l;
-//	for (unsigned int i = 0; i < f.size(); ++i)
-//		l.append(f[i]);
-//	return l;
-//}
-
-// state to dict conversion
-//py::dict state_to_dict(const state &s)
-//{
-//	py::dict d;
-//	for(auto iter = s.begin(); iter != s.end(); ++iter)
-//	{
-//		d[py::make_tuple(fock_to_list(iter -> first))] = iter -> second;
-//		//d.second = iter -> second;
-//		//d[iter -> first] = iter->second;
-//	}
-//	return d;
-//}
-
-// basis to list conversion
-//py::list basis_to_list(const basis &b)
-//{
-//	py::list s;
-//	for(auto iter: b)
-//		s.append(iter);
-//	return s;
-//}
+template<typename Container, typename Key>
+void delitem_key(Container &c, const Key &k)
+{
+	auto iter = c.find(k);
+	if(iter == c.end())
+		throw py::key_error();
+	else
+		c.erase(k);
+}
 
 static const auto docstr =
 	"Linear optics circuit calculator.";
@@ -169,12 +148,33 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def("__len__", [](const fock &f) { return f.size(); })
 
-		.def("__iter__", [](fock &f) { return py::make_iterator(f.begin(), f.end()); },
+		.def("__getitem__", [](const fock &f, int i) {
+				if( !(0 <= i && i < f.size()) )
+					throw py::index_error();
+				return f[i];
+			})
+
+		.def("__setitem__", [](fock &f, int i, fock::value_type val) {
+				if( !(0 <= i && i < f.size()) )
+					throw py::index_error();
+				return f[i] = val;
+			})
+
+		.def("__delitem__", [](fock &f, int i, fock::value_type val) {
+				 if( !(0 <= i && i < f.size()) )
+					 throw py::index_error();
+				 return f.erase(f.begin() + i);
+			 })
+
+		.def("__iter__", [](fock &f) {
+				 return py::make_iterator(f.begin(), f.end());
+			 },
 			 py::keep_alive<0, 1>())
 
-		.def("__getitem__", [](const fock &f, int i) { return f[i]; })
-
-		.def("__setitem__", [](fock &f, int i, int val) { return f[i] = val; })
+		.def("__reversed__", [](fock &f) {
+				 return py::make_iterator(f.rbegin(), f.rend());
+			 },
+			 py::keep_alive<0, 1>())
 
 		.def("total", &fock::total,
 			 "Calculates the total number of photons in all modes.")
@@ -187,7 +187,13 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::self *= py::self,
 			 "Effectively equivalent to f1 = f1 * f2.")
 
-//		.def_property("as_list", &fock_to_list, &list_to_fock)
+		.def("as_list", [](const fock &f) {
+				 py::list l;
+				 for (const auto &elem: f)
+					 l.append(elem);
+				 return l;
+			 },
+			 "Returns Python list object that represents the Fock state.")
 	;
 
 	// Basis
@@ -203,8 +209,40 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def("__len__", [](const basis &b) { return b.size(); })
 
-		.def("__iter__", [](basis &b) { return py::make_iterator(b.begin(), b.end()); },
+		.def("__delitem__", (void (*)(basis &, const fock &)) &delitem_key)
+
+		.def("__iter__", [](basis &b) {
+				 return py::make_iterator(b.begin(), b.end());
+			 },
 			 py::keep_alive<0, 1>())
+
+		.def("__reversed__", [](basis &b) {
+				 return py::make_iterator(b.rbegin(), b.rend());
+			 },
+			 py::keep_alive<0, 1>())
+
+		.def("__contains__", [](const basis &b, const fock &f) {
+				 return b.find(f) != b.end();
+			 })
+
+		.def("add", [](basis &b, const fock &f) {
+				 b.insert(f);
+			 },
+			 "Adds the Fock state 'f' to the basis.",
+			 py::arg("f"))
+
+		.def("remove", (void (*)(basis &, const fock &)) &delitem_key,
+			 "Removes the Fock state 'f' from the basis.",
+			 py::arg("f"))
+
+		.def("discard", [](basis &b, const fock &f) {
+				 b.erase(f);
+			 },
+			 "Removes the Fock state 'f' from the basis if it is present.",
+			 py::arg("f"))
+
+		.def("clear", &basis::clear,
+			 "Remove all elements from the basis.")
 
 		.def(py::self + py::self,
 			 "Returns a basis which is a union of Fock states from both bases.")
@@ -218,6 +256,10 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::self *= py::self,
 			 "Effectively equivalent to b1 = b1*b2.")
 
+		.def("generate_basis", &basis::generate_basis,
+			 "",
+			 py::arg("nphot"), py::arg("modes"), py::arg("head") = fock())
+
 		.def("postselect", &basis::postselect,
 			 "Returns a postselected basis after observing ancilla 'anc'.\n"
 			 "Ancilla is assumed to occupy the first modes.",
@@ -229,17 +271,60 @@ PYBIND11_MODULE(pylinopt, m)
 			 "state.",
 			 py::arg("func"))
 
-//		.def_property("as_list", &basis_to_list, &list_to_basis)
+		.def("as_set", [](const basis &b) {
+				 py::set s;
+				 for(const auto &f: b)
+					 s.add(f);
+				 return s;
+			 },
+			 "Returns Python set object that represents the basis.")
 	;
 
 	// State
 	py::class_<state>(m, "state")
 		.def(py::init<>())
 		.def(py::init<const state &>())
+		.def(py::init<const fock &>())
 		.def(py::init<const state::map_class &>())
 
 		.def("__str__", &state_str)
 		.def("__repr__", &state_repr)
+
+		.def("__len__", [](const state &s) { return s.size(); })
+
+		.def("__getitem__", [](const state &s, const fock &f) {
+				 auto iter = s.find(f);
+				 if(iter == s.end())
+					 throw py::key_error();
+				 return iter->second;
+			 })
+
+		.def("__missing__", [](state &s) { return state::value_type(0); })
+
+		.def("__setitem__", [](state &s, const fock &f, state::value_type amp) {
+				 auto iter = s.find(f);
+				 if(iter == s.end())
+					 throw py::key_error();
+				 return iter->second = amp;
+			 })
+
+		.def("__delitem__", (void (*)(state &, const fock &)) &delitem_key)
+
+		.def("__iter__", [](state &s) {
+				 return py::make_key_iterator(s.begin(), s.end());
+			 },
+			 py::keep_alive<0, 1>())
+
+		.def("__reversed__", [](state &s) {
+				 return py::make_key_iterator(s.rbegin(), s.rend());
+			 },
+			 py::keep_alive<0, 1>())
+
+		.def("__contains__", [](const state &s, const fock &f) {
+				 return s.find(f) != s.end();
+			 })
+
+		.def("clear", &state::clear)
 
 		.def(py::self + py::self,
 			 "Adds two states, i.e., calculates their superposition.")
@@ -279,17 +364,31 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Calculates a dot (scalar) product.")
 
 		.def("postselect", (state (state::*)(const fock&) const) &state::postselect,
-			 "",
+			 "Returns postselected state for ancilla 'anc'. The ancilla is "
+			 "assumed to occupy the first modes.",
 			 py::arg("anc"))
 
 		.def("postselect", (std::map<fock, state> (state::*)(int) const) &state::postselect,
-			 "",
-			 py::arg("modes"))
+			 "Calculates postselected states for all possible ancillas that "
+			 "occupy the first 'nmodes' modes. Returns a dictionary in the "
+			 "following format:\n"
+			 "{anc1: postselected_state1, anc2: postselected_state2, ...},\n"
+			 "where anc1, anc2, ... have 'nmodes' modes.\n"
+			 "This function is useful when postselection for all possible "
+			 "ancillas is required. It is faster than calling postselect(anc) "
+			 "in cycle for different 'anc'.",
+			 py::arg("nmodes"))
 
 		.def("get_basis", &state::get_basis,
 			 "Returns basis of the state.")
 
-//		.def_property("as_dict", &state_to_dict, &dict_to_state)
+		.def("as_dict", [](const state &s) {
+				 py::dict d;
+				 for(const auto &elem: s)
+				 d[py::make_tuple(elem.first)] = elem.second;
+			 return d;
+			 },
+			 "Returns Python dict object that represents the state.")
 	;
 
 	m

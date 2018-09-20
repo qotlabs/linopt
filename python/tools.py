@@ -56,7 +56,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
 	# 	raise ValueError('You have supplied an empty ancilla basis')
 
 	# check the consistency between the vector size and the number of modes in input fock state
-	# if len(input_fock.as_list) != sqrt(len(random_vector)):
+	# if len(input_fock) != sqrt(len(random_vector)):
 	# 	raise ValueError('The supplied vector length is inconsistent with the number of input fock state modes')
 	
 	# check if the fock input state, output target state and ancilla basis are consistent ->
@@ -64,10 +64,10 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
 	# + the total photon number in any of the ancilla basis states
 	# for anc in ancilla:
 	# 	for sta in target:
-	# 		for key in sta.as_dict.keys():
+	# 		for key in sta.get_basis():
 	# 			if input_fock.total() != (anc.total() + key.total()):
 	# 				raise ValueError('Input fock state total photon number is inconsistent with the target state and ancilla basis')
-	# 			if len(input_fock.as_list) != (len(anc.as_list) + len(key.as_list)):
+	# 			if len(input_fock) != (len(anc) + len(key)):
 	# 				raise ValueError('Number of input modes is inconsistent with total output number of modes')   
 
 	#v = VectorX(random_vector)
