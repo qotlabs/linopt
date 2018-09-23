@@ -2,6 +2,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/operators.h>
+#include <pybind11/functional.h>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 #include "../lib/linopt.h"
@@ -78,7 +79,7 @@ std::string state_repr(const state &s)
 }
 
 template<typename Container, typename Key>
-void delitem_key(Container &c, const Key &k)
+void erase_key(Container &c, const Key &k)
 {
 	auto iter = c.find(k);
 	if(iter == c.end())
@@ -139,53 +140,79 @@ PYBIND11_MODULE(pylinopt, m)
 		.def("__str__", &fock_str)
 		.def("__repr__", &fock_repr)
 
-		.def(py::self < py::self)
-		.def(py::self <= py::self)
-		.def(py::self == py::self)
-		.def(py::self != py::self)
-		.def(py::self >= py::self)
-		.def(py::self > py::self)
+		.def(py::self < py::self,
+			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "'self' is less than 'f'.",
+			 py::arg("f"))
+		.def(py::self <= py::self,
+			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "'self' is less or equal than 'f'.",
+			 py::arg("f"))
+		.def(py::self == py::self,
+			 "Tests whether two Fock states are equal.",
+			 py::arg("f"))
+		.def(py::self != py::self,
+			 "Tests whether two Fock state differ",
+			 py::arg("f"))
+		.def(py::self >= py::self,
+			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "'self' is greater or equal than 'f'.",
+			 py::arg("f"))
+		.def(py::self > py::self,
+			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "'self' is greater than 'f'.",
+			 py::arg("f"))
 
-		.def("__len__", [](const fock &f) { return f.size(); })
+		.def("__len__", [](const fock &f) { return f.size(); },
+			 "Returns number of modes of the Fock state.")
 
 		.def("__getitem__", [](const fock &f, int i) {
 				if( !(0 <= i && i < f.size()) )
 					throw py::index_error();
 				return f[i];
-			})
+			 },
+			 "Returns the occupation number of the i-th mode.",
+			 py::arg("i"))
 
 		.def("__setitem__", [](fock &f, int i, fock::value_type val) {
 				if( !(0 <= i && i < f.size()) )
 					throw py::index_error();
 				return f[i] = val;
-			})
+			 },
+			 "Sets the occupation number of the i-th mode to 'val'.",
+			 py::arg("i"), py::arg("val"))
 
-		.def("__delitem__", [](fock &f, int i, fock::value_type val) {
+		.def("__delitem__", [](fock &f, int i) {
 				 if( !(0 <= i && i < f.size()) )
 					 throw py::index_error();
 				 return f.erase(f.begin() + i);
-			 })
+			 },
+			 "Removes i-th mode.",
+			 py::arg("i"))
 
 		.def("__iter__", [](fock &f) {
 				 return py::make_iterator(f.begin(), f.end());
 			 },
+			 "Returns corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__reversed__", [](fock &f) {
 				 return py::make_iterator(f.rbegin(), f.rend());
 			 },
+			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("total", &fock::total,
 			 "Calculates the total number of photons in all modes.")
 
 		.def("prod_fact", &fock::prod_fact,
-			 "Calculates product of factorials of ocupation numbers.")
+			 "Calculates product of factorials of occupation numbers.")
 
 		.def(py::self * py::self,
 			 "Calculates a tensor product of two Fock states.")
 		.def(py::self *= py::self,
-			 "Effectively equivalent to f1 = f1 * f2.")
+			 "Effectively equivalent to self = self * f.",
+			 py::arg("f"))
 
 		.def("as_list", [](const fock &f) {
 				 py::list l;
@@ -207,23 +234,30 @@ PYBIND11_MODULE(pylinopt, m)
 		.def("__str__", &basis_str)
 		.def("__repr__", &basis_repr)
 
-		.def("__len__", [](const basis &b) { return b.size(); })
+		.def("__len__", [](const basis &b) { return b.size(); },
+			 "Returns the number of Fock states in the basis.")
 
-		.def("__delitem__", (void (*)(basis &, const fock &)) &delitem_key)
+		.def("__delitem__", (void (*)(basis &, const fock &)) &erase_key,
+			 "Removes the Fock 'f' from the basis.",
+			 py::arg("f"))
 
 		.def("__iter__", [](basis &b) {
 				 return py::make_iterator(b.begin(), b.end());
 			 },
+			 "Returns corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__reversed__", [](basis &b) {
 				 return py::make_iterator(b.rbegin(), b.rend());
 			 },
+			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__contains__", [](const basis &b, const fock &f) {
 				 return b.find(f) != b.end();
-			 })
+			 },
+			 "Tests whether the Fock 'f' is in the basis.",
+			 py::arg("f"))
 
 		.def("add", [](basis &b, const fock &f) {
 				 b.insert(f);
@@ -231,8 +265,9 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Adds the Fock state 'f' to the basis.",
 			 py::arg("f"))
 
-		.def("remove", (void (*)(basis &, const fock &)) &delitem_key,
-			 "Removes the Fock state 'f' from the basis.",
+		.def("remove", (void (*)(basis &, const fock &)) &erase_key,
+			 "Removes the Fock state 'f' from the basis. Throws KeyError if 'f' "
+			 "does not exist",
 			 py::arg("f"))
 
 		.def("discard", [](basis &b, const fock &f) {
@@ -247,17 +282,20 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::self + py::self,
 			 "Returns a basis which is a union of Fock states from both bases.")
 		.def(py::self += py::self,
-			 "Effectively equivalent to b1 = b1 + b2.")
+			 "Effectively equivalent to self = self + b.",
+			 py::arg("b"))
 
 		.def(py::self * py::self,
 			 "Calculates a tensor product of two bases.\n"
 			 "Returns a basis consisting of all possible elementwise tensor "
 			 "products of elements of the bases.")
 		.def(py::self *= py::self,
-			 "Effectively equivalent to b1 = b1*b2.")
+			 "Effectively equivalent to self = self * b.",
+			 py::arg("b"))
 
 		.def("generate_basis", &basis::generate_basis,
-			 "",
+			 "Generates a basis of all possible Fock states with 'modes' modes "
+			 "and containing 'nphot' photons.",
 			 py::arg("nphot"), py::arg("modes"), py::arg("head") = fock())
 
 		.def("postselect", &basis::postselect,
@@ -268,7 +306,8 @@ PYBIND11_MODULE(pylinopt, m)
 		.def("apply_func", &basis::apply_func,
 			 "Applies a function 'func' to all Fock states of the basis to "
 			 "compute corresponding amplitude and returns the corresponding "
-			 "state.",
+			 "state. The 'func' should take a fock object as an argument and "
+			 "return a complex number representing its amplitude.",
 			 py::arg("func"))
 
 		.def("as_set", [](const basis &b) {
@@ -290,51 +329,68 @@ PYBIND11_MODULE(pylinopt, m)
 		.def("__str__", &state_str)
 		.def("__repr__", &state_repr)
 
-		.def("__len__", [](const state &s) { return s.size(); })
+		.def("__len__", [](const state &s) { return s.size(); },
+			 "Returns number of Focks with a specified amplitude in the state.")
 
 		.def("__getitem__", [](const state &s, const fock &f) {
 				 auto iter = s.find(f);
 				 if(iter == s.end())
 					 throw py::key_error();
 				 return iter->second;
-			 })
+			 },
+			 "Returns an amplitude corresponding to the Fock 'f'.",
+			 py::arg("f"))
 
-		.def("__missing__", [](state &s) { return state::value_type(0); })
+		.def("__missing__", [](state &s) { return state::value_type(0.); })
 
 		.def("__setitem__", [](state &s, const fock &f, state::value_type amp) {
-				 auto iter = s.find(f);
-				 if(iter == s.end())
-					 throw py::key_error();
-				 return iter->second = amp;
-			 })
+				 if(amp == 0.)
+					 s.erase(f);
+				 else
+					 s[f] = amp;
+				 return amp;
+			 },
+			 "Sets amplitude of the Fock 'f' to 'amp'. If 'amp' = 0, then "
+			 "deletes the Fock 'f' from the state.",
+			 py::arg("f"), py::arg("amp"))
 
-		.def("__delitem__", (void (*)(state &, const fock &)) &delitem_key)
+		.def("__delitem__", (void (*)(state &, const fock &)) &erase_key,
+			 "Removes the Fock 'f' from the state. Equivalent to self[f] = 0.",
+			 py::arg("f"))
 
 		.def("__iter__", [](state &s) {
 				 return py::make_key_iterator(s.begin(), s.end());
 			 },
+			 "Returns corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__reversed__", [](state &s) {
 				 return py::make_key_iterator(s.rbegin(), s.rend());
 			 },
+			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__contains__", [](const state &s, const fock &f) {
 				 return s.find(f) != s.end();
-			 })
+			 },
+			 "Tests whether the state has a specified amplitude corresponding "
+			 "to the Fock 'f'.",
+			 py::arg("f"))
 
-		.def("clear", &state::clear)
+		.def("clear", &state::clear,
+			 "Completely clears the state.")
 
 		.def(py::self + py::self,
 			 "Adds two states, i.e., calculates their superposition.")
 		.def(py::self += py::self,
-			 "Effectively equivalent to s1 = s1 + s2.")
+			 "Effectively equivalent to self = self + s.",
+			 py::arg("s"))
 
 		.def(py::self - py::self,
-			 "Substracts two states.")
+			 "Subtracts two states.")
 		.def(py::self -= py::self,
-			 "Effectively equivalent to s1 = s1 - s2.")
+			 "Effectively equivalent to self = self - s.",
+			 py::arg("s"))
 
 		.def(-py::self,
 			 "Negates amplitudes of the state.")
@@ -342,17 +398,20 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::self * py::self,
 			 "Returns a tensor product of two states.")
 		.def(py::self *= py::self,
-			 "Effectively equivalent to s1 = s1 * s2.")
+			 "Effectively equivalent to self = self * s.",
+			 py::arg("s"))
 
 		.def(py::self * complex_type(),
 			 "Multiplies a state by a complex number.")
 		.def(py::self *= complex_type(),
-			 "Effectively equivalent to s = s * z.")
+			 "Effectively equivalent to self = self * z.",
+			 py::arg("z"))
 
 		.def(py::self / complex_type(),
-			  "Divides a state by a complex number.")
+			 "Divides a state by a complex number.")
 		.def(py::self /= complex_type(),
-			  "Effectively equivalent to s = s / z.")
+			 "Effectively equivalent to self = self / z.",
+			 py::arg("z"))
 
 		.def("norm", &state::norm,
 			 "Returns norm of the state.")

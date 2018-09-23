@@ -20,6 +20,7 @@ bool is_row_unitary(const matrix_type &M, real_type eps = default_epsilon);
 bool is_unitary(const matrix_type &M, real_type eps = default_epsilon);
 
 complex_type permanent(const matrix_type &M);
+complex_type ppermanent(const matrix_type &M);	// TODO: Parallel version
 
 }
 
