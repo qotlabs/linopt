@@ -202,6 +202,46 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
+		.def("append", (void (fock::*)(const fock::value_type &n)) &fock::push_back,
+			  "Adds the mode with the occupation number 'n' to the end.",
+			  py::arg("n"))
+
+		.def("insert", [](fock &f, int i, fock::value_type n) {
+				if( !(0 <= i && i <= f.size()) )
+					throw py::index_error();
+				else
+					f.insert(f.begin() + i, n);
+			 },
+			 "Inserts the mode with occupation number 'n' at position 'i'.",
+			 py::arg("i"), py::arg("n"))
+
+		.def("pop", [](fock &f, int i = -1) {
+				 if(i == -1)
+				 {
+					 auto val = f.back();
+					 f.pop_back();
+					 return val;
+				 }
+				 else
+				 {
+					 if( !(0 <= i && i < f.size()) )
+						 throw py::index_error();
+					 auto val = f[i];
+					 f.erase(f.begin() + i);
+					 return val;
+				 }
+			 },
+			 "Removes i-th mode and returns its occupation number. By default "
+			 "removes the last mode.",
+			 py::arg("i"))
+
+		.def("clear", &fock::clear,
+			 "Completely clears the Fock state")
+
+		.def("resize", [](fock &f, int n) { f.resize(n); },
+			 "Sets the numbers of modes for the Fock state to 'n'.",
+			 py::arg("n"))
+
 		.def("total", &fock::total,
 			 "Calculates the total number of photons in all modes.")
 
