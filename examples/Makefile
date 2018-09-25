@@ -1,5 +1,5 @@
 CC := g++
-LIBLINOPT_PATH := ./lib
+LIBLINOPT_PATH := ../lib
 LDLIBS := -L ${LIBLINOPT_PATH} -lm -llinopt
 CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math \
           -Wall -Wextra -Wno-unused-result -Wno-int-in-bool-context \
