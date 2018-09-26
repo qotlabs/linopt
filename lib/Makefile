@@ -35,7 +35,7 @@ doc:	doxygen.conf $(SRCS) $(HDRS)
 	$(DOXYGEN) $<
 
 clean:
-	$(RM) -r *.o *.d *.s *.a *.so* doc/
+	$(RM) -r *.o *.d *.s *.a *.so*
 
 help:
 	@echo "Available commands:"
