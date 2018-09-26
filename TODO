@@ -1,7 +1,7 @@
-1. Finish wrappers for fock, basis, state, circuit classes
-1.1. Slice
-1.2. See TODO functions
-3. Exceptions
+1. Add slices to fock in pylinopt
+2. Implement functions marked with TODO
+3. Modify circuit interface
+4. Exceptions
 ====GitHub release here====
 4. Usage of Eigen::Ref
 5. Move semantics in C++
