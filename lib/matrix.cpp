@@ -19,9 +19,9 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include <cassert>
 #include <limits.h>
 #include <complex>
+#include <stdexcept>
 #include <unsupported/Eigen/MatrixFunctions>
 #include "misc.h"
 #include "matrix.h"
@@ -30,8 +30,10 @@ using namespace linopt;
 
 complex_type linopt::permanent(const matrix_type &M)
 {
-	assert(M.cols() == M.rows());
-	assert(M.cols() > 0);
+	if(M.cols() != M.rows())
+		throw std::invalid_argument("Matrix should be square.");
+	if(M.cols() == 0)
+		throw std::invalid_argument("Empty matrix is not allowed.");
 	if(M.cols() == 2)
 		return M(0, 0)*M(1, 1) + M(0, 1)*M(1, 0);
 	if(M.cols() == 3)
@@ -51,8 +53,8 @@ complex_type linopt::permanent(const matrix_type &M)
 			   M(2,0)*M(3,1)) + M(1,1)*(M(2,3)*M(3,0) + M(2,0)*M(3,3)) +
 			   M(1,0)*(M(2,3)*M(3,1) + M(2,1)*M(3,3)));
 	using index_type = unsigned long;
-	// Matrix size too large
-	assert(static_cast<index_type>(M.cols()) <= CHAR_BIT*sizeof(index_type));
+	if(static_cast<index_type>(M.cols()) > CHAR_BIT*sizeof(index_type))
+		throw std::invalid_argument("Matrix size is too large.");
 	complex_type perm = 0.;
 	vector_type sum = M.rowwise().sum();
 	real_type mult;
@@ -82,7 +84,8 @@ static inline real_type pyramid(real_type x, real_type a)
 void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 {
 	const int N = std::sqrt(x.size());
-	assert(N*N == static_cast<int>(x.size()));
+	if(N*N != static_cast<int>(x.size()))
+		throw std::length_error("Size of point should match matrix size.");
 	if(M.cols() != N || M.rows() != N)
 		M.resize(N, N);
 	int i, j, k = 0;
@@ -125,7 +128,8 @@ matrix_type linopt::hurwitz_parametrization(const point &x)
 void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 {
 	const int N = std::sqrt(x.size());
-	assert(N*N == static_cast<int>(x.size()));
+	if(N*N != static_cast<int>(x.size()))
+		throw std::length_error("Size of point should match matrix size.");
 	matrix_type H(N, N);
 	int k = N;
 	for(int i = 0; i < N; i++)
