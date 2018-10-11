@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import sys
-sys.path.insert(0, '../libpy')
+sys.path.insert(0, '../pylib')
 from pylinopt import *
 import numpy as np
 import tools as lot
