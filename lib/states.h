@@ -27,10 +27,17 @@
 #include <map>
 #include <ostream>
 #include <initializer_list>
+#include <functional>
 #include "types.h"
 
 namespace linopt
 {
+
+class fock;
+class basis;
+class state;
+
+typedef std::function<complex_type(const fock&)> basis_func;
 
 class fock : private std::vector<int>
 {
