@@ -20,6 +20,7 @@
  */
 
 #include <limits.h>
+#include <cmath>
 #include <complex>
 #include <stdexcept>
 #include <unsupported/Eigen/MatrixFunctions>

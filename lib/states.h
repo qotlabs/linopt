@@ -62,7 +62,7 @@ public:
 	using base_class::operator[];
 
 	using base_class::empty;
-	int size() const { return base_class::size(); }
+	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::resize;
 	using base_class::assign;
 	using base_class::push_back;
@@ -71,6 +71,7 @@ public:
 	using base_class::erase;
 	using base_class::clear;
 
+	fock() = default;
 	fock(const vector_class &v): base_class(v) {}
 	int total() const;
 	real_type prod_fact() const;
@@ -135,7 +136,7 @@ public:
 	using base_class::crend;
 
 	using base_class::empty;
-	int size() const { return base_class::size(); }
+	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::insert;
 	using base_class::erase;
 	using base_class::clear;
@@ -180,7 +181,7 @@ public:
 	using base_class::crend;
 
 	using base_class::empty;
-	int size() const { return base_class::size(); }
+	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::operator[];
 	using base_class::insert;
 	using base_class::erase;
