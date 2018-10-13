@@ -21,19 +21,20 @@
 
 #include <limits.h>
 #include <complex>
-#include <stdexcept>
 #include <unsupported/Eigen/MatrixFunctions>
 #include "misc.h"
 #include "matrix.h"
+#include "exceptions.h"
 
 using namespace linopt;
 
 complex_type linopt::permanent(const matrix_type &M)
 {
 	if(M.cols() != M.rows())
-		throw std::invalid_argument("Matrix should be square.");
+		throw wrong_size(ERROR_MSG("Matrix should be square. Current size is (" +
+				std::to_string(M.rows()) + "x" + std::to_string(M.cols()) + ")."));
 	if(M.cols() == 0)
-		throw std::invalid_argument("Empty matrix is not allowed.");
+		throw wrong_size(ERROR_MSG("Empty matrix is not allowed."));
 	if(M.cols() == 2)
 		return M(0, 0)*M(1, 1) + M(0, 1)*M(1, 0);
 	if(M.cols() == 3)
@@ -54,7 +55,9 @@ complex_type linopt::permanent(const matrix_type &M)
 			   M(1,0)*(M(2,3)*M(3,1) + M(2,1)*M(3,3)));
 	using index_type = unsigned long;
 	if(static_cast<index_type>(M.cols()) > CHAR_BIT*sizeof(index_type))
-		throw std::invalid_argument("Matrix size is too large.");
+		throw wrong_size(ERROR_MSG("Matrix size (which is " +
+				std::to_string(M.rows()) + ") is too large (maximum is " +
+				std::to_string(CHAR_BIT*sizeof(index_type)) + ")."));
 	complex_type perm = 0.;
 	vector_type sum = M.rowwise().sum();
 	real_type mult;
@@ -85,7 +88,8 @@ void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 {
 	const int N = std::sqrt(x.size());
 	if(N*N != static_cast<int>(x.size()))
-		throw std::length_error("Size of point should match matrix size.");
+		throw wrong_size(ERROR_MSG("Size of point (which is " +
+				std::to_string(x.size()) + ") should be a square of an integer."));
 	if(M.cols() != N || M.rows() != N)
 		M.resize(N, N);
 	int i, j, k = 0;
@@ -129,7 +133,8 @@ void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 {
 	const int N = std::sqrt(x.size());
 	if(N*N != static_cast<int>(x.size()))
-		throw std::length_error("Size of point should match matrix size.");
+		throw wrong_size(ERROR_MSG("Size of point (which is " +
+				std::to_string(x.size()) + ") should be a square of an integer."));
 	matrix_type H(N, N);
 	int k = N;
 	for(int i = 0; i < N; i++)

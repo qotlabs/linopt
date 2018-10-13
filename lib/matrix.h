@@ -24,7 +24,6 @@
 
 #include <Eigen/Dense>
 #include "types.h"
-#include "states.h"
 
 namespace linopt
 {
