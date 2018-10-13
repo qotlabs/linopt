@@ -21,6 +21,7 @@
 
 #include "misc.h"
 #include "states.h"
+#include "exceptions.h"
 
 #include <algorithm>
 
@@ -59,6 +60,27 @@ fock fock::operator*(const fock &f) const
 fock &fock::operator*=(const fock &f)
 {
 	insert(end(), f.begin(), f.end());
+	return *this;
+}
+
+fock fock::operator+(const fock &f) const
+{
+	fock newf = *this;
+	return newf += f;
+}
+
+fock &fock::operator+=(const fock &f)
+{
+	if(this->size() != f.size())
+		throw wrong_size(ERROR_MSG("Sizes of two Fock states should be equal. "
+				"Currently they are " + std::to_string(this->size()) + " and " +
+				std::to_string(f.size()) + "."));
+	auto iter = this->begin();
+	for(auto &n: f)
+	{
+		*iter += n;
+		iter++;
+	}
 	return *this;
 }
 
@@ -315,12 +337,56 @@ std::map<fock, state> state::postselect(int modes) const
 	return res;
 }
 
+std::map<fock, state> state::postselect(const basis &b) const
+{
+	if(b.size() == 0)
+		return {{fock(), *this}};
+	std::map<fock, state> res;
+	auto si = this->begin();
+	auto bi = b.begin();
+	state *res_bi = &res[*bi];
+	while(si != this->end() && bi != b.end())
+	{
+		const fock &f = si->first;
+		const complex_type &amp = si->second;
+		const fock anc(f.begin(), f.begin() + bi->size());
+		if(*bi < anc)
+		{
+			bi++;
+			if(bi == b.end())
+				break;
+			res_bi = &res[*bi];
+		}
+		else if(*bi == anc)
+		{
+			res_bi->emplace_hint(res_bi->end(), fock(f.begin() + bi->size(), f.end()), amp);
+			si++;
+		}
+		else
+		{
+			si++;
+		}
+	}
+	bi++;
+	for(; bi != b.end(); bi++)
+		res[*bi] = state();
+	return res;
+}
+
 basis state::get_basis() const
 {
 	basis b;
 	for(auto &elem: *this)
 		b.insert(b.end(), elem.first);
 	return b;
+}
+
+std::vector<state::value_type> state::get_amplitudes() const
+{
+	std::vector<state::value_type> amps;
+	for(auto &elem: *this)
+		amps.push_back(elem.second);
+	return amps;
 }
 
 std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)

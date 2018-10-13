@@ -22,10 +22,10 @@
 #ifndef LINOPT_H
 #define LINOPT_H
 
-#define LINOPT_VERSION_STRING	"0.0.4"
+#define LINOPT_VERSION_STRING	"0.0.5"
 #define LINOPT_VERSION_MAJOR	0
 #define LINOPT_VERSION_MINOR	0
-#define LINOPT_VERSION_MICRO	4
+#define LINOPT_VERSION_MICRO	5
 
 #include "states.h"
 #include "matrix.h"

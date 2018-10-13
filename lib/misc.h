@@ -95,6 +95,11 @@ inline T mod(T x, T a)
 	return (x < 0) ? x + a : x;
 }
 
+inline int isqrt(int x)
+{
+	return static_cast<int>(std::sqrt(x) + 0.5);
+}
+
 template<typename T>
 std::ostream& print_array(std::ostream &stream, const T &a,
 						  const char *b1 = "{",

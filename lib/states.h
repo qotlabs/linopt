@@ -76,8 +76,8 @@ public:
 	real_type prod_fact() const;
 	fock operator*(const fock &f) const;
 	fock &operator*=(const fock &f);
-	fock operator+(const fock &f) const; // TODO
-	fock &operator+=(const fock &f); // TODO
+	fock operator+(const fock &f) const;
+	fock &operator+=(const fock &f);
 };
 
 inline bool operator==(const fock &f, const fock &g)
@@ -208,9 +208,9 @@ public:
 	complex_type dot(const state &s) const;
 	state postselect(const fock &ancilla) const;
 	std::map<fock, state> postselect(int modes) const;
-	std::map<fock, state> postselect(const basis &b) const; // TODO
+	std::map<fock, state> postselect(const basis &b) const;
 	basis get_basis() const;
-	std::vector<state::value_type> get_amplitudes() const;	// TODO
+	std::vector<state::value_type> get_amplitudes() const;
 };
 
 state operator*(complex_type x, const state &s);

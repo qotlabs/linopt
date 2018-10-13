@@ -86,7 +86,7 @@ static inline real_type pyramid(real_type x, real_type a)
 
 void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 {
-	const int N = std::sqrt(x.size());
+	const int N = isqrt(x.size());
 	if(N*N != static_cast<int>(x.size()))
 		throw wrong_size(ERROR_MSG("Size of point (which is " +
 				std::to_string(x.size()) + ") should be a square of an integer."));
@@ -131,7 +131,7 @@ matrix_type linopt::hurwitz_parametrization(const point &x)
 
 void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 {
-	const int N = std::sqrt(x.size());
+	const int N = isqrt(x.size());
 	if(N*N != static_cast<int>(x.size()))
 		throw wrong_size(ERROR_MSG("Size of point (which is " +
 				std::to_string(x.size()) + ") should be a square of an integer."));

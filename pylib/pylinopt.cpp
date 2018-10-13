@@ -275,6 +275,13 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Effectively equivalent to self = self * f.",
 			 py::arg("f"))
 
+		.def(py::self + py::self,
+			 "Calculates a sum of two Fock states (elementwise addition of "
+			 "occupation numbers).")
+		.def(py::self += py::self,
+			 "Effectively equivalent to self = self + f.",
+			 py::arg("f"))
+
 		.def("as_list", [](const fock &f) {
 				 py::list l;
 				 for (const auto &elem: f)
@@ -498,6 +505,15 @@ PYBIND11_MODULE(pylinopt, m)
 			 "ancillas is required. It is faster than calling postselect(anc) "
 			 "in cycle for different 'anc'.",
 			 py::arg("nmodes"))
+
+		.def("postselect", (std::map<fock, state> (state::*)(const basis &) const) &state::postselect,
+			 "Calculates postselected states for all ancillas specified by "
+			 "'basis'. Returns a dictionary in the following format:\n"
+			 "{anc1: postselected_state1, anc2: postselected_state2, ...}.\n"
+			 "This function is useful when postselection for an array of "
+			 "ancillas is required. It is faster than calling postselect(anc) "
+			 "in cycle for different 'anc'.",
+			 py::arg("basis"))
 
 		.def("get_basis", &state::get_basis,
 			 "Returns basis of the state.")
