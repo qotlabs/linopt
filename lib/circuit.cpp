@@ -24,9 +24,6 @@
 
 using namespace linopt;
 
-circuit::circuit():
-	uin_possibly_changed(false) {}
-
 matrix_type &circuit::prepare_uin(const matrix_type &u, const fock &fin)
 {
 	int tot = fin.total();
@@ -54,60 +51,53 @@ complex_type circuit::calc_fock_amp(const fock &fout)
 	return perm;
 }
 
-matrix_type &circuit::unitary()
-{
-	uin_possibly_changed = true;
-	return U;
-}
-
-const matrix_type &circuit::unitary() const
-{
-	return U;
-}
-
-fock &circuit::input_state()
-{
-	uin_possibly_changed = true;
-	return _input_state;
-}
-
-const fock &circuit::input_state() const
+const fock &circuit::get_input_state() const
 {
 	return _input_state;
 }
 
-basis &circuit::output_basis()
+void circuit::set_input_state(const fock &fin)
+{
+	output_state_changed = true;
+	uin_possibly_changed = true;
+	_input_state = fin;
+}
+
+const basis &circuit::get_output_basis() const
 {
 	return _output_basis;
 }
 
-const basis &circuit::output_basis() const
+void circuit::set_output_basis(const basis &bout)
 {
-	return _output_basis;
+	output_state_changed = true;
+	_output_basis = bout;
 }
 
-state circuit::output_state()
+const matrix_type &circuit::get_unitary() const
+{
+	return U;
+}
+
+void circuit::set_unitary(const matrix_type &u)
+{
+	output_state_changed = true;
+	uin_possibly_changed = true;
+	U = u;
+}
+
+const state &circuit::output_state()
 {
 	if(uin_possibly_changed)
 	{
 		prepare_uin(U, _input_state);
 		uin_possibly_changed = false;
 	}
-	return _output_basis.apply_func(std::bind(&circuit::calc_fock_amp,
-											 this, std::placeholders::_1));
-}
-
-void circuit::set_input_state(const fock &fin)
-{
-	this->input_state() = fin;
-}
-
-void circuit::set_output_basis(const basis &bout)
-{
-	this->output_basis() = bout;
-}
-
-void circuit::set_unitary(const matrix_type &u)
-{
-	this->unitary() = u;
+	if(output_state_changed)
+	{
+		_output_state = _output_basis.apply_func(std::bind(&circuit::calc_fock_amp,
+													this, std::placeholders::_1));
+		output_state_changed = false;
+	}
+	return _output_state;
 }

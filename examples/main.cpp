@@ -31,9 +31,9 @@ int main()
 	for(unsigned i = 0; i < a.size(); i++)
 		a[i] = distribution(rand_gen);
 	circuit C;
-	C.unitary() = hurwitz_parametrization(a);
-	C.input_state() = input_state;
-	C.output_basis() = full_basis;
+	C.set_unitary(hurwitz_parametrization(a));
+	C.set_input_state(input_state);
+	C.set_output_basis(full_basis);
 	state out = C.output_state();
 	for(const auto &anc : ancilla_basis)
 		cout << out.postselect(anc).normalize() << endl;

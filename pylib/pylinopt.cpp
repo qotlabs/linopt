@@ -545,19 +545,34 @@ PYBIND11_MODULE(pylinopt, m)
 	py::class_<circuit>(m, "circuit")
 		.def(py::init<>())
 
-		.def("output_state", &circuit::output_state)
-
 		.def_property("input_state",
-					  py::cpp_function((const fock& (circuit::*)() const) &circuit::input_state, py::return_value_policy::copy),
-					  &circuit::set_input_state)
+			 &circuit::get_input_state,
+			 &circuit::set_input_state,
+			 "Input Fock state.")
 
 		.def_property("output_basis",
-					  py::cpp_function((const basis& (circuit::*)() const) &circuit::output_basis, py::return_value_policy::copy),
-					  &circuit::set_output_basis)
+			 &circuit::get_output_basis,
+			 &circuit::set_output_basis,
+			 "A basis of Fock states used to compute the output state. It may "
+			 "either contain the full Fock state basis of the system or be "
+			 "composed only of the combination of the possible states in the "
+			 "logical and ancilla subsystems. Such a combination eliminates "
+			 "the necessity to compute the probabilities for the output states "
+			 "which won't be present in the system. For example, if the total "
+			 "number of photons in the system is 4, the ancilla subsystem is "
+			 "set to have 2 photons, and the logical subsystem is also set to "
+			 "have 2 photons, the states, where 3 or 4 photons populate either "
+			 "ancilla or logical subsystem are irrelevant to the problem being "
+			 "solved.")
 
 		.def_property("unitary",
-					  py::cpp_function((const matrix_type& (circuit::*)() const) &circuit::unitary, py::return_value_policy::copy),
-					  &circuit::set_unitary)
+			 &circuit::get_unitary,
+			 &circuit::set_unitary,
+			 "Unitary matrix representing a transformation of creation "
+			 "operators of photons in modes.")
+
+		.def("output_state", &circuit::output_state,
+			 "Calculates output state.")
 	;
 
 #if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2

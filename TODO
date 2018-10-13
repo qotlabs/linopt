@@ -1,6 +1,5 @@
 Add slices to fock in pylinopt
 Implement functions marked with TODO
-Modify circuit interface
 Usage of Eigen::Ref
 Move semantics in C++
 Pass by reference in Python
