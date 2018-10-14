@@ -19,6 +19,10 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @defgroup matrix Matrix
+ * @brief Various matrix-related functions
+ */
+
 #include <limits.h>
 #include <cmath>
 #include <complex>
@@ -29,6 +33,15 @@
 
 using namespace linopt;
 
+/** @ingroup matrix
+ * @brief Calculates permanent of a square matrix
+ *
+ * Calculates permanent of a square NxN matrix M.
+ * Internally the function uses Glynn formula with Gray code summation
+ * technique. Complexity is O(N*2^N).
+ * @param M[in] -- matrix to calculate its permanent.
+ * @return Computed permanent.
+ */
 complex_type linopt::permanent(const matrix_type &M)
 {
 	if(M.cols() != M.rows())

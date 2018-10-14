@@ -19,17 +19,21 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @mainpage
+ * Linopt is a library for linear optics calculations. It consists of C++11 core
+ * library and Python bindings to it.
+ */
+
 #ifndef LINOPT_H
 #define LINOPT_H
 
 #define LINOPT_VERSION_STRING	"0.0.7"
 #define LINOPT_VERSION_MAJOR	0
 #define LINOPT_VERSION_MINOR	0
-#define LINOPT_VERSION_MICRO	7
+#define LINOPT_VERSION_PATCH	7
 
 #include "states.h"
 #include "matrix.h"
 #include "circuit.h"
-#include "cost_functor.h"
 
 #endif // LINOPT_H

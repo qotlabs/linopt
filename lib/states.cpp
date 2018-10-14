@@ -19,6 +19,10 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @defgroup States
+ * @brief Linear optics states
+ */
+
 #include "misc.h"
 #include "states.h"
 #include "exceptions.h"
