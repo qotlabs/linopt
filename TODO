@@ -1,5 +1,6 @@
-Add slices to fock in pylinopt
-Implement functions marked with TODO
+README.md
+Implement parallel version of permanent
+Documentation
 Usage of Eigen::Ref
 Move semantics in C++
 Pass by reference in Python

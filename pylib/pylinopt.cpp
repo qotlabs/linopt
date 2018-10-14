@@ -189,23 +189,50 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def("__getitem__", [](const fock &f, int i) {
 				if( !(0 <= i && i < f.size()) )
-					throw py::index_error();
+					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				return f[i];
 			 },
 			 "Returns the occupation number of the i-th mode.",
 			 py::arg("i"))
 
+		.def("__getitem__", [](const fock &f, py::slice slice) {
+				size_t start, stop, step, len;
+				if(!slice.compute(f.size(), &start, &stop, &step, &len))
+					throw py::error_already_set();
+				fock *res = new fock(len);
+				for(size_t i = 0; i < len; i++)
+				{
+					(*res)[i] = f[start];
+					start += step;
+				}
+				return res;
+			 })
+
 		.def("__setitem__", [](fock &f, int i, fock::value_type val) {
 				if( !(0 <= i && i < f.size()) )
-					throw py::index_error();
+					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				return f[i] = val;
 			 },
 			 "Sets the occupation number of the i-th mode to 'val'.",
 			 py::arg("i"), py::arg("val"))
 
+		.def("__setitem__", [](fock &f, py::slice slice, const fock &val) {
+				 size_t start, stop, step, len;
+				 if(!slice.compute(f.size(), &start, &stop, &step, &len))
+					 throw py::error_already_set();
+				 if(len != static_cast<size_t>(val.size()))
+					 throw std::runtime_error("Left and right hand size of slice "
+											  "assignment have different sizes.");
+				 for(size_t i = 0; i < len; i++)
+				 {
+					 f[start] = val[i];
+					 start += step;
+				 }
+			 })
+
 		.def("__delitem__", [](fock &f, int i) {
 				 if( !(0 <= i && i < f.size()) )
-					 throw py::index_error();
+					 throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				 return f.erase(f.begin() + i);
 			 },
 			 "Removes i-th mode.",
@@ -229,31 +256,28 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def("insert", [](fock &f, int i, fock::value_type n) {
 				if( !(0 <= i && i <= f.size()) )
-					throw py::index_error();
+					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				else
 					f.insert(f.begin() + i, n);
 			 },
 			 "Inserts the mode with occupation number 'n' at position 'i'.",
 			 py::arg("i"), py::arg("n"))
 
-		.def("pop", [](fock &f, int i = -1) {
-				 if(i == -1)
-				 {
-					 auto val = f.back();
-					 f.pop_back();
-					 return val;
-				 }
-				 else
-				 {
-					 if( !(0 <= i && i < f.size()) )
-						 throw py::index_error();
-					 auto val = f[i];
-					 f.erase(f.begin() + i);
-					 return val;
-				 }
+		.def("pop", [](fock &f) {
+				 auto val = f.back();
+				 f.pop_back();
+				 return val;
 			 },
-			 "Removes i-th mode and returns its occupation number. By default "
-			 "removes the last mode.",
+			 "Removes the last mode and returns its occupation number.")
+
+		.def("pop", [](fock &f, int i) {
+				 if( !(0 <= i && i < f.size()) )
+					 throw py::index_error("Index " + std::to_string(i) + " is out of range.");
+				 auto val = f[i];
+				 f.erase(f.begin() + i);
+				 return val;
+			 },
+			 "Removes i-th mode and returns its occupation number.",
 			 py::arg("i"))
 
 		.def("clear", &fock::clear,

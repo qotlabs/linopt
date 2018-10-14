@@ -23,6 +23,7 @@
 #define MATRIX_H
 
 #include <Eigen/Dense>
+#include <vector>
 #include "types.h"
 
 namespace linopt
