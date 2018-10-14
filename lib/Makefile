@@ -3,7 +3,7 @@ ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
 LDLIBS := -lm
-CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math -fPIC \
+CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-int-in-bool-context \
           -I /usr/include \
           $(shell pkg-config eigen3 --cflags) \
