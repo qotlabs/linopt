@@ -223,6 +223,31 @@ matrix_type linopt::exp_hermite_parametrization(const point &x)
 }
 
 /** @ingroup matrix
+ * @brief Calculates normalized fidelity between two matrices
+ *
+ * Normalized fidelity @f$ F(A, B) @f$ between two matrices @f$ A @f$ and
+ * @f$ B @f$ is defined as follows:
+ * @f[ \newcommand{\Tr}{\mathrm{Tr}}
+ *     F(A, B) = \frac{|\Tr(A^\dagger B)|^2}{\Tr(A^\dagger A) \Tr(B^\dagger B)}.
+ * @f]
+ * @param A[in] -- first matrix.
+ * @param B[in] -- second matrix.
+ * @return Calculated fidelity.
+ * @throw If matrix sizes do not match `wrong_size` is thrown.
+ */
+real_type linopt::matrix_fidelity(const matrix_type &A, const matrix_type &B)
+{
+	if(A.rows() != B.rows() || A.cols() != B.cols())
+		throw wrong_size(ERROR_MSG("Matrix A size (which is " +
+			std::to_string(A.rows()) + "x" + std::to_string(A.cols()) +
+			") should be equal to B size (which is " +
+			std::to_string(B.rows()) + "x" + std::to_string(B.cols()) + ")."));
+	real_type F = std::norm((A.conjugate().cwiseProduct(B)).sum());
+	F /= A.squaredNorm() * B.squaredNorm();
+	return F;
+}
+
+/** @ingroup matrix
  * @brief Tests whether a matrix is column-unitary
  *
  * A matrix @f$ M @f$ is called column unitary if @f$ M^\dagger M = 1 @f$.

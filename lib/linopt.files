@@ -1,3 +1,5 @@
+circuit_design.cpp
+circuit_design.h
 exceptions.h
 misc.cpp
 misc.h

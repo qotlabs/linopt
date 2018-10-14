@@ -43,6 +43,8 @@ matrix_type hurwitz_parametrization(const point &x);
 void exp_hermite_parametrization(matrix_type &M, const point &x);
 matrix_type exp_hermite_parametrization(const point &x);
 
+real_type matrix_fidelity(const matrix_type &A, const matrix_type &B);
+
 bool is_column_unitary(const matrix_type &M, real_type eps = default_epsilon);
 bool is_row_unitary(const matrix_type &M, real_type eps = default_epsilon);
 bool is_unitary(const matrix_type &M, real_type eps = default_epsilon);
