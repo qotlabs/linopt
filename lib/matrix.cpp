@@ -36,11 +36,17 @@ using namespace linopt;
 /** @ingroup matrix
  * @brief Calculates permanent of a square matrix
  *
- * Calculates permanent of a square NxN matrix M.
+ * Calculates permanent of a square @f$ N \times N @f$ matrix `M`.
  * Internally the function uses Glynn formula with Gray code summation
- * technique. Complexity is O(N*2^N).
+ * technique. Complexity is @f$ O(N \times 2^N) @f$.
  * @param M[in] -- matrix to calculate its permanent.
  * @return Computed permanent.
+ *
+ * @todo Parallel version `ppermanent()`.
+ *
+ * @see
+ * David G.Glynn "The permanent of a square matrix." Eur. J. Combin. __31__,
+ * pp. 1887-1891 (2010), https://doi.org/10.1016/j.ejc.2010.01.010
  */
 complex_type linopt::permanent(const matrix_type &M)
 {
@@ -98,6 +104,22 @@ static inline real_type pyramid(real_type x, real_type a)
 	return mod(x, a);
 }
 
+/** @ingroup matrix
+ * @brief Fills a matrix according to the Hurwitz parametrization.
+ *
+ *
+ * @param M[out] -- a matrix to store the result. If it has improper size it
+ * will be resized.
+ * @param x[in] -- an array of parameters.
+ *
+ * @throw
+ * If size of `x` is not a square of some integer number, then `wrong_size` is
+ * thrown.
+ *
+ * @see
+ * K. Życzkowski and M. Kus "Random unitary matrices." J. Phys. A: Math. Gen.
+ * __27__, pp. 4235-4245 (1994), https://doi.org/10.1088/0305-4470/27/12/028
+ */
 void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 {
 	const int N = isqrt(x.size());
@@ -136,6 +158,13 @@ void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 	return;
 }
 
+/** @ingroup matrix
+ * @brief Returns a matrix parametrized according to the Hurwitz parametrization
+ *
+ * @overload
+ * @param x[in] -- an array of parameters.
+ * @return Unitary matrix parametrized by `x`.
+ */
 matrix_type linopt::hurwitz_parametrization(const point &x)
 {
 	matrix_type M;
@@ -143,6 +172,18 @@ matrix_type linopt::hurwitz_parametrization(const point &x)
 	return M;
 }
 
+/** @ingroup matrix
+ * @brief Fills a matrix according to the exp-Hermitian parametrization.
+ *
+ *
+ * @param M[out] -- a matrix to store the result. If it has improper size it
+ * will be resized.
+ * @param x[in] -- an array of parameters.
+ *
+ * @throw
+ * If size of `x` is not a square of some integer number, then `wrong_size` is
+ * thrown.
+ */
 void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 {
 	const int N = isqrt(x.size());
@@ -166,6 +207,14 @@ void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 	return;
 }
 
+/** @ingroup matrix
+ * @brief Returns a matrix parametrized according to the exp-Hermitian
+ * parametrization
+ *
+ * @overload
+ * @param x[in] -- an array of parameters.
+ * @return Unitary matrix parametrized by `x`.
+ */
 matrix_type linopt::exp_hermite_parametrization(const point &x)
 {
 	matrix_type M;
@@ -173,16 +222,50 @@ matrix_type linopt::exp_hermite_parametrization(const point &x)
 	return M;
 }
 
+/** @ingroup matrix
+ * @brief Tests whether a matrix is column-unitary
+ *
+ * A matrix @f$ M @f$ is called column unitary if @f$ M^\dagger M = 1 @f$.
+ * @param M[in] -- matrix to test.
+ * @param eps[in] -- accuracy within test is performed.
+ * @return `true` if the matrix `M` is a column-unitary one with the given
+ * accuracy, `false` otherwise.
+ *
+ * @see is_row_unitary(), is_unitary()
+ */
 bool linopt::is_column_unitary(const matrix_type &M, real_type eps)
 {
 	return (M.adjoint() * M).isIdentity(eps);
 }
 
+/** @ingroup matrix
+ * @brief Tests whether a matrix is row-unitary
+ *
+ * A matrix @f$ M @f$ is called row unitary if @f$ M M^\dagger = 1 @f$.
+ * @param M[in] -- matrix to test.
+ * @param eps[in] -- accuracy within test is performed.
+ * @return `true` if the matrix `M` is a row-unitary one with the given
+ * accuracy, `false` otherwise.
+ *
+ * @see is_column_unitary(), is_unitary()
+ */
 bool linopt::is_row_unitary(const matrix_type &M, real_type eps)
 {
 	return (M * M.adjoint()).isIdentity(eps);
 }
 
+/** @ingroup matrix
+ * @brief Tests whether a matrix is unitary
+ *
+ * A square matrix @f$ M @f$ is called unitary if it is both column and row
+ * unitary.
+ * @param M[in] -- matrix to test.
+ * @param eps[in] -- accuracy within test is performed.
+ * @return `true` if the matrix `M` is a unitary one with the given
+ * accuracy, `false` otherwise.
+ *
+ * @see is_column_unitary(), is_row_unitary()
+ */
 bool linopt::is_unitary(const matrix_type &M, real_type eps)
 {
 	if(M.cols() != M.rows())
