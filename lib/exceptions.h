@@ -45,6 +45,10 @@ class wrong_size: public general_error
 	using general_error::general_error;
 };
 
+class not_unitary : public general_error
+{
+	using general_error::general_error;
+};
 }
 
 #endif // EXCEPTIONS_H
