@@ -31,7 +31,7 @@ using namespace linopt;
 
 static void checkmate(int mm[], const int N)
 {
-	// mm is assumed to contain N(N-1)/2 elementss
+	// mm is assumed to contain N(N-1)/2 elements
 	int k = 1;
 	for(int i = 0; i < N*(N - 1) / 2; i++)
 	{
@@ -44,22 +44,32 @@ static void checkmate(int mm[], const int N)
 }
 
 /** @ingroup design
- * @brief Fills a matrix parametrized according to the Clements
- * parametrization with basic matrices @f$$ e^{i\theta}i \begin{pmatrix}
-					e^{i\phi}sin{\theta} & cos{\theta}  \\
-					e^{i\phi}cos{\theta} & -sin{\theta} 
-   \end{pmatrix} @f$$ with beam splitter angle defects.
+ * @brief Fills a unitary matrix according to the Clements design
  *
- * @param M[in] -- diagonal unitary matrix of proper size, if not - it will be set as
- * identity matrix of proper size.
- * @param M[out] -- produced unitary matrix.
- * @param x[in] -- an array of phase shift parameters, such that even elements
- * are @f$ \phi @f$ — phase shift before beam splitters, and odds are @f$ \theta @f$
- * - phase shift between beam splitters. All pairs of parameters goes in reverse 
- * column-wise enumeration order.
- * @param y[in] -- an array of beam splitters' angle defects, such that even elements
- * are deffects of first splitters, and odds are deffects of second splitters. All pairs
- * of parameters goes in reverse column-wise enumeration order.
+ * Fills a unitary matrix parametrized according to the Clements parametrization
+ * with basic matrices of the form
+ * @f[
+ *		e^{i\theta}i \begin{pmatrix}
+ *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
+ *		e^{i\phi}\cos{\theta} & -\sin{\theta}
+ *  \end{pmatrix}
+ * @f]
+ * with beam splitter angle defects.
+ *
+ * @param M[in,out] -- on input a diagonal unitary matrix of size
+ * @f$ N \times N @f$ is provided. If the matrix is not unitary or have improper
+ * size (calculated from `x` size) -- it will be resized accordingly and set to
+ * the identity matrix. On output this matrix is used to store the final
+ * result.
+ * @param x[in] -- an array of @f$ N(N-1)/2 @f$ phase shift parameters, such
+ * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
+ * splitters, and odd ones are @f$ \theta @f$ -- phase shifts _between_ the beam
+ * splitters. All pairs of parameters go in reverse column-wise enumeration
+ * order.
+ * @param y[in] -- an array of beam splitters angle defects, such that even
+ * elements are defects of the first splitters, and odd ones are defects of the
+ * second splitters. All pairs of parameters go in reverse column-wise
+ * enumeration order.
  *
  * @throw
  * If `x` size is not equal to @f$ N(N-1)/2 @f$ for some integer @f$ N @f$ or if
@@ -116,20 +126,11 @@ void linopt::clements_design(matrix_type &M, const point &x, const point &y)
 }
 
 /** @ingroup design
- * @brief Fills a matrix parametrized according to the Clements
- * parametrization with basic matrices @f$$ e^{i\theta}i \begin{pmatrix}
-					e^{i\phi}sin{\theta} & cos{\theta}  \\
-					e^{i\phi}cos{\theta} & -sin{\theta} 
-   \end{pmatrix} @f$$.
+ * @brief @overload
  *
- * @param M[in] -- diagonal unitary matrix of proper size, if not - it will be set as
- * identity matrix of proper size.
- * @param M[out] -- produced unitary matrix.
- * @param x[in] -- an array of phase shift parameters, such that even elements
- * are @f$ \phi @f$ - phase shift before beam splitters, and odds are @f$ \theta @f$
- * - phase shift between beam splitters. All pairs of parameters goes in reverse
- * column-wise enumeration order.
- * @overload
+ * @details
+ * This function is equivalent to the `clements_design(M, x, y)` with all
+ * elements of `y` set to zero, however, calculations are a bit faster.
  */
 void linopt::clements_design(matrix_type &M, const point &x)
 {
@@ -163,21 +164,13 @@ void linopt::clements_design(matrix_type &M, const point &x)
 }
 
 /** @ingroup design
- * @brief Returns a matrix parametrized according to the Clements
- * parametrization with basic matrices @f$$ e^{i\theta}i \begin{pmatrix}
-					e^{i\phi}sin{\theta} & cos{\theta}  \\
-					e^{i\phi}cos{\theta} & -sin{\theta}
-   \end{pmatrix} @f$$ with beam splitter angle defects.
- * Starting diagonal matrix is assumed to be identity.
+ * @brief @overload
  *
- * @overload
- * @param x[in] -- an array of phase shift parameters, such that even elements
- * are @f$ \phi @f$ - phase shift before beam splitters, and odds are @f$ \theta @f$
- * - phase shift between beam splitters. All pairs of parameters goes in reverse
- * column-wise enumeration order.
- * @param y[in] -- an array of beam splitters' angle defects, such that even elements
- * are deffects of first splitters, and odds are deffects of second splitters. All pairs
- * of parameters goes in reverse column-wise enumeration order.
+ * @details
+ * This function is equivalent to `clements_design(M, x, y)` with `M` being the
+ * identity matrix.
+ *
+ * @return Calculated unitary matrix `M`.
  */
 matrix_type linopt::clements_design(const point &x, const point &y)
 {
@@ -187,17 +180,13 @@ matrix_type linopt::clements_design(const point &x, const point &y)
 }
 
 /** @ingroup design
- * @brief Returns a matrix parametrized according to the Clements
- * parametrization with basic matrices @f$$ e^{i\theta}i \begin{pmatrix}
-					e^{i\phi}sin{\theta} & cos{\theta}  \\
-					e^{i\phi}cos{\theta} & -sin{\theta}
-   \end{pmatrix} @f$$. Starting diagonal matrix is assumed to be identity.
+ * @brief @overload
  *
- * @overload
- * @param x[in] -- an array of phase shift parameters, such that even elements
- * are @f$ \phi @f$ - phase shift before beam splitters, and odds are @f$ \theta @f$
- * - phase shift between beam splitters. All pairs of parameters goes in reverse
- * column-wise enumeration order.
+ * @details
+ * This function is equivalent to `clements_design(M, x)` with `M` being the
+ * identity matrix.
+ *
+ * @return Calculated unitary matrix `M`.
  */
 matrix_type linopt::clements_design(const point &x)
 {
@@ -206,43 +195,54 @@ matrix_type linopt::clements_design(const point &x)
 	return M;
 }
 
+
+
 /** @ingroup design
- * @brief Returns phase shift coefficients and leaves diagonal unitary matrix
- * according to the Clements parametrization with basic matrices
- * @f$$ e^{i\theta}i \begin{pmatrix}
-					e^{i\phi}sin{\theta} & cos{\theta}  \\
-					e^{i\phi}cos{\theta} & -sin{\theta}
-   \end{pmatrix} @f$$.
+ * @brief Calculates phase shift coefficients for a unitary matrix according to
+ * the Clements design.
  *
- * @param M[in] -- unitary matrix of proper size, if it has no proper size it will be resized.
- * @param M[out] -- diagonal unitary matrix.
- * @param x[out] -- an array of phase shift parameters, such that even elements
- * are @f$ \phi @f$ — phase delay before beam splitters, and odds are @f$ \theta @f$
- * — phase delay between beam splitters. All pairs of parameters goes in reverse
- * column-wise enumeration orde.
+ * Returns phase shift coefficients and leaves a diagonal unitary matrix
+ * according to the Clements parametrization with basic matrices of the form
+ * @f[
+ *		e^{i\theta}i \begin{pmatrix}
+ *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
+ *		e^{i\phi}\cos{\theta} & -\sin{\theta}
+ *	\end{pmatrix}.
+ * @f]
+ * This function is effectively inverse of the `clements_design(M, x)`.
+ *
+ * @param M[in,out] -- on input a unitary @f$ N \times N @f$ matrix is
+ * specified. On output a diagonal unitary matrix is produced. The original
+ * matrix is destroyed during calculations.
+ * @param x[out] -- the array of @f$ N(N-1) @f$ phase shift parameters, such
+ * that even elements are @f$ \phi @f$ -- phase delays _before_ the beam
+ * splitters, and odd ones are @f$ \theta @f$ -- phase delays _between_ the beam
+ * splitters. All pairs of parameters go in reverse column-wise enumeration
+ * order.
+ * @param eps -- precision for unitarity test of the input matrix `M`. If `eps`
+ * is negative then no tests are performed.
  *
  * @throw
- * If `x` size is not equal to @f$ N(N-1)/2 @f$ for some integer @f$ N @f$ or if
- * `x` and `y` sizes do not match, then `wrong_size` is thrown.
- * If `M` is not unitary (if needed after resize procedure), then `not_unitary` is thrown.
+ * If `M` is not unitary within given precision `eps`, then `not_unitary` is
+ * thrown.
  *
  * @see
  * W. R. Clements, _et al._ "Optimal design for universal multiport
  * interferometers." Optica __3__, pp. 1460-1465 (2016),
  * https://doi.org/10.1364/OPTICA.3.001460
  */
-point linopt::get_clements_design(matrix_type &M)
+void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
 {
 	// Leaves diagonal unitary matrix & gives point in which even elements are
 	// phi, odd elements are theta. Phase shift coefficients are given in
 	// reverse column-wise enumeration order
 	const int N = static_cast<int>(M.cols());
-	if (M.cols() != N || M.rows() != N)
-		M.resize(N, N);
-	if (!is_unitary(M))
-		throw not_unitary(ERROR_MSG("Given matrix is not unitary"));
+	if(eps > 0)
+		if (!is_unitary(M, eps))
+			throw not_unitary(ERROR_MSG("Given matrix is not unitary"));
 	const int NN = N * (N - 1) / 2;
-	point param(2 * NN);
+	if(static_cast<int>(x.size()) != 2*NN)
+		x.resize(2*NN);
 	int* mm = new int[NN];
 	int* pattern = new int[NN];
 	checkmate(pattern, N);
@@ -273,8 +273,8 @@ point linopt::get_clements_design(matrix_type &M)
 							 M.col(m+1)*((exp2theta + 1.)*i1*0.5);
 				M.col(m+1) = tempcol   *((exp2theta + 1.)*i1*expphi*(-0.5)) -
 							 M.col(m+1)*((exp2theta - 1.)*0.5);
-				param[2*f] = phi;
-				param[2*f + 1] = theta;
+				x[2*f] = phi;
+				x[2*f + 1] = theta;
 				f--;
 			}
 		}
@@ -293,8 +293,8 @@ point linopt::get_clements_design(matrix_type &M)
 							 M.row(n)  *((exp2theta + 1.)*i1*0.5);
 				M.row(n)   = temprow   *((exp2theta + 1.)*expphi*i1*0.5) -
 							 M.row(n)  *((exp2theta - 1.)*0.5);
-				param[2 * s] = phi;
-				param[2 * s + 1] = theta;
+				x[2 * s] = phi;
+				x[2 * s + 1] = theta;
 				s++;
 			}
 		}
@@ -306,12 +306,12 @@ point linopt::get_clements_design(matrix_type &M)
 		m = mm[i] - 1;
 		phim = arg(M(m, m));
 		phin = arg(M(m + 1, m + 1));
-		M(m, m) = -polar(1., phin - param[2 * i]);
+		M(m, m) = -polar(1., phin - x[2 * i]);
 		if (phim - phin >= 0)
-			param[2 * i] = phim - phin - M_PI;
+			x[2 * i] = phim - phin - M_PI;
 		else
-			param[2 * i] = phim - phin + M_PI;
-		param[2 * i + 1] = -param[2 * i + 1];
+			x[2 * i] = phim - phin + M_PI;
+		x[2 * i + 1] = -x[2 * i + 1];
 	}
 	// Obtaining reverse column-wise enumeration order
 	for(i = NN - 1; i >= 0; i--)
@@ -322,12 +322,12 @@ point linopt::get_clements_design(matrix_type &M)
 			{
 				if(mm[n] == pattern[NN - 1 - i])
 				{
-					phim = param[2 * i];
-					param[2 * i] = param[2 * n];
-					param[2 * n] = phim;
-					phim = param[2 * i + 1];
-					param[2 * i + 1] = param[2 * n + 1];
-					param[2 * n + 1] = phim;
+					phim = x[2 * i];
+					x[2 * i] = x[2 * n];
+					x[2 * n] = phim;
+					phim = x[2 * i + 1];
+					x[2 * i + 1] = x[2 * n + 1];
+					x[2 * n + 1] = phim;
 					f = mm[i];
 					mm[i] = mm[n];
 					mm[n] = f;
@@ -335,17 +335,26 @@ point linopt::get_clements_design(matrix_type &M)
 				}
 				else if(mm[n] == mm[i])
 				{
-					phim = param[2 * i];
-					param[2 * i] = param[2 * n];
-					param[2 * n] = phim;
-					phim = param[2 * i + 1];
-					param[2 * i + 1] = param[2 * n + 1];
-					param[2 * n + 1] = phim;
+					phim = x[2 * i];
+					x[2 * i] = x[2 * n];
+					x[2 * n] = phim;
+					phim = x[2 * i + 1];
+					x[2 * i + 1] = x[2 * n + 1];
+					x[2 * n + 1] = phim;
 				}
 			}
 		}
 	}
 	delete[] mm;
 	delete[] pattern;
-	return param;
+}
+
+/** @ingroup design
+ * @brief @overload
+ */
+point linopt::get_clements_design(matrix_type &M, real_type eps)
+{
+	point x;
+	get_clements_design(M, x, eps);
+	return x;
 }

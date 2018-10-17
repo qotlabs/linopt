@@ -32,7 +32,8 @@ void clements_design(matrix_type &M, const point &x, const point &y);
 void clements_design(matrix_type &M, const point &x);
 matrix_type clements_design(const point &x, const point &y);
 matrix_type clements_design(const point &x);
-point get_clements_design(matrix_type &M);
+void get_clements_design(matrix_type &M, point &x, real_type eps  = default_epsilon);
+point get_clements_design(matrix_type &M, real_type eps = default_epsilon);
 
 }
 
