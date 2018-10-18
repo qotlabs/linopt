@@ -105,16 +105,28 @@ static inline real_type pyramid(real_type x, real_type a)
 }
 
 /** @ingroup matrix
- * @brief Fills a matrix according to the Hurwitz parametrization.
+ * @brief Fills a unitary matrix according to the Hurwitz parametrization.
  *
+ * Hurwitz parametrization is capable to parametrize any unitary matrix of size
+ * @f$ N \times N @f$ with @f$ N^2 @f$ parameters `x`. The essential feature of
+ * this parametrization is that a uniform ensemble of random points inside
+ * a unit hypercube @f$ 0 \le x_i < 1, i = 1, \dots, N^2 @f$ is mapped onto
+ * a Haar-uniform ensemble of random unitary matrices. Therefore this
+ * parametrization can be used, for example, to sample random matrices from
+ * a circular unitary ensemble (CUE). Or it can be used when optimizing over
+ * the space of all unitary matrices. In some sense it maps the space of unitary
+ * matrices onto a unit hypercube with least possible "distorsion".
  *
- * @param M[out] -- a matrix to store the result. If it has improper size it
- * will be resized.
- * @param x[in] -- an array of parameters.
+ * Parameters `x` may lie outside the unit hypercube. If so, they are
+ * effectively moved back to the hypercube by means of a peridic function.
+ * The parametrization is continuous on boundaries, but not smooth.
+ * @param M[out] -- an @f$ N \times N @f$ matrix to store the result. If it has
+ * an improper size it will be resized.
+ * @param x[in] -- an array of @f$ N^2 @f$ parameters.
  *
  * @throw
- * If size of `x` is not a square of some integer number, then `wrong_size` is
- * thrown.
+ * If size of `x` is not a square of some integer number @f$ N @f$, then
+ * `wrong_size` is thrown.
  *
  * @see
  * K. Życzkowski and M. Kus "Random unitary matrices." J. Phys. A: Math. Gen.
@@ -173,16 +185,33 @@ matrix_type linopt::hurwitz_parametrization(const point &x)
 }
 
 /** @ingroup matrix
- * @brief Fills a matrix according to the exp-Hermitian parametrization.
+ * @brief Fills a unitary matrix according to the exponential-Hermitian
+ * parametrization.
  *
- *
- * @param M[out] -- a matrix to store the result. If it has improper size it
- * will be resized.
- * @param x[in] -- an array of parameters.
+ * The exponential-Hermitian parametrization of a unitary matrix is based on
+ * the relation
+ * @f[ M = \exp(i H(x)). @f]
+ * If @f$ H @f$ is Hermitian then @f$ M @f$ is unitary. Since @f$ H @f$ is
+ * Hermitian it can be parametrized by its matrix elements. First elements of
+ * `x` contain the real-valued diagonal of @f$ H @f$, then the upper triangular
+ * part is specified. For example, @f$ 4 \times 4 @f$ Hermitian matrix is
+ * parametrized in the following way
+ * @f[
+ *	H(x) =
+ *	\begin{pmatrix}
+ *	    x[0]    &  x[4]+ix[5]  &  x[6]+ix[7]  &  x[8]+ix[9]  \\
+ *	x[4]-ix[5]  &      x[1]    & x[10]+ix[11] & x[12]+ix[13] \\
+ *	x[6]-ix[7]  & x[10]-ix[11] &     x[2]     & x[14]+ix[15] \\
+ *	x[8]-ix[9]  & x[12]-ix[13] & x[14]-ix[15] &      x[3]
+ *	\end{pmatrix}.
+ * \f]
+ * @param M[out] -- an @f$ N \times N @f$  matrix to store the result. If it has
+ * improper size it will be resized.
+ * @param x[in] -- an array of @f$ N^2 @f$ parameters.
  *
  * @throw
- * If size of `x` is not a square of some integer number, then `wrong_size` is
- * thrown.
+ * If size of `x` is not a square of some integer number @f$ N @f$, then
+ * `wrong_size` is thrown.
  */
 void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 {
@@ -208,7 +237,7 @@ void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 }
 
 /** @ingroup matrix
- * @brief Returns a matrix parametrized according to the exp-Hermitian
+ * @brief Returns a matrix parametrized according to the exponential-Hermitian
  * parametrization
  *
  * @overload

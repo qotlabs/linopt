@@ -75,6 +75,8 @@ static void checkmate(int mm[], const int N)
  * If `x` size is not equal to @f$ N(N-1) @f$ for some integer @f$ N @f$ or if
  * `x` and `y` sizes do not match, then `wrong_size` is thrown.
  *
+ * @see get_clements_design()
+ *
  * @see
  * W. R. Clements, _et al._ "Optimal design for universal multiport
  * interferometers." Optica __3__, pp. 1460-1465 (2016),
@@ -217,6 +219,8 @@ matrix_type linopt::clements_design(const point &x)
  * @throw
  * If `M` is not unitary within given precision `eps`, then `not_unitary` is
  * thrown.
+ *
+ * @see clements_design()
  *
  * @see
  * W. R. Clements, _et al._ "Optimal design for universal multiport
