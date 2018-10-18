@@ -49,7 +49,7 @@ static void checkmate(int mm[], const int N)
  * Fills a unitary matrix parametrized according to the Clements parametrization
  * with basic matrices of the form
  * @f[
- *		e^{i\theta}i \begin{pmatrix}
+ *		i e^{i\theta} \begin{pmatrix}
  *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
  *		e^{i\phi}\cos{\theta} & -\sin{\theta}
  *  \end{pmatrix}
@@ -58,10 +58,10 @@ static void checkmate(int mm[], const int N)
  *
  * @param M[in,out] -- on input a diagonal unitary matrix of size
  * @f$ N \times N @f$ is provided. If the matrix is not unitary or have improper
- * size (calculated from `x` size) -- it will be resized accordingly and set to
- * the identity matrix. On output this matrix is used to store the final
+ * size (calculated from `x` size), then it will be resized accordingly and
+ * set to the identity matrix. On output this matrix is used to store the final
  * result.
- * @param x[in] -- an array of @f$ N(N-1)/2 @f$ phase shift parameters, such
+ * @param x[in] -- an array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
  * splitters, and odd ones are @f$ \theta @f$ -- phase shifts _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration
@@ -72,7 +72,7 @@ static void checkmate(int mm[], const int N)
  * enumeration order.
  *
  * @throw
- * If `x` size is not equal to @f$ N(N-1)/2 @f$ for some integer @f$ N @f$ or if
+ * If `x` size is not equal to @f$ N(N-1) @f$ for some integer @f$ N @f$ or if
  * `x` and `y` sizes do not match, then `wrong_size` is thrown.
  *
  * @see
@@ -126,11 +126,11 @@ void linopt::clements_design(matrix_type &M, const point &x, const point &y)
 }
 
 /** @ingroup design
- * @brief @overload
+ * @brief Equivalent to `clements_design(M, x, y)` with all @f$ y_i = 0 @f$
  *
- * @details
  * This function is equivalent to the `clements_design(M, x, y)` with all
- * elements of `y` set to zero, however, calculations are a bit faster.
+ * elements of `y` set to zero. However, calculations are a bit faster than
+ * direct call of `clements_design(M, x, y)`.
  */
 void linopt::clements_design(matrix_type &M, const point &x)
 {
@@ -164,11 +164,8 @@ void linopt::clements_design(matrix_type &M, const point &x)
 }
 
 /** @ingroup design
- * @brief @overload
- *
- * @details
- * This function is equivalent to `clements_design(M, x, y)` with `M` being the
- * identity matrix.
+ * @brief This function is equivalent to `clements_design(M, x, y)` with `M`
+ * being the identity matrix.
  *
  * @return Calculated unitary matrix `M`.
  */
@@ -180,11 +177,8 @@ matrix_type linopt::clements_design(const point &x, const point &y)
 }
 
 /** @ingroup design
- * @brief @overload
- *
- * @details
- * This function is equivalent to `clements_design(M, x)` with `M` being the
- * identity matrix.
+ * @brief This function is equivalent to `clements_design(M, x)` with `M` being
+ * the identity matrix.
  *
  * @return Calculated unitary matrix `M`.
  */
@@ -195,16 +189,14 @@ matrix_type linopt::clements_design(const point &x)
 	return M;
 }
 
-
-
 /** @ingroup design
- * @brief Calculates phase shift coefficients for a unitary matrix according to
- * the Clements design.
+ * @brief Calculates phase-shift coefficients for a unitary matrix `M` according
+ * to the Clements design.
  *
- * Returns phase shift coefficients and leaves a diagonal unitary matrix
- * according to the Clements parametrization with basic matrices of the form
+ * Returns phase-shift coefficients and leaves a diagonal unitary matrix
+ * according to the Clements design with basic matrices of the form
  * @f[
- *		e^{i\theta}i \begin{pmatrix}
+ *		i e^{i\theta} \begin{pmatrix}
  *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
  *		e^{i\phi}\cos{\theta} & -\sin{\theta}
  *	\end{pmatrix}.
@@ -214,11 +206,11 @@ matrix_type linopt::clements_design(const point &x)
  * @param M[in,out] -- on input a unitary @f$ N \times N @f$ matrix is
  * specified. On output a diagonal unitary matrix is produced. The original
  * matrix is destroyed during calculations.
- * @param x[out] -- the array of @f$ N(N-1) @f$ phase shift parameters, such
+ * @param x[out] -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase delays _before_ the beam
  * splitters, and odd ones are @f$ \theta @f$ -- phase delays _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration
- * order.
+ * order. If `x` has improper size then it will be resized.
  * @param eps -- precision for unitarity test of the input matrix `M`. If `eps`
  * is negative then no tests are performed.
  *
@@ -351,6 +343,8 @@ void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
 
 /** @ingroup design
  * @brief @overload
+ *
+ * @return Calculated array `x` of phase-shift parameters.
  */
 point linopt::get_clements_design(matrix_type &M, real_type eps)
 {
