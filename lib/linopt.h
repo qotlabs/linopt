@@ -27,14 +27,9 @@
 #ifndef LINOPT_H
 #define LINOPT_H
 
-#define LINOPT_VERSION_STRING	"0.0.8"
+#define LINOPT_VERSION_STRING	"0.0.9"
 #define LINOPT_VERSION_MAJOR	0
 #define LINOPT_VERSION_MINOR	0
-#define LINOPT_VERSION_PATCH	8
-
-#include "states.h"
-#include "matrix.h"
-#include "circuit.h"
-#include "circuit_design.h"
+#define LINOPT_VERSION_PATCH	9
 
 #endif // LINOPT_H

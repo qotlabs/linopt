@@ -2,7 +2,7 @@
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
- *				   Fldjyan Suren
+ *				   Fldjyan Suren <fldzhian.sa17@physics.msu.ru>
  *
  * This file is part of Linopt.
  *
@@ -23,6 +23,7 @@
 #ifndef CIRCUIT_DESIGN_H
 #define CIRCUIT_DESIGN_H
 
+#include "linopt.h"
 #include "matrix.h"
 
 namespace linopt

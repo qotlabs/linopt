@@ -1,16 +1,20 @@
 #include <iostream>
 #include <random>
 
-#include <linopt.h>
+#include <states.h>
+#include <circuit.h>
 
 using namespace std;
 using namespace linopt;
 
 int main()
 {
-	basis full_basis = basis(2, 4)*basis(2, 4);
-	basis ancilla_basis = basis(2, 4);
-	fock input_state = {1, 1, 1, 1, 0, 0, 0, 0};
+	const int nphot = 4;
+	const int modes = 8;
+	basis full_basis = basis(nphot/2, modes/2)*basis(nphot/2, modes/2);
+	fock input_state(modes);
+	for(int i = 0; i < modes; i++)
+		input_state[i] = 1;
 	vector<state> B(6);
 	B[0][{1, 0, 1, 0}] =  M_SQRT1_2;
 	B[0][{0, 1, 0, 1}] =  M_SQRT1_2;
@@ -24,7 +28,7 @@ int main()
 	B[4][{0, 0, 1, 1}] =  M_SQRT1_2;
 	B[5][{1, 1, 0, 0}] =  M_SQRT1_2;
 	B[5][{0, 0, 1, 1}] = -M_SQRT1_2;
-	point a(64);
+	point a(modes*modes);
 	random_device rand_dev;
 	mt19937 rand_gen(rand_dev());
 	uniform_real_distribution<real_type> distribution(0., 1.);

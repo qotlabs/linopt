@@ -2,7 +2,7 @@
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
- *				   Fldjyan Suren
+ *				   Fldjyan Suren <fldzhian.sa17@physics.msu.ru>
  *
  * This file is part of Linopt.
  *
@@ -56,17 +56,17 @@ static void checkmate(int mm[], const int N)
  * @f]
  * with beam splitter angle defects.
  *
- * @param M[in,out] -- on input a diagonal unitary matrix of size
+ * @param[in,out] M -- on input a diagonal unitary matrix of size
  * @f$ N \times N @f$ is provided. If the matrix is not unitary or have improper
  * size (calculated from `x` size), then it will be resized accordingly and
  * set to the identity matrix. On output this matrix is used to store the final
  * result.
- * @param x[in] -- an array of @f$ N(N-1) @f$ phase-shift parameters, such
+ * @param[in] x -- an array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
  * splitters, and odd ones are @f$ \theta @f$ -- phase shifts _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration
  * order.
- * @param y[in] -- an array of beam splitters angle defects, such that even
+ * @param[in] y -- an array of beam splitters angle defects, such that even
  * elements are defects of the first splitters, and odd ones are defects of the
  * second splitters. All pairs of parameters go in reverse column-wise
  * enumeration order.
@@ -205,10 +205,10 @@ matrix_type linopt::clements_design(const point &x)
  * @f]
  * This function is effectively inverse of the `clements_design(M, x)`.
  *
- * @param M[in,out] -- on input a unitary @f$ N \times N @f$ matrix is
+ * @param[in,out] M -- on input a unitary @f$ N \times N @f$ matrix is
  * specified. On output a diagonal unitary matrix is produced. The original
  * matrix is destroyed during calculations.
- * @param x[out] -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
+ * @param[out] x -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase delays _before_ the beam
  * splitters, and odd ones are @f$ \theta @f$ -- phase delays _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration

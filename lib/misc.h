@@ -24,6 +24,7 @@
 
 #include <cmath>
 #include <ostream>
+#include "linopt.h"
 #include "types.h"
 
 namespace linopt
