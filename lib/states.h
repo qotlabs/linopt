@@ -264,6 +264,7 @@ public:
 	state(const map_class &m): base_class(m) {}
 	/// Constructs a `state` from `fock` with unit amplitude.
 	state(const fock &f): base_class() { (*this)[f] = 1; }
+	state(const basis &b): base_class() { set_basis(b); }
 
 	state operator+(const state &s) const;
 	state &operator+=(const state &s);
@@ -284,7 +285,10 @@ public:
 	std::map<fock, state> postselect(int modes) const;
 	std::map<fock, state> postselect(const basis &b) const;
 	basis get_basis() const;
+	void set_basis(const basis &b);
 	std::vector<state::value_type> get_amplitudes() const;
+	void set_amplitudes(const std::vector<complex_type> &amps);
+	void set_amplitudes(const fock_amp_function &f);
 };
 
 state operator*(complex_type x, const state &s);

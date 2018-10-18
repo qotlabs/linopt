@@ -26,8 +26,12 @@
 #include "misc.h"
 #include "states.h"
 #include "exceptions.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include <algorithm>
+#include <memory>
 
 using namespace linopt;
 
@@ -234,12 +238,14 @@ basis basis::postselect(const fock &ancilla) const
  *
  * Applies a function `f` to all Fock states of `*this` to compute a
  * corresponding amplitude of a resulting state.
+ *
+ * @note
+ * This method is automatically parallelized using OpenMP.
  */
 state basis::apply_function(const fock_amp_function &f) const
 {
-	state s;
-	for(auto &elem: *this)
-		s.insert(s.end(), state::element(elem, f(elem)));
+	state s(*this);
+	s.set_amplitudes(f);
 	return s;
 }
 
@@ -516,13 +522,59 @@ basis state::get_basis() const
 	return b;
 }
 
+void state::set_basis(const basis &b)
+{
+	clear();
+	for(auto &f: b)
+		emplace_hint(end(), f, 0.);
+}
+
 std::vector<state::value_type> state::get_amplitudes() const
 {
 	std::vector<state::value_type> amps;
+	amps.reserve(size());
 	for(auto &elem: *this)
 		amps.push_back(elem.second);
 	return amps;
 }
+
+void state::set_amplitudes(const std::vector<complex_type> &amps)
+{
+	using std::to_string;
+	if(static_cast<int>(amps.size()) != size())
+		throw wrong_size(ERROR_MSG("The size of 'amps' (which is " +
+			to_string(amps.size()) + ") should be equal to the state size (which is " +
+			to_string(size()) + ")."));
+	auto amps_iter = amps.begin();
+	for(auto &elem: *this)
+	{
+		elem.second = *amps_iter;
+		amps_iter++;
+	}
+}
+
+#ifdef _OPENMP
+void state::set_amplitudes(const fock_amp_function &f)
+{
+	const int tnum = omp_get_max_threads();
+	#pragma omp parallel num_threads(tnum)
+	{
+		const int tid = omp_get_thread_num();
+		int cnt = 0;
+		for(auto iter = begin(); iter != end(); iter++, cnt++)
+			if(cnt % tnum == tid)
+				iter->second = f(iter->first);
+	}
+}
+
+#else
+
+void state::set_amplitudes(const fock_amp_function &f)
+{
+	for(auto &elem: *this)
+		elem.second = f(elem.first);
+}
+#endif // _OPENMP
 
 std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)
 {
