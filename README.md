@@ -27,6 +27,10 @@ Linopt is likely to compile with any C++11 compatible compiler which is supporte
 
 We develop Linopt under [Ubuntu](https://www.ubuntu.com/) 18.04 and provide Makefiles for building. To build C++ library you should run `make` command from the `lib` directory. It will generate static version of the library `liblinopt.a`. Type `make help` for a list of available commands. If you want to build Python version of the library go to `pylib` directory and execute `make` in it. If the build is successful Python module `pylinopt.so` will appear. We also provide [Qt Creator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/#ide) project files (with extension *.creator) for convenience (however, Qt Creator uses the same Makefiles for building).
 
+### Documentation
+
+Documentation is available [here](https://www.qotlabs.org/linopt/doc/index.html). The most recent version of documentation can be generated from the source code using Doxygen. Simply run `make doc` in the `lib` directory.
+
 ## About
 
 ### Versioning
