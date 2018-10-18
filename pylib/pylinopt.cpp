@@ -173,7 +173,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Tests whether two Fock states are equal.",
 			 py::arg("f"))
 		.def(py::self != py::self,
-			 "Tests whether two Fock state differ",
+			 "Tests whether two Fock state differ.",
 			 py::arg("f"))
 		.def(py::self >= py::self,
 			 "Compares two Fock states in lexicographic order. Returns True if "
@@ -291,7 +291,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Calculates the total number of photons in all modes.")
 
 		.def("prod_fact", &fock::prod_fact,
-			 "Calculates product of factorials of occupation numbers.")
+			 "Calculates a product of factorials of occupation numbers.")
 
 		.def(py::self * py::self,
 			 "Calculates a tensor product of two Fock states.")
@@ -301,7 +301,7 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def(py::self + py::self,
 			 "Calculates a sum of two Fock states (elementwise addition of "
-			 "occupation numbers).")
+			 "corresponding occupation numbers).")
 		.def(py::self += py::self,
 			 "Effectively equivalent to self = self + f.",
 			 py::arg("f"))
@@ -397,7 +397,7 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def("apply_function", &basis::apply_function,
 			 "Applies a function 'func' to all Fock states of the basis to "
-			 "compute corresponding amplitude and returns the corresponding "
+			 "compute a corresponding amplitude and returns the corresponding "
 			 "state. The 'func' should take a fock object as an argument and "
 			 "return a complex number representing its amplitude.",
 			 py::arg("func"))

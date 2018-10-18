@@ -19,7 +19,7 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-/** @defgroup States
+/** @defgroup states States
  * @brief Linear optics states
  */
 
@@ -31,6 +31,9 @@
 
 using namespace linopt;
 
+/**
+ * @brief Returns the total number of photons in all modes
+ */
 int fock::total() const
 {
 	int tot = 0;
@@ -47,6 +50,9 @@ static inline real_type factorial(int n)
 	return (n <= 12) ? factorial_precomputed[n] : std::tgamma(n+1);
 }
 
+/**
+ * @brief Returns a product of factorials of occupation numbers
+ */
 real_type fock::prod_fact() const
 {
 	real_type p = 1.;
@@ -55,24 +61,40 @@ real_type fock::prod_fact() const
 	return p;
 }
 
+/**
+ * @brief Returns a tensor product of `*this` and `f`
+ */
 fock fock::operator*(const fock &f) const
 {
 	fock newf = *this;
 	return newf *= f;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) * f`
+ */
 fock &fock::operator*=(const fock &f)
 {
 	insert(end(), f.begin(), f.end());
 	return *this;
 }
 
+/**
+ * @brief Returns a sum of two Fock states (elementwise addition of
+ * corresponding occupation numbers).
+ *
+ * @throw
+ * If `*this` and `f` have different sizes then `wrong_size` is thrown.
+ */
 fock fock::operator+(const fock &f) const
 {
 	fock newf = *this;
 	return newf += f;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) + f`
+ */
 fock &fock::operator+=(const fock &f)
 {
 	if(this->size() != f.size())
@@ -88,24 +110,41 @@ fock &fock::operator+=(const fock &f)
 	return *this;
 }
 
+/**
+ * @brief Constructs a basis of all possible Fock states with `modes` modes and
+ * containing `nphot` photons
+ */
 basis::basis(int nphot, int modes):
 	basis()
 {
 	generate_basis(nphot, modes);
 }
 
+/**
+ * @brief Returns a basis which is a union of Fock states from both `*this` and
+ * `b`.
+ */
 basis basis::operator+(const basis &b) const
 {
 	basis newb = *this;
 	return newb += b;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) + b`
+ */
 basis &basis::operator+=(const basis &b)
 {
 	insert(b.begin(), b.end());
 	return *this;
 }
 
+/**
+ * @brief Calculates a tensor product of two bases
+ *
+ * Returns a basis consisting of all possible elementwise tensor
+ * products of elements of `*this` and `b`.
+ */
 basis basis::operator*(const basis &b) const
 {
 	basis newb;
@@ -115,12 +154,30 @@ basis basis::operator*(const basis &b) const
 	return newb;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) * b`
+ */
 basis &basis::operator*=(const basis &b)
 {
 	*this = (*this) * b;
 	return *this;
 }
 
+/**
+ * @brief Generates a basis of all possible Fock states with `modes` modes and
+ * containing `nphot` photons.
+ *
+ * @param[in] nphot -- number of photons in each Fock state.
+ * @param[in] modes -- number of modes in each Fock state.
+ * @deprecated
+ * @param[in] head -- intended for internal usage. Normally empty Fock state
+ * should be passed.
+ *
+ * @note
+ * This funtion only appends elements to `*this` and never removes them.
+ * Therefore, if you want to freshly generate a basis, you should call
+ * `basis::clear` first.
+ */
 basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 {
 	if(head.size() == modes)
@@ -138,6 +195,11 @@ basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 	return *this;
 }
 
+/**
+ * @brief Returns a postselected basis after observing ancilla
+ *
+ * Ancilla is assumed to occupy the first modes.
+ */
 basis basis::postselect(const fock &ancilla) const
 {
 	basis b;
@@ -149,6 +211,14 @@ basis basis::postselect(const fock &ancilla) const
 	return b;
 }
 
+/**
+ * @brief Constructs a state from the basis using function `f`
+ *
+ * Applies a function `f` to all Fock states of `*this` to compute a
+ * corresponding amplitude of a resulting state.
+ * @param[in] f -- function to apply.
+ * @return Constructed state.
+ */
 state basis::apply_function(const fock_amp_function &f) const
 {
 	state s;

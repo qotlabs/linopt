@@ -37,12 +37,27 @@ class fock;
 class basis;
 class state;
 
+/** @ingroup states
+ * @brief A typedef of a function taking a Fock state as an argument and
+ * returning a corresponding `complex_type` amplitude
+ */
 typedef std::function<complex_type(const fock&)> fock_amp_function;
 
+/** @ingroup states
+ * @brief The class representing a Fock state
+ *
+ * A Fock state is a state with exact number of photons in each mode. A Fock
+ * state is represented as a list of nonnegative integers:
+ * @f[ | n_0, \dots, n_m \rangle, @f]
+ * where @f$ n_i @f$ is called an _occupation number_ of an @f$ i @f$-th mode.
+ *
+ * The interface of this class is very similar to `std::vector`.
+ */
 class fock : private std::vector<int>
 {
 	typedef std::vector<int> base_class;
 public:
+	/// Convenience typedef to std::vector
 	typedef std::vector<int> vector_class; //In principle this can be different from base_class
 	typedef int value_type;
 	typedef int& reference;
@@ -68,7 +83,9 @@ public:
 	using base_class::back;
 	using base_class::operator[];
 
+	/// Checks whether a Fock is empty, i.e. contains zero modes
 	using base_class::empty;
+	/// Returns the number of modes in a Fock state
 	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::resize;
 	using base_class::assign;
@@ -76,9 +93,12 @@ public:
 	using base_class::pop_back;
 	using base_class::insert;
 	using base_class::erase;
+	/// Clears a Fock state (
 	using base_class::clear;
 
+	/// Default constructor
 	fock() = default;
+	/// Construct a Fock state from a `fock::vector_class`
 	fock(const vector_class &v): base_class(v) {}
 	int total() const;
 	real_type prod_fact() const;
@@ -88,42 +108,78 @@ public:
 	fock &operator+=(const fock &f);
 };
 
+/** @ingroup states
+ * @brief Tests whether two Fock states are equal
+ */
 inline bool operator==(const fock &f, const fock &g)
 {
 	return f.size() == g.size() &&
 			std::equal(f.begin(), f.end(), g.begin());
 }
 
+/** @ingroup states
+ * @brief Compares two Fock states in lexicographic order
+ *
+ * @return
+ * `true` if `f` is less than `g`.
+ */
 inline bool operator<(const fock &f, const fock &g)
 {
 	return std::lexicographical_compare(f.begin(), f.end(),
 										g.begin(), g.end());
 }
 
+/** @ingroup states
+ * @brief Tests whether two Fock states differ
+ */
 inline bool operator!=(const fock &f, const fock &g)
 {
 	return !(f == g);
 }
 
+/** @ingroup states
+ * @brief Compares two Fock states in lexicographic order
+ *
+ * @return
+ * `true` if `f` is greater than `g`.
+ */
 inline bool operator>(const fock &f, const fock &g)
 {
 	return g < f;
 }
 
+/** @ingroup states
+ * @brief Compares two Fock states in lexicographic order
+ *
+ * @return
+ * `true` if `f` is less or equal than `g`.
+ */
 inline bool operator<=(const fock &f, const fock &g)
 {
 	return !(f > g);
 }
 
+/** @ingroup states
+ * @brief Compares two Fock states in lexicographic order
+ *
+ * @return
+ * `true` if `f` is greater or equal than `g`.
+ */
 inline bool operator>=(const fock &f, const fock &g)
 {
 	return !(f < g);
 }
 
+/** @ingroup states
+ * @brief The class representing a collection of Fock states
+ *
+ * The interface of this class is very similar to `std::set`.
+ */
 class basis : private std::set<fock>
 {
 	typedef std::set<fock> base_class;
 public:
+	/// Convenience typedef to std::set
 	typedef std::set<fock> set_class; //In principle this can be different from base_class
 	typedef fock value_type;
 	typedef fock& reference;
@@ -143,6 +199,7 @@ public:
 	using base_class::crend;
 
 	using base_class::empty;
+	/// Returns the number of Fock states in the basis
 	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::insert;
 	using base_class::erase;
