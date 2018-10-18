@@ -395,7 +395,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Ancilla is assumed to occupy the first modes.",
 			 py::arg("anc"))
 
-		.def("apply_func", &basis::apply_func,
+		.def("apply_function", &basis::apply_function,
 			 "Applies a function 'func' to all Fock states of the basis to "
 			 "compute corresponding amplitude and returns the corresponding "
 			 "state. The 'func' should take a fock object as an argument and "

@@ -37,7 +37,7 @@ class fock;
 class basis;
 class state;
 
-typedef std::function<complex_type(const fock&)> basis_func;
+typedef std::function<complex_type(const fock&)> fock_amp_function;
 
 class fock : private std::vector<int>
 {
@@ -161,7 +161,7 @@ public:
 	basis &operator*=(const basis &b);
 	basis &generate_basis(const int nphot, const int modes, const fock &head = fock());
 	basis postselect(const fock &ancilla) const;
-	state apply_func(const basis_func &f) const;
+	state apply_function(const fock_amp_function &f) const;
 };
 
 class state : private std::map<fock, complex_type>

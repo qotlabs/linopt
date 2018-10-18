@@ -95,7 +95,7 @@ const state &circuit::output_state()
 	}
 	if(output_state_changed)
 	{
-		_output_state = _output_basis.apply_func(std::bind(&circuit::calc_fock_amp,
+		_output_state = _output_basis.apply_function(std::bind(&circuit::calc_fock_amp,
 													this, std::placeholders::_1));
 		output_state_changed = false;
 	}

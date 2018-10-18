@@ -149,7 +149,7 @@ basis basis::postselect(const fock &ancilla) const
 	return b;
 }
 
-state basis::apply_func(const basis_func &f) const
+state basis::apply_function(const fock_amp_function &f) const
 {
 	state s;
 	for(auto &elem: *this)
