@@ -20,7 +20,7 @@
  */
 
 /** @defgroup matrix Matrix
- * @brief Various matrix-related functions
+ * @brief Various matrix-related functions.
  */
 
 #include <limits.h>
@@ -34,13 +34,14 @@
 using namespace linopt;
 
 /** @ingroup matrix
- * @brief Calculates permanent of a square matrix
+ * @brief Calculates permanent of a square matrix.
+ *
+ * @param[in] M -- matrix to calculate its permanent.
+ * @return Computed permanent.
  *
  * Calculates permanent of a square @f$ N \times N @f$ matrix `M`.
  * Internally the function uses Glynn formula with Gray code summation
  * technique. Complexity is @f$ O(N \times 2^N) @f$.
- * @param M[in] -- matrix to calculate its permanent.
- * @return Computed permanent.
  *
  * @todo Parallel version `ppermanent()`.
  *
@@ -107,6 +108,10 @@ static inline real_type pyramid(real_type x, real_type a)
 /** @ingroup matrix
  * @brief Fills a unitary matrix according to the Hurwitz parametrization.
  *
+ * @param[out] M -- an @f$ N \times N @f$ matrix to store the result. If it has
+ * an improper size it will be resized.
+ * @param[in] x -- an array of @f$ N^2 @f$ parameters.
+ *
  * Hurwitz parametrization is capable to parametrize any unitary matrix of size
  * @f$ N \times N @f$ with @f$ N^2 @f$ parameters `x`. The essential feature of
  * this parametrization is that a uniform ensemble of random points inside
@@ -120,9 +125,6 @@ static inline real_type pyramid(real_type x, real_type a)
  * Parameters `x` may lie outside the unit hypercube. If so, they are
  * effectively moved back to the hypercube by means of a peridic function.
  * The parametrization is continuous on boundaries, but not smooth.
- * @param M[out] -- an @f$ N \times N @f$ matrix to store the result. If it has
- * an improper size it will be resized.
- * @param x[in] -- an array of @f$ N^2 @f$ parameters.
  *
  * @throw
  * If size of `x` is not a square of some integer number @f$ N @f$, then
@@ -171,11 +173,13 @@ void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 }
 
 /** @ingroup matrix
- * @brief Returns a matrix parametrized according to the Hurwitz parametrization
+ * @brief Returns a matrix parametrized according to the Hurwitz
+ * parametrization.
+ *
+ * @param[in] x -- an array of parameters.
+ * @return Unitary matrix parametrized by `x`.
  *
  * @overload
- * @param x[in] -- an array of parameters.
- * @return Unitary matrix parametrized by `x`.
  */
 matrix_type linopt::hurwitz_parametrization(const point &x)
 {
@@ -187,6 +191,10 @@ matrix_type linopt::hurwitz_parametrization(const point &x)
 /** @ingroup matrix
  * @brief Fills a unitary matrix according to the exponential-Hermitian
  * parametrization.
+ *
+ * @param[out] M -- an @f$ N \times N @f$  matrix to store the result. If it has
+ * improper size it will be resized.
+ * @param[in] x -- an array of @f$ N^2 @f$ parameters.
  *
  * The exponential-Hermitian parametrization of a unitary matrix is based on
  * the relation
@@ -205,9 +213,6 @@ matrix_type linopt::hurwitz_parametrization(const point &x)
  *	x[8]-ix[9]  & x[12]-ix[13] & x[14]-ix[15] &      x[3]
  *	\end{pmatrix}.
  * \f]
- * @param M[out] -- an @f$ N \times N @f$  matrix to store the result. If it has
- * improper size it will be resized.
- * @param x[in] -- an array of @f$ N^2 @f$ parameters.
  *
  * @throw
  * If size of `x` is not a square of some integer number @f$ N @f$, then
@@ -238,11 +243,12 @@ void linopt::exp_hermite_parametrization(matrix_type &M, const point &x)
 
 /** @ingroup matrix
  * @brief Returns a matrix parametrized according to the exponential-Hermitian
- * parametrization
+ * parametrization.
+ *
+ * @param[in] x -- an array of parameters.
+ * @return Unitary matrix parametrized by `x`.
  *
  * @overload
- * @param x[in] -- an array of parameters.
- * @return Unitary matrix parametrized by `x`.
  */
 matrix_type linopt::exp_hermite_parametrization(const point &x)
 {
@@ -252,16 +258,18 @@ matrix_type linopt::exp_hermite_parametrization(const point &x)
 }
 
 /** @ingroup matrix
- * @brief Calculates normalized fidelity between two matrices
+ * @brief Calculates normalized fidelity between two matrices.
+ *
+ * @param[in] A -- first matrix.
+ * @param[in] B -- second matrix.
+ * @return Calculated fidelity.
  *
  * Normalized fidelity @f$ F(A, B) @f$ between two matrices @f$ A @f$ and
  * @f$ B @f$ is defined as follows:
  * @f[ \newcommand{\Tr}{\mathrm{Tr}}
  *     F(A, B) = \frac{|\Tr(A^\dagger B)|^2}{\Tr(A^\dagger A) \Tr(B^\dagger B)}.
  * @f]
- * @param A[in] -- first matrix.
- * @param B[in] -- second matrix.
- * @return Calculated fidelity.
+ *
  * @throw If matrix sizes do not match `wrong_size` is thrown.
  */
 real_type linopt::matrix_fidelity(const matrix_type &A, const matrix_type &B)
@@ -277,13 +285,14 @@ real_type linopt::matrix_fidelity(const matrix_type &A, const matrix_type &B)
 }
 
 /** @ingroup matrix
- * @brief Tests whether a matrix is column-unitary
+ * @brief Tests whether a matrix is column-unitary.
  *
- * A matrix @f$ M @f$ is called column unitary if @f$ M^\dagger M = 1 @f$.
- * @param M[in] -- matrix to test.
- * @param eps[in] -- accuracy within test is performed.
+ * @param[in] M -- matrix to test.
+ * @param[in] eps -- accuracy within test is performed.
  * @return `true` if the matrix `M` is a column-unitary one with the given
  * accuracy, `false` otherwise.
+ *
+ * A matrix @f$ M @f$ is called column unitary if @f$ M^\dagger M = 1 @f$.
  *
  * @see is_row_unitary(), is_unitary()
  */
@@ -293,13 +302,14 @@ bool linopt::is_column_unitary(const matrix_type &M, real_type eps)
 }
 
 /** @ingroup matrix
- * @brief Tests whether a matrix is row-unitary
+ * @brief Tests whether a matrix is row-unitary.
  *
- * A matrix @f$ M @f$ is called row unitary if @f$ M M^\dagger = 1 @f$.
- * @param M[in] -- matrix to test.
- * @param eps[in] -- accuracy within test is performed.
+ * @param[in] M -- matrix to test.
+ * @param[in] eps -- accuracy within test is performed.
  * @return `true` if the matrix `M` is a row-unitary one with the given
  * accuracy, `false` otherwise.
+ *
+ * A matrix @f$ M @f$ is called row unitary if @f$ M M^\dagger = 1 @f$.
  *
  * @see is_column_unitary(), is_unitary()
  */
@@ -309,14 +319,15 @@ bool linopt::is_row_unitary(const matrix_type &M, real_type eps)
 }
 
 /** @ingroup matrix
- * @brief Tests whether a matrix is unitary
+ * @brief Tests whether a matrix is unitary.
+ *
+ * @param[in] M -- matrix to test.
+ * @param[in] eps -- accuracy within test is performed.
+ * @return `true` if the matrix `M` is a unitary one with the given
+ * accuracy, `false` otherwise.
  *
  * A square matrix @f$ M @f$ is called unitary if it is both column and row
  * unitary.
- * @param M[in] -- matrix to test.
- * @param eps[in] -- accuracy within test is performed.
- * @return `true` if the matrix `M` is a unitary one with the given
- * accuracy, `false` otherwise.
  *
  * @see is_column_unitary(), is_row_unitary()
  */

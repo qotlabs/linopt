@@ -35,7 +35,7 @@ typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
 typedef std::vector<real_type> point;
 
 /** @ingroup matrix
- * @brief Default precision for numeric comparison operations
+ * @brief Default precision for numeric comparison operations.
  */
 const real_type default_epsilon = 1e-15;
 

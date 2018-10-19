@@ -21,7 +21,7 @@
  */
 
 /** @defgroup design Circuit design
- * @brief Circuit designs and decompositions into elementary blocks
+ * @brief Circuit designs and decompositions into elementary blocks.
  */
 
 #include "circuit_design.h"
@@ -44,17 +44,7 @@ static void checkmate(int mm[], const int N)
 }
 
 /** @ingroup design
- * @brief Fills a unitary matrix according to the Clements design
- *
- * Fills a unitary matrix parametrized according to the Clements parametrization
- * with basic matrices of the form
- * @f[
- *		i e^{i\theta} \begin{pmatrix}
- *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
- *		e^{i\phi}\cos{\theta} & -\sin{\theta}
- *  \end{pmatrix}
- * @f]
- * with beam splitter angle defects.
+ * @brief Fills a unitary matrix according to the Clements design.
  *
  * @param[in,out] M -- on input a diagonal unitary matrix of size
  * @f$ N \times N @f$ is provided. If the matrix is not unitary or have improper
@@ -70,6 +60,16 @@ static void checkmate(int mm[], const int N)
  * elements are defects of the first splitters, and odd ones are defects of the
  * second splitters. All pairs of parameters go in reverse column-wise
  * enumeration order.
+ *
+ * Fills a unitary matrix parametrized according to the Clements parametrization
+ * with basic matrices of the form
+ * @f[
+ *		i e^{i\theta} \begin{pmatrix}
+ *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
+ *		e^{i\phi}\cos{\theta} & -\sin{\theta}
+ *  \end{pmatrix}
+ * @f]
+ * with beam splitter angle defects.
  *
  * @throw
  * If `x` size is not equal to @f$ N(N-1) @f$ for some integer @f$ N @f$ or if
@@ -128,7 +128,7 @@ void linopt::clements_design(matrix_type &M, const point &x, const point &y)
 }
 
 /** @ingroup design
- * @brief Equivalent to `clements_design(M, x, y)` with all @f$ y_i = 0 @f$
+ * @brief Equivalent to `clements_design(M, x, y)` with all @f$ y_i = 0 @f$.
  *
  * This function is equivalent to the `clements_design(M, x, y)` with all
  * elements of `y` set to zero. However, calculations are a bit faster than
@@ -195,6 +195,17 @@ matrix_type linopt::clements_design(const point &x)
  * @brief Calculates phase-shift coefficients for a unitary matrix `M` according
  * to the Clements design.
  *
+ * @param[in,out] M -- on input a unitary @f$ N \times N @f$ matrix is
+ * specified. On output a diagonal unitary matrix is produced. The original
+ * matrix is destroyed during calculations.
+ * @param[out] x -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
+ * that even elements are @f$ \phi @f$ -- phase delays _before_ the beam
+ * splitters, and odd ones are @f$ \theta @f$ -- phase delays _between_ the beam
+ * splitters. All pairs of parameters go in reverse column-wise enumeration
+ * order. If `x` has improper size then it will be resized.
+ * @param[in] eps -- precision for unitarity test of the input matrix `M`. If
+ * `eps` is negative then no tests are performed.
+ *
  * Returns phase-shift coefficients and leaves a diagonal unitary matrix
  * according to the Clements design with basic matrices of the form
  * @f[
@@ -204,17 +215,6 @@ matrix_type linopt::clements_design(const point &x)
  *	\end{pmatrix}.
  * @f]
  * This function is effectively inverse of the `clements_design(M, x)`.
- *
- * @param[in,out] M -- on input a unitary @f$ N \times N @f$ matrix is
- * specified. On output a diagonal unitary matrix is produced. The original
- * matrix is destroyed during calculations.
- * @param[out] x -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
- * that even elements are @f$ \phi @f$ -- phase delays _before_ the beam
- * splitters, and odd ones are @f$ \theta @f$ -- phase delays _between_ the beam
- * splitters. All pairs of parameters go in reverse column-wise enumeration
- * order. If `x` has improper size then it will be resized.
- * @param eps -- precision for unitarity test of the input matrix `M`. If `eps`
- * is negative then no tests are performed.
  *
  * @throw
  * If `M` is not unitary within given precision `eps`, then `not_unitary` is

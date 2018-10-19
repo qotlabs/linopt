@@ -19,6 +19,10 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
+/** @defgroup exceptions Exceptions
+  * @brief Exception types.
+  */
+
 #ifndef EXCEPTIONS_H
 #define EXCEPTIONS_H
 
@@ -36,16 +40,30 @@ inline std::string format_error_message(std::string msg, const char *func)
 
 #define ERROR_MSG(...) format_error_message(__VA_ARGS__, __func__)
 
+/** @ingroup exceptions
+ * @brief The base exception class.
+ *
+ * All other exceptions inherits from it. Therefore, you can catch objects of
+ * this type to handle all Linopt exceptions.
+ */
 class general_error: public std::logic_error
 {
 	using logic_error::logic_error;
 };
 
+/** @ingroup exceptions
+ * @brief The object of this type is thrown when an object of improper size
+ * is encountered.
+ */
 class wrong_size: public general_error
 {
 	using general_error::general_error;
 };
 
+/** @ingroup exceptions
+ * @brief The object of this type is thrown when a unitary matrix is expected,
+ * but it is not.
+ */
 class not_unitary : public general_error
 {
 	using general_error::general_error;

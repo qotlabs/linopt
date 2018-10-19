@@ -20,7 +20,7 @@
  */
 
 /** @defgroup states States
- * @brief Linear optics states
+ * @brief Linear optics states.
  */
 
 #include "misc.h"
@@ -32,7 +32,7 @@
 using namespace linopt;
 
 /**
- * @brief Returns the total number of photons in all modes
+ * @brief Returns the total number of photons in all modes.
  */
 int fock::total() const
 {
@@ -51,7 +51,7 @@ static inline real_type factorial(int n)
 }
 
 /**
- * @brief Returns a product of factorials of occupation numbers
+ * @brief Returns a product of factorials of occupation numbers.
  */
 real_type fock::prod_fact() const
 {
@@ -62,7 +62,7 @@ real_type fock::prod_fact() const
 }
 
 /**
- * @brief Returns a tensor product of `*this` and `f`
+ * @brief Returns a tensor product of `*this` and `f`.
  */
 fock fock::operator*(const fock &f) const
 {
@@ -71,7 +71,7 @@ fock fock::operator*(const fock &f) const
 }
 
 /**
- * @brief Effectively equivalent to `*this = (*this) * f`
+ * @brief Effectively equivalent to `*this = (*this) * f`.
  */
 fock &fock::operator*=(const fock &f)
 {
@@ -93,7 +93,7 @@ fock fock::operator+(const fock &f) const
 }
 
 /**
- * @brief Effectively equivalent to `*this = (*this) + f`
+ * @brief Effectively equivalent to `*this = (*this) + f`.
  */
 fock &fock::operator+=(const fock &f)
 {
@@ -112,7 +112,7 @@ fock &fock::operator+=(const fock &f)
 
 /**
  * @brief Constructs a basis of all possible Fock states with `modes` modes and
- * containing `nphot` photons
+ * containing `nphot` photons.
  */
 basis::basis(int nphot, int modes):
 	basis()
@@ -131,7 +131,7 @@ basis basis::operator+(const basis &b) const
 }
 
 /**
- * @brief Effectively equivalent to `*this = (*this) + b`
+ * @brief Effectively equivalent to `*this = (*this) + b`.
  */
 basis &basis::operator+=(const basis &b)
 {
@@ -140,7 +140,7 @@ basis &basis::operator+=(const basis &b)
 }
 
 /**
- * @brief Calculates a tensor product of two bases
+ * @brief Calculates a tensor product of two bases.
  *
  * Returns a basis consisting of all possible elementwise tensor
  * products of elements of `*this` and `b`.
@@ -155,7 +155,7 @@ basis basis::operator*(const basis &b) const
 }
 
 /**
- * @brief Effectively equivalent to `*this = (*this) * b`
+ * @brief Effectively equivalent to `*this = (*this) * b`.
  */
 basis &basis::operator*=(const basis &b)
 {
@@ -196,9 +196,24 @@ basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 }
 
 /**
- * @brief Returns a postselected basis after observing ancilla
+ * @brief Returns a postselected basis after observing ancilla.
  *
- * Ancilla is assumed to occupy the first modes.
+ * @param[in] ancilla -- ancilla's Fock state for postselection.
+ * @return A basis after postselection.
+ *
+ * Postselection of a basis @f$ B @f$ with the ancilla state
+ * @f$ | \mathrm{anc} \rangle = | a_0, a_2, \dots, a_A \rangle @f$
+ * picks only Fock states from @f$ B @f$ with the heading (first @f$ A @f$
+ * occupation numbers) which equals to @f$ | \mathrm{anc} \rangle @f$.
+ * The headings do not get to the new constructed basis.
+ * Note that currently there is no possibility to specify a position of ancilla
+ * modes.
+ *
+ * For example, postselection of a basis
+ * @f[ \{ | 0000001 \rangle, | 1234567 \rangle, | 1239999 \rangle \} @f]
+ * with the ancilla @f$ | 123 \rangle @f$ results in the basis
+ * @f[ \{ | 4567 \rangle, | 9999 \rangle \}. @f]
+ *
  */
 basis basis::postselect(const fock &ancilla) const
 {
@@ -212,12 +227,13 @@ basis basis::postselect(const fock &ancilla) const
 }
 
 /**
- * @brief Constructs a state from the basis using function `f`
+ * @brief Constructs a state from the basis using function `f`.
+ *
+ * @param[in] f -- function to apply.
+ * @return Constructed state.
  *
  * Applies a function `f` to all Fock states of `*this` to compute a
  * corresponding amplitude of a resulting state.
- * @param[in] f -- function to apply.
- * @return Constructed state.
  */
 state basis::apply_function(const fock_amp_function &f) const
 {
@@ -227,6 +243,9 @@ state basis::apply_function(const fock_amp_function &f) const
 	return s;
 }
 
+/**
+ * @brief Adds two states, i.e., calculates their superposition.
+ */
 state state::operator+(const state &s) const
 {
 	state snew;
@@ -258,6 +277,9 @@ state state::operator+(const state &s) const
 	return snew;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) + s`.
+ */
 state &state::operator+=(const state &s)
 {
 	for(auto &elem: s)
@@ -265,6 +287,9 @@ state &state::operator+=(const state &s)
 	return *this;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) - s`.
+ */
 state &state::operator-=(const state &s)
 {
 	for(auto &elem: s)
@@ -272,6 +297,9 @@ state &state::operator-=(const state &s)
 	return *this;
 }
 
+/**
+ * @brief Returns a tensor product of two states.
+ */
 state state::operator*(const state &s) const
 {
 	state snew;
@@ -281,12 +309,18 @@ state state::operator*(const state &s) const
 	return snew;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) * s`.
+ */
 state &state::operator*=(const state &s)
 {
 	state snew = *this;
 	return snew *= s;
 }
 
+/**
+ * @brief Negates amplitudes of the state.
+ */
 state state::operator-() const
 {
 	state s = *this;
@@ -295,17 +329,26 @@ state state::operator-() const
 	return s;
 }
 
+/**
+ * @brief Multiplies a state by a complex number.
+ */
 state state::operator*(complex_type x) const
 {
 	state s = *this;
 	return s *= x;
 }
 
+/** @ingroup states
+ * @brief Multiplies a state by a complex number.
+ */
 state linopt::operator*(complex_type x, const state &s)
 {
 	return s*x;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) * x`.
+ */
 state &state::operator*=(complex_type x)
 {
 	for(auto &elem: *this)
@@ -313,12 +356,18 @@ state &state::operator*=(complex_type x)
 	return *this;
 }
 
+/**
+  * @brief Divides a state by a complex number.
+  */
 state state::operator/(complex_type x) const
 {
 	state s = *this;
 	return s /= x;
 }
 
+/**
+ * @brief Effectively equivalent to `*this = (*this) / x`.
+ */
 state &state::operator/=(complex_type x)
 {
 	for(auto &elem: *this)
@@ -326,6 +375,9 @@ state &state::operator/=(complex_type x)
 	return *this;
 }
 
+/**
+ * @brief Returns norm of the state.
+ */
 real_type state::norm() const
 {
 	real_type n = 0.;
@@ -334,11 +386,17 @@ real_type state::norm() const
 	return sqrt(n);
 }
 
+/**
+ * @brief Normalizes the state to have unit norm.
+ */
 state &state::normalize()
 {
 	return *this /= norm();
 }
 
+/**
+ * @brief Calculates a dot (scalar) product.
+ */
 complex_type state::dot(const state &s) const
 {
 	complex_type z = 0.;
@@ -364,6 +422,9 @@ complex_type state::dot(const state &s) const
 	return z;
 }
 
+/** @ingroup states
+ * @brief Calculates a dot (scalar) product.
+ */
 complex_type linopt::dot(const state &a, const state &b)
 {
 	return a.dot(b);

@@ -40,12 +40,12 @@ class state;
 
 /** @ingroup states
  * @brief A typedef of a function taking a Fock state as an argument and
- * returning a corresponding `complex_type` amplitude
+ * returning a corresponding `complex_type` amplitude.
  */
 typedef std::function<complex_type(const fock&)> fock_amp_function;
 
 /** @ingroup states
- * @brief The class representing a Fock state
+ * @brief The class representing a Fock state.
  *
  * A Fock state is a state with exact number of photons in each mode. A Fock
  * state is represented as a list of nonnegative integers:
@@ -58,7 +58,7 @@ class fock : private std::vector<int>
 {
 	typedef std::vector<int> base_class;
 public:
-	/// Convenience typedef to std::vector
+	/// Convenience typedef to std::vector.
 	typedef std::vector<int> vector_class; //In principle this can be different from base_class
 	typedef int value_type;
 	typedef int& reference;
@@ -84,9 +84,9 @@ public:
 	using base_class::back;
 	using base_class::operator[];
 
-	/// Checks whether a Fock is empty, i.e. contains zero modes
+	/// Checks whether a Fock is empty, i.e. contains zero modes.
 	using base_class::empty;
-	/// Returns the number of modes in a Fock state
+	/// Returns the number of modes in a Fock state.
 	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::resize;
 	using base_class::assign;
@@ -94,12 +94,12 @@ public:
 	using base_class::pop_back;
 	using base_class::insert;
 	using base_class::erase;
-	/// Clears a Fock state (
+	/// Clears a Fock state.
 	using base_class::clear;
 
-	/// Default constructor
+	/// Default constructor.
 	fock() = default;
-	/// Construct a Fock state from a `fock::vector_class`
+	/// Construct a Fock state from a `fock::vector_class`.
 	fock(const vector_class &v): base_class(v) {}
 	int total() const;
 	real_type prod_fact() const;
@@ -110,7 +110,7 @@ public:
 };
 
 /** @ingroup states
- * @brief Tests whether two Fock states are equal
+ * @brief Tests whether two Fock states are equal.
  */
 inline bool operator==(const fock &f, const fock &g)
 {
@@ -119,7 +119,7 @@ inline bool operator==(const fock &f, const fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order
+ * @brief Compares two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is less than `g`.
@@ -131,7 +131,7 @@ inline bool operator<(const fock &f, const fock &g)
 }
 
 /** @ingroup states
- * @brief Tests whether two Fock states differ
+ * @brief Tests whether two Fock states differ.
  */
 inline bool operator!=(const fock &f, const fock &g)
 {
@@ -139,7 +139,7 @@ inline bool operator!=(const fock &f, const fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order
+ * @brief Compares two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is greater than `g`.
@@ -150,7 +150,7 @@ inline bool operator>(const fock &f, const fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order
+ * @brief Compares two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is less or equal than `g`.
@@ -161,7 +161,7 @@ inline bool operator<=(const fock &f, const fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order
+ * @brief Compares two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is greater or equal than `g`.
@@ -172,15 +172,15 @@ inline bool operator>=(const fock &f, const fock &g)
 }
 
 /** @ingroup states
- * @brief The class representing a collection of Fock states
+ * @brief The class representing a collection of Fock states.
  *
- * The interface of this class is very similar to `std::set`.
+ * The interface of this class is very similar to `std::set<fock>`.
  */
 class basis : private std::set<fock>
 {
 	typedef std::set<fock> base_class;
 public:
-	/// Convenience typedef to std::set
+	/// Convenience typedef to std::set.
 	typedef std::set<fock> set_class; //In principle this can be different from base_class
 	typedef fock value_type;
 	typedef fock& reference;
@@ -200,7 +200,7 @@ public:
 	using base_class::crend;
 
 	using base_class::empty;
-	/// Returns the number of Fock states in the basis
+	/// Returns the number of Fock states in the basis.
 	int size() const { return static_cast<int>(base_class::size()); }
 	using base_class::insert;
 	using base_class::erase;
@@ -222,6 +222,11 @@ public:
 	state apply_function(const fock_amp_function &f) const;
 };
 
+/** @ingroup states
+ * @brief The class representing a linear optical state.
+ *
+ * The interface of this class is very similar to `std::map<fock,complex_type>`.
+ */
 class state : private std::map<fock, complex_type>
 {
 	typedef std::map<fock, complex_type> base_class;
@@ -254,12 +259,15 @@ public:
 	using base_class::find;
 
 	using base_class::operator=;
+	/// Default constructor.
 	state(): base_class() {}
 	state(const map_class &m): base_class(m) {}
+	/// Constructs a `state` from `fock` with unit amplitude.
 	state(const fock &f): base_class() { (*this)[f] = 1; }
 
 	state operator+(const state &s) const;
 	state &operator+=(const state &s);
+	/// Subtracts two states.
 	state operator-(const state &s) const { return *this + (-s); }
 	state &operator-=(const state &s);
 	state operator*(const state &s) const;
