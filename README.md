@@ -6,18 +6,19 @@ Linopt is a library for linear optics calculations. It consists of C++11 core li
 
 Linopt has the following directory structure:
 
-* `lib` --- C++ library source code,
-* `examples` --- examples of C++ library using,
-* `pylib` --- Python bindings to C++ library,
-* `pyexamples` --- Python example scripts.
+* `lib` -- C++ library source code,
+* `examples` -- examples of C++ library using,
+* `pylib` -- Python bindings to C++ library,
+* `pyexamples` -- Python example scripts.
 
 ### Prerequisites
 
-Linopt uses Eigen library for matrix operations and pybind11 for Python bindings to C++ code. We use Doxygen to generate documentation from the source code comments (in progress).
+Linopt uses Eigen library for matrix operations and pybind11 for Python bindings to C++ code. We use Doxygen to generate documentation from the source code comments.
 
-* [Eigen](http://eigen.tuxfamily.org/index.php) --- library for linear algebra.
-* [pybind11](https://github.com/pybind/pybind11) --- library for exposing C++ types in Python.
-* [Doxygen](http://www.doxygen.org/) --- documentation generator from source code.
+* [Eigen](http://eigen.tuxfamily.org/index.php) -- library for linear algebra.
+* [pybind11](https://github.com/pybind/pybind11) -- library for exposing C++ types in Python.
+* [OpenMP](https://www.openmp.org) -- API for parallel programming.
+* [Doxygen](http://www.doxygen.org/) -- documentation generator from source code.
 
 ### Building
 Linopt is likely to compile with any C++11 compatible compiler which is supported by its dependencies (libraries from [prerequisites](#prerequisites) section). We have tested Linopt with the following compilers:
@@ -34,9 +35,14 @@ Documentation is available [here](https://www.qotlabs.org/linopt/doc/index.html)
 ## About
 
 ### Versioning
+
 We use [SemVer](http://semver.org/) for versioning.
 
 Currently this project is under initial development, so the major version is 0.
+
+### Contributing
+
+Contributing to Linopt is done via pull request mechanism. See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ### Authors
 
