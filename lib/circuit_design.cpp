@@ -199,8 +199,8 @@ matrix_type linopt::clements_design(const point &x)
  * specified. On output a diagonal unitary matrix is produced. The original
  * matrix is destroyed during calculations.
  * @param[out] x -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
- * that even elements are @f$ \phi @f$ -- phase delays _before_ the beam
- * splitters, and odd ones are @f$ \theta @f$ -- phase delays _between_ the beam
+ * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
+ * splitters, and odd ones are @f$ \theta @f$ -- phase shifts _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration
  * order. If `x` has improper size then it will be resized.
  * @param[in] eps -- precision for unitarity test of the input matrix `M`. If
