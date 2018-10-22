@@ -63,15 +63,15 @@ void circuit::set_input_state(const fock &fin)
 	_input_state = fin;
 }
 
-const basis &circuit::get_output_basis() const
+const basis circuit::get_output_basis() const
 {
-	return _output_basis;
+	return _output_state.get_basis();
 }
 
 void circuit::set_output_basis(const basis &bout)
 {
 	output_state_changed = true;
-	_output_basis = bout;
+	_output_state.set_basis(bout);
 }
 
 const matrix_type &circuit::get_unitary() const
@@ -95,8 +95,8 @@ const state &circuit::output_state()
 	}
 	if(output_state_changed)
 	{
-		_output_state = _output_basis.apply_function(std::bind(&circuit::calc_fock_amp,
-													this, std::placeholders::_1));
+		_output_state.set_amplitudes(std::bind(&circuit::calc_fock_amp,
+									 this, std::placeholders::_1));
 		output_state_changed = false;
 	}
 	return _output_state;
