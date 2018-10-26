@@ -41,7 +41,7 @@ complex_type circuit::calc_fock_amp(const fock &fout)
 {
 	int tot = fout.total();
 	int modes = fout.size();
-	Uinout.resize(tot, Uin.cols());
+	matrix_type Uinout(tot, Uin.cols());
 	int k = 0;
 	for(int m = 0; m < modes; m++)
 		for(int i = 0; i < fout[m]; i++)

@@ -35,7 +35,6 @@ private:
 	matrix_type U;
 	matrix_type Uin;
 	bool uin_possibly_changed = false;
-	matrix_type Uinout;
 	fock _input_state;
 	real_type input_prod_fact;
 	state _output_state;
