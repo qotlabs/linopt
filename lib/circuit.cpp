@@ -103,9 +103,5 @@ const state &circuit::output_state()
 	return _output_state;
 }
 
-template
-const state &circuit::output_state<execution::seq>();
-
-
-template
-const state &circuit::output_state<execution::par>();
+template const state &circuit::output_state<execution::seq>();
+template const state &circuit::output_state<execution::par>();

@@ -26,11 +26,21 @@
 #include <pybind11/functional.h>
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
-#include "../lib/linopt.h"
-#include "../lib/misc.h"
+
+#include "matrix.h"
+#include "states.h"
+#include "circuit.h"
+#include "circuit_design.h"
+#include "misc.h"
 
 using namespace linopt;
 namespace py = pybind11;
+
+enum class pyexecution
+{
+	seq,
+	par
+};
 
 // __repr__ and __str__ methods for class "fock"
 std::string fock_str(const fock &f)
@@ -121,6 +131,12 @@ PYBIND11_MODULE(pylinopt, m)
 {
 	m.doc() = docstr;
 #endif
+
+	// Execution policies
+	py::enum_<pyexecution>(m, "execution")
+		.value("seq", pyexecution::seq)
+		.value("par", pyexecution::par)
+		.export_values();
 
 	// Matrix functions
 	m
@@ -395,12 +411,24 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Ancilla is assumed to occupy the first modes.",
 			 py::arg("anc"))
 
-		.def("apply_function", &basis::apply_function,
+		.def("apply_function", [](const basis &b, const fock_amp_function &f, pyexecution exec_policy) {
+				 state s;
+				 switch(exec_policy)
+				 {
+				 case pyexecution::seq:
+					 s =  b.apply_function<execution::seq>(f);
+					 break;
+				 case pyexecution::par:
+					 s =  b.apply_function<execution::par>(f);
+					 break;
+				 }
+				 return s;
+			 },
 			 "Applies a function 'func' to all Fock states of the basis to "
 			 "compute a corresponding amplitude and returns the corresponding "
 			 "state. The 'func' should take a fock object as an argument and "
 			 "return a complex number representing its amplitude.",
-			 py::arg("func"))
+			 py::arg("func"), py::arg("exec_policy") = pyexecution::seq)
 
 		.def("as_set", [](const basis &b) {
 				 py::set s;
@@ -417,6 +445,7 @@ PYBIND11_MODULE(pylinopt, m)
 		.def(py::init<const state &>())
 		.def(py::init<const fock &>())
 		.def(py::init<const state::map_class &>())
+		.def(py::init<const basis &>())
 
 		.def("__str__", &state_str)
 		.def("__repr__", &state_repr)
@@ -542,6 +571,41 @@ PYBIND11_MODULE(pylinopt, m)
 		.def("get_basis", &state::get_basis,
 			 "Returns basis of the state.")
 
+		.def("set_basis", &state::set_basis,
+			 "Sets basis of the state.",
+			 py::arg("basis"))
+
+		.def("get_amplitudes", &state::get_amplitudes,
+			 "Returns an array of state amplitudes.")
+
+		.def("set_amplitudes", [](state &s, const std::vector<complex_type> &amps, pyexecution exec_policy) {
+				switch(exec_policy)
+				{
+				case pyexecution::seq:
+					s.set_amplitudes<execution::seq>(amps);
+					break;
+				case pyexecution::par:
+					s.set_amplitudes<execution::par>(amps);
+					break;
+				}
+			 },
+			 "Sets amplitudes of the state according to the array 'amps'.",
+			 py::arg("amps"), py::arg("exec_policy") = pyexecution::seq)
+
+		.def("set_amplitudes", [](state &s, const fock_amp_function &f, pyexecution exec_policy) {
+				 switch(exec_policy)
+				 {
+				 case pyexecution::seq:
+					 s.set_amplitudes<execution::seq>(f);
+					 break;
+				 case pyexecution::par:
+					 s.set_amplitudes<execution::par>(f);
+					 break;
+				 }
+			  },
+			  "Sets amplitudes of the state using a function 'func'.",
+			  py::arg("func"), py::arg("exec_policy") = pyexecution::seq)
+
 		.def("as_dict", [](const state &s) {
 				 py::dict d;
 				 for(const auto &elem: s)
@@ -595,8 +659,71 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Unitary matrix representing a transformation of creation "
 			 "operators of photons in modes.")
 
-		.def("output_state", &circuit::output_state,
-			 "Calculates output state.")
+		.def("output_state", [](circuit &c, pyexecution exec_policy) {
+				 state s;
+				 switch(exec_policy)
+				 {
+				 case pyexecution::seq:
+					 s = c.output_state<execution::seq>();
+					 break;
+				 case pyexecution::par:
+					 s = c.output_state<execution::par>();
+					 break;
+				 }
+				 return s;
+			 },
+			 "Calculates output state.",
+			 py::arg("exec_policy") = pyexecution::seq)
+	;
+
+	// Circuit design
+	m
+	.def("clements_design", [](matrix_type Min, const point &x, const point &y) {
+			 clements_design(Min, x, y);
+			 return Min;
+		 },
+		 "Returns a unitary NxN matrix 'M' according to the Clements design.\n"
+		 "Min - a diagonal unitary matrix of size NxN.\n"
+		 "x - an array of N*(N-1) phase-shift parameters, such that even "
+		 "elements are phase shifts before the beam splitters, and odd ones "
+		 "are phase shifts between the beam splitters. All pairs of parameters "
+		 "go in reverse column-wise enumeration order.\n"
+		 "y - an array of N*(N-1) beam splitters angle defects, such that "
+		 "even elements are defects of the first splitters, and odd ones are "
+		 "defects of the second splitters. All pairs of parameters go in "
+		 "reverse column-wise enumeration order.",
+		 py::arg("Min"), py::arg("x"), py::arg("y"))
+
+	.def("clements_design", (matrix_type (*)(const point &, const point &)) &clements_design,
+		 "Effectively equivalent to clements_design(Min, x, y) with Min being "
+		 "the identity matrix.",
+		 py::arg("x"), py::arg("y"))
+
+	.def("clements_design", [](matrix_type Min, const point &x) {
+			 clements_design(Min, x);
+			 return Min;
+		 },
+		 "Effectively equivalent to clements_design(Min, x, y) with y = 0."
+		 "This function is provided for optimization.",
+		 py::arg("Min"), py::arg("x"))
+
+	.def("clements_design", (matrix_type (*)(const point &)) &clements_design,
+		 "Effectively equivalent to clements_design(Min, x) with Min being "
+		 "the identity matrix.",
+		 py::arg("x"))
+
+	.def("get_clements_design", [](matrix_type M, real_type eps) {
+			 point x;
+			 get_clements_design(M, x, eps);
+			 return std::pair<point, matrix_type>(x, M);
+		 },
+		 "Calculates phase-shift coefficients 'x' for a unitary matrix 'M' "
+		 "according to the Clements design. This function is inverse of "
+		 "clements_design(x). Returns a pair ('x', 'Mout'), where 'Mout' is a "
+		 "diagonal unitary matrix.\n"
+		 "'eps' is a precision for a unitarity test of the input matrix 'M'. "
+		 "If 'eps' is negative then no tests are performed",
+		 py::arg("M"), py::arg("eps") = default_epsilon)
 	;
 
 #if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2

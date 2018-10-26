@@ -37,7 +37,7 @@ typedef std::vector<real_type> point;
 /** @ingroup matrix
  * @brief Default precision for numeric comparison operations.
  */
-const real_type default_epsilon = 1e-15;
+constexpr real_type default_epsilon = 1e-15;
 
 void hurwitz_parametrization(matrix_type &M, const point &x);
 matrix_type hurwitz_parametrization(const point &x);

@@ -9,7 +9,7 @@ LDLIBS := -lm \
 		  -L ${LIBLINOPT_PATH} -llinopt
 CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra -Wno-unused-parameter -Wno-int-in-bool-context\
-          -I /usr/include \
+          -I /usr/include -I ${LIBLINOPT_PATH} \
           $(shell pkg-config eigen3 --cflags) \
           $(shell pkg-config $(PYTHON) --cflags) \
           -D_USE_MATH_DEFINES \

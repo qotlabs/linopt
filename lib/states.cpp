@@ -250,11 +250,8 @@ state basis::apply_function(const fock_amp_function &f) const
 	return s;
 }
 
-template
-state basis::apply_function<execution::seq>(const fock_amp_function &f) const;
-
-template
-state basis::apply_function<execution::par>(const fock_amp_function &f) const;
+template state basis::apply_function<execution::seq>(const fock_amp_function &f) const;
+template state basis::apply_function<execution::par>(const fock_amp_function &f) const;
 
 /**
  * @brief Adds two states, i.e., calculates their superposition.

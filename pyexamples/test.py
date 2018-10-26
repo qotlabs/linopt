@@ -28,7 +28,7 @@ state({(1,1,0,0): 1/sqrt(2), (0,0,1,1):  1/sqrt(2)}),
 state({(1,1,0,0): 1/sqrt(2), (0,0,1,1): -1/sqrt(2)}),
 ]
 
-r = np.random.rand(1,64)
+r = np.random.rand(64)
 
 a = minimize(lot.cf_inner_product, r, args = (in_state, state_list, ancilla_basis, full_basis), \
     method='BFGS', tol=None, options={'gtol':1e-5})
