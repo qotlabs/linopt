@@ -242,12 +242,19 @@ basis basis::postselect(const fock &ancilla) const
  * @note
  * This method is automatically parallelized using OpenMP.
  */
+template<class exec_policy>
 state basis::apply_function(const fock_amp_function &f) const
 {
 	state s(*this);
-	s.set_amplitudes(f);
+	s.set_amplitudes<exec_policy>(f);
 	return s;
 }
+
+template
+state basis::apply_function<execution::seq>(const fock_amp_function &f) const;
+
+template
+state basis::apply_function<execution::par>(const fock_amp_function &f) const;
 
 /**
  * @brief Adds two states, i.e., calculates their superposition.
@@ -538,7 +545,8 @@ std::vector<state::value_type> state::get_amplitudes() const
 	return amps;
 }
 
-void state::set_amplitudes(const std::vector<complex_type> &amps)
+template<>
+void state::set_amplitudes<execution::seq>(const std::vector<complex_type> &amps)
 {
 	using std::to_string;
 	if(static_cast<int>(amps.size()) != size())
@@ -553,8 +561,21 @@ void state::set_amplitudes(const std::vector<complex_type> &amps)
 	}
 }
 
-#ifdef _OPENMP
-void state::set_amplitudes(const fock_amp_function &f)
+template<>
+void state::set_amplitudes<execution::par>(const std::vector<complex_type> &amps)
+{
+	throw not_implemented(ERROR_MSG("Parallel execution is not supported."));
+}
+
+template<>
+void state::set_amplitudes<execution::seq>(const fock_amp_function &f)
+{
+	for(auto &elem: *this)
+		elem.second = f(elem.first);
+}
+
+template<>
+void state::set_amplitudes<execution::par>(const fock_amp_function &f)
 {
 	const int tnum = omp_get_max_threads();
 	#pragma omp parallel num_threads(tnum)
@@ -566,15 +587,6 @@ void state::set_amplitudes(const fock_amp_function &f)
 				iter->second = f(iter->first);
 	}
 }
-
-#else
-
-void state::set_amplitudes(const fock_amp_function &f)
-{
-	for(auto &elem: *this)
-		elem.second = f(elem.first);
-}
-#endif // _OPENMP
 
 std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)
 {

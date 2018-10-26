@@ -4,6 +4,7 @@
 #include <states.h>
 #include <circuit.h>
 #include <chrono>
+#include <omp.h>
 
 using namespace std;
 using namespace linopt;
@@ -29,11 +30,12 @@ int main()
 	C.set_output_basis(full_basis);
 	using clock = chrono::high_resolution_clock;
 	auto t1 = clock::now();
-	const state &out = C.output_state();
+	const state &out = C.output_state<execution::par>();
 	auto t2 = clock::now();
 	chrono::duration<double> sec = t2 - t1;
 	//for(const auto &anc : ancilla_basis)
 	//	cout << out.postselect(anc).normalize() << endl;
-	cout << "output_state() execution time is " << sec.count() << " seconds." << endl;
+	cout << "output_state() execution time is " << sec.count() << " seconds with "
+		 << omp_get_max_threads() << " threads." << endl;
 	return EXIT_SUCCESS;
 }

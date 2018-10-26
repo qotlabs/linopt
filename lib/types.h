@@ -30,6 +30,12 @@ namespace linopt
 typedef double real_type;
 typedef std::complex<real_type> complex_type;
 
+namespace execution
+{
+	class seq;
+	class par;
+}
+
 }
 
 #endif // TYPES_H

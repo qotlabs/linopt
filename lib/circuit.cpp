@@ -86,6 +86,7 @@ void circuit::set_unitary(const matrix_type &u)
 	U = u;
 }
 
+template<class exec_policy>
 const state &circuit::output_state()
 {
 	if(uin_possibly_changed)
@@ -95,9 +96,16 @@ const state &circuit::output_state()
 	}
 	if(output_state_changed)
 	{
-		_output_state.set_amplitudes(std::bind(&circuit::calc_fock_amp,
-									 this, std::placeholders::_1));
+		_output_state.set_amplitudes<exec_policy>(std::bind(&circuit::calc_fock_amp,
+													this, std::placeholders::_1));
 		output_state_changed = false;
 	}
 	return _output_state;
 }
+
+template
+const state &circuit::output_state<execution::seq>();
+
+
+template
+const state &circuit::output_state<execution::par>();
