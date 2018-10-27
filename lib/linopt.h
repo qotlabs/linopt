@@ -27,21 +27,21 @@
 #ifndef LINOPT_H
 #define LINOPT_H
 
-#include <types.h>
-#include <matrix.h>
-#include <states.h>
-#include <circuit.h>
-#include <circuit_design.h>
+#include "types.h"
+#include "matrix.h"
+#include "states.h"
+#include "circuit.h"
+#include "circuit_design.h"
 
 namespace linopt
 {
 
 constexpr struct version
 {
-	static constexpr auto string = "0.1.1";
+	static constexpr auto string = "0.1.2";
 	static constexpr int major = 0;
 	static constexpr int minor = 1;
-	static constexpr int patch = 1;
+	static constexpr int patch = 2;
 } version;
 
 }

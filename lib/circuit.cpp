@@ -24,43 +24,66 @@
 
 using namespace linopt;
 
-matrix_type &circuit::prepare_uin(const matrix_type &u, const fock &fin)
+void circuit::copy_columns_on_input(matrix_type &Ucc, const matrix_type &U, const fock &fin)
 {
-	int tot = fin.total();
-	int modes = fin.size();
+	const int tot = fin.total();
+	const int modes = fin.size();
 	int k = 0;
-	Uin.resize(u.rows(), tot);
+	Ucc.resize(U.rows(), tot);
 	for(int m = 0; m < modes; m++)
 		for(int i = 0; i < fin[m]; i++)
-			Uin.col(k++) = u.col(m);
-	input_prod_fact = fin.prod_fact();
-	return Uin;
+			Ucc.col(k++) = U.col(m);
 }
 
-complex_type circuit::calc_fock_amp(const fock &fout)
+void circuit::copy_rows_on_output(matrix_type &Ucr, const matrix_type &U, const fock &fout)
 {
-	int tot = fout.total();
-	int modes = fout.size();
-	matrix_type Uinout(tot, Uin.cols());
+	const int tot = fout.total();
+	const int modes = fout.size();
+	Ucr.resize(tot, U.cols());
 	int k = 0;
 	for(int m = 0; m < modes; m++)
 		for(int i = 0; i < fout[m]; i++)
-			Uinout.row(k++) = Uin.row(m);
-	complex_type perm = permanent(Uinout);
-	perm /= std::sqrt(fout.prod_fact() * input_prod_fact);
-	return perm;
+			Ucr.row(k++) = U.row(m);
 }
 
-const fock &circuit::get_input_state() const
+complex_type circuit::calc_fock_amp(const fock &fout) const
 {
-	return _input_state;
+	matrix_type Uout;
+	copy_rows_on_output(Uout, unitary, fout);
+	const auto tot = fout.total();
+	const auto out_prod_fact = fout.prod_fact();
+	matrix_type Uoutin(tot, tot);
+	complex_type amp = 0.;
+	for(const auto &in_elem: input_state)
+	{
+		const fock &fin = in_elem.first;
+		if(fin.total() != tot)
+			continue;
+		copy_columns_on_input(Uoutin, Uout, fin);
+		amp += permanent(Uoutin) * in_elem.second /
+								std::sqrt(out_prod_fact * fin.prod_fact());
+	}
+	return amp;
 }
 
-void circuit::set_input_state(const fock &fin)
+complex_type circuit::calc_fock_amp_1(const uin_fin &precomputed, const fock &fout) const
 {
-	output_state_changed = true;
-	uin_possibly_changed = true;
-	_input_state = fin;
+	if(fout.total()	!= precomputed.tot)
+		return 0.;
+	matrix_type Uinout;
+	copy_rows_on_output(Uinout, precomputed.Uin, fout);
+	return permanent(Uinout) * precomputed.mult / std::sqrt(fout.prod_fact());
+}
+
+const state &circuit::get_input_state() const
+{
+	return input_state;
+}
+
+void circuit::set_input_state(const state &s)
+{
+	output_state_valid = false;
+	input_state = s;
 }
 
 const basis circuit::get_output_basis() const
@@ -70,35 +93,45 @@ const basis circuit::get_output_basis() const
 
 void circuit::set_output_basis(const basis &bout)
 {
-	output_state_changed = true;
+	output_state_valid = false;
 	_output_state.set_basis(bout);
 }
 
 const matrix_type &circuit::get_unitary() const
 {
-	return U;
+	return unitary;
 }
 
-void circuit::set_unitary(const matrix_type &u)
+void circuit::set_unitary(const matrix_type &U)
 {
-	output_state_changed = true;
-	uin_possibly_changed = true;
-	U = u;
+	output_state_valid = false;
+	unitary = U;
 }
 
 template<class exec_policy>
 const state &circuit::output_state()
 {
-	if(uin_possibly_changed)
+	using namespace std;
+	using namespace std::placeholders;
+	if(!output_state_valid)
 	{
-		prepare_uin(U, _input_state);
-		uin_possibly_changed = false;
-	}
-	if(output_state_changed)
-	{
-		_output_state.set_amplitudes<exec_policy>(std::bind(&circuit::calc_fock_amp,
-													this, std::placeholders::_1));
-		output_state_changed = false;
+		if(input_state.size() > 1)
+		{
+			_output_state.set_amplitudes<exec_policy>(
+				bind(&circuit::calc_fock_amp, this, _1));
+		}
+		else
+		{
+			uin_fin precomputed;
+			const fock &fin = input_state.begin()->first;
+			const auto &amp = input_state.begin()->second;
+			copy_columns_on_input(precomputed.Uin, unitary, fin);
+			precomputed.tot = fin.total();
+			precomputed.mult = amp / std::sqrt(fin.prod_fact());
+			_output_state.set_amplitudes<exec_policy>(
+				bind(&circuit::calc_fock_amp_1, this, ref(precomputed), _1));
+		}
+		output_state_valid = true;
 	}
 	return _output_state;
 }

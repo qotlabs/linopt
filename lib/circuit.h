@@ -31,23 +31,39 @@ namespace linopt
 class circuit
 {
 private:
-	matrix_type U;
-	matrix_type Uin;
-	bool uin_possibly_changed = false;
-	fock _input_state;
-	real_type input_prod_fact;
+	state input_state;
+	matrix_type unitary;
 	state _output_state;
-	bool output_state_changed = false;
-	matrix_type &prepare_uin(const matrix_type &u, const fock &fin);
-	complex_type calc_fock_amp(const fock &fout);
+
+	// Cache
+
+	// Indicates whether variable `_output_state` is valid
+	bool output_state_valid = true;
+
+	// Cache struct for `calc_fock_amp_1()`
+	struct uin_fin
+	{
+		matrix_type Uin;
+		int tot;
+		complex_type mult;
+	};
+
+	// Members
+
+	static void copy_columns_on_input(matrix_type &Ucc, const matrix_type &U, const fock &fin);
+	static void copy_rows_on_output(matrix_type &Ucr, const matrix_type &Uin, const fock &fout);
+	// Calculates amplitude corresponding to the output Fock state `fout`
+	complex_type calc_fock_amp(const fock &fout) const;
+	// Optimized version of `calc_fock_amp()` when `input_state` has size = 1
+	complex_type calc_fock_amp_1(const uin_fin &precomputed, const fock &fout) const;
 
 public:
-	const fock &get_input_state() const;
-	void set_input_state(const fock &fin);
+	const state &get_input_state() const;
+	void set_input_state(const state &s);
 	const basis get_output_basis() const;
 	void set_output_basis(const basis &bout);
 	const matrix_type &get_unitary() const;
-	void set_unitary(const matrix_type &u);
+	void set_unitary(const matrix_type &U);
 	template<class exec_policity = execution::seq>
 	const state &output_state();
 };

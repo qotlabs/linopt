@@ -628,6 +628,7 @@ PYBIND11_MODULE(pylinopt, m)
 	py::implicitly_convertible<fock::vector_class, fock>();
 	py::implicitly_convertible<basis::set_class, basis>();
 	py::implicitly_convertible<state::map_class, state>();
+	py::implicitly_convertible<fock, state>();
 
 	// Circuit
 	py::class_<circuit>(m, "circuit")
