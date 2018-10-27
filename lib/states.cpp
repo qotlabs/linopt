@@ -556,9 +556,9 @@ void state::set_amplitudes<execution::seq>(const std::vector<complex_type> &amps
 }
 
 template<>
-void state::set_amplitudes<execution::par>(const std::vector<complex_type> &amps)
+void state::set_amplitudes<execution::par>(const std::vector<complex_type> &)
 {
-	throw not_implemented(ERROR_MSG("Parallel execution is not supported."));
+	throw not_supported(ERROR_MSG("Parallel execution is not supported."));
 }
 
 template<>
@@ -568,6 +568,7 @@ void state::set_amplitudes<execution::seq>(const fock_amp_function &f)
 		elem.second = f(elem.first);
 }
 
+#ifdef _OPENMP
 template<>
 void state::set_amplitudes<execution::par>(const fock_amp_function &f)
 {
@@ -581,6 +582,15 @@ void state::set_amplitudes<execution::par>(const fock_amp_function &f)
 				iter->second = f(iter->first);
 	}
 }
+
+#else
+template<>
+void state::set_amplitudes<execution::par>(const fock_amp_function &)
+{
+	throw not_supported(ERROR_MSG("Parallel execution is not supported when "
+								  "the library is compiled without OpenMP."));
+}
+#endif // _OPENMP
 
 std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)
 {

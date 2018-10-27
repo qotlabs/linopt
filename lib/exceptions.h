@@ -68,7 +68,7 @@ class not_unitary : public general_error
 	using general_error::general_error;
 };
 
-class not_implemented: public general_error
+class not_supported: public general_error
 {
 	using general_error::general_error;
 };
