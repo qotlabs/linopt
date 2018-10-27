@@ -64,7 +64,7 @@ public:
 	void set_output_basis(const basis &bout);
 	const matrix_type &get_unitary() const;
 	void set_unitary(const matrix_type &U);
-	template<class exec_policity = execution::seq>
+	template<class exec_policy = execution::seq>
 	const state &output_state();
 };
 

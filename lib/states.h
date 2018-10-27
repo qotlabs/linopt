@@ -218,7 +218,7 @@ public:
 	basis &operator*=(const basis &b);
 	basis &generate_basis(const int nphot, const int modes, const fock &head = fock());
 	basis postselect(const fock &ancilla) const;
-	template<class exec_policity = execution::seq>
+	template<class exec_policy = execution::seq>
 	state apply_function(const fock_amp_function &f) const;
 };
 
@@ -287,9 +287,9 @@ public:
 	basis get_basis() const;
 	void set_basis(const basis &b);
 	std::vector<state::value_type> get_amplitudes() const;
-	template<class exec_policity = execution::seq>
+	template<class exec_policy = execution::seq>
 	void set_amplitudes(const std::vector<complex_type> &amps);
-	template<class exec_policity = execution::seq>
+	template<class exec_policy = execution::seq>
 	void set_amplitudes(const fock_amp_function &f);
 };
 
