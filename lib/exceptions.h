@@ -28,7 +28,6 @@
 
 #include <string>
 #include <stdexcept>
-#include "linopt.h"
 
 namespace linopt
 {

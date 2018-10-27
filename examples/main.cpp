@@ -1,8 +1,7 @@
 #include <iostream>
 #include <random>
 
-#include <states.h>
-#include <circuit.h>
+#include <linopt.h>
 #include <chrono>
 #include <omp.h>
 
@@ -30,7 +29,7 @@ int main()
 	C.set_output_basis(full_basis);
 	using clock = chrono::high_resolution_clock;
 	auto t1 = clock::now();
-	const state &out = C.output_state<execution::par>();
+	auto out = C.output_state<execution::par>();
 	auto t2 = clock::now();
 	chrono::duration<double> sec = t2 - t1;
 	//for(const auto &anc : ancilla_basis)

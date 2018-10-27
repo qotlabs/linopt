@@ -24,7 +24,6 @@
 
 #include <Eigen/Dense>
 #include <vector>
-#include "linopt.h"
 #include "types.h"
 
 namespace linopt

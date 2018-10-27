@@ -27,9 +27,23 @@
 #ifndef LINOPT_H
 #define LINOPT_H
 
-#define LINOPT_VERSION_STRING	"0.1.0"
-#define LINOPT_VERSION_MAJOR	0
-#define LINOPT_VERSION_MINOR	1
-#define LINOPT_VERSION_PATCH	0
+#include <types.h>
+#include <matrix.h>
+#include <states.h>
+#include <circuit.h>
+#include <circuit_design.h>
+
+namespace linopt
+{
+
+constexpr struct version
+{
+	static constexpr auto string = "0.1.1";
+	static constexpr int major = 0;
+	static constexpr int minor = 1;
+	static constexpr int patch = 1;
+} version;
+
+}
 
 #endif // LINOPT_H

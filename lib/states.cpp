@@ -238,9 +238,6 @@ basis basis::postselect(const fock &ancilla) const
  *
  * Applies a function `f` to all Fock states of `*this` to compute a
  * corresponding amplitude of a resulting state.
- *
- * @note
- * This method is automatically parallelized using OpenMP.
  */
 template<class exec_policy>
 state basis::apply_function(const fock_amp_function &f) const

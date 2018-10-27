@@ -22,7 +22,6 @@
 #ifndef CIRCUIT_H
 #define CIRCUIT_H
 
-#include "linopt.h"
 #include "states.h"
 #include "matrix.h"
 

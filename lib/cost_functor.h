@@ -23,7 +23,6 @@
 #define COST_FUNCTOR_H
 
 #include <vector>
-#include "linopt.h"
 #include "circuit.h"
 
 namespace linopt

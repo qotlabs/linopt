@@ -28,7 +28,6 @@
 #include <ostream>
 #include <initializer_list>
 #include <functional>
-#include "linopt.h"
 #include "types.h"
 
 namespace linopt

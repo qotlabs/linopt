@@ -23,7 +23,6 @@
 #ifndef CIRCUIT_DESIGN_H
 #define CIRCUIT_DESIGN_H
 
-#include "linopt.h"
 #include "matrix.h"
 
 namespace linopt
