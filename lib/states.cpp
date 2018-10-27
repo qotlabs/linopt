@@ -321,8 +321,7 @@ state state::operator*(const state &s) const
  */
 state &state::operator*=(const state &s)
 {
-	state snew = *this;
-	return snew *= s;
+	return *this = (*this) * s;
 }
 
 /**
