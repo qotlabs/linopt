@@ -38,10 +38,10 @@ namespace linopt
 
 constexpr struct version
 {
-	static constexpr auto string = "0.1.2";
+	static constexpr auto string = "0.2.0";
 	static constexpr int major = 0;
-	static constexpr int minor = 1;
-	static constexpr int patch = 2;
+	static constexpr int minor = 2;
+	static constexpr int patch = 0;
 } version;
 
 }
