@@ -6,25 +6,21 @@ CFLAGS := -std=c++0x -fopenmp -O3 -march=native -ffast-math \
 		  -I /usr/include -I /usr/include/eigen3 -I . -I ${LIBLINOPT_PATH} \
 		  -D_USE_MATH_DEFINES
 VPATH = .
-TARGET := example
 
 SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))
 HDRS := $(wildcard $(addsuffix /*.h, $(VPATH)))
-OBJS := $(notdir $(SRCS:.cpp=.o))
+BINS := $(notdir $(SRCS:.cpp=.example))
 
 .PHONY: all clean
 
-all:	$(TARGET)
+all: $(LIBLINOPT_PATH)/liblinopt.a $(BINS)
 
 $(LIBLINOPT_PATH)/liblinopt.a:
 	$(MAKE) -C $(LIBLINOPT_PATH)
 
-$(TARGET):	$(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDLIBS) 
-
-%.o: %.cpp
-	$(CC) $(CFLAGS) -c -MD $<
+%.example: %.cpp
+	$(CC) $(CFLAGS) -MD $< -o $@ $(LDLIBS)
 include $(wildcard *.d)
 
 clean:
-	$(RM) -r *.o *.d
+	$(RM) -r *.o *.d *.example

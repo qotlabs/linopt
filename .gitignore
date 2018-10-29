@@ -9,7 +9,6 @@
 *.d
 *.so
 *.pyc
+*.example
 
 doc/
-
-example
