@@ -43,7 +43,7 @@ using namespace linopt;
  * Internally the function uses Glynn formula with Gray code summation
  * technique. Complexity is @f$ O(N \times 2^N) @f$.
  *
- * @todo Parallel version `ppermanent()`.
+ * @todo Parallel version.
  *
  * @see
  * David G.Glynn "The permanent of a square matrix." Eur. J. Combin. __31__,
@@ -80,7 +80,7 @@ complex_type linopt::permanent(const matrix_type &M)
 				std::to_string(M.rows()) + ") is too large (maximum is " +
 				std::to_string(CHAR_BIT*sizeof(index_type)) + ")."));
 	complex_type perm = 0.;
-	vector_type sum = M.rowwise().sum();
+	column_type sum = M.rowwise().sum();
 	real_type mult;
 	index_type n = 0;
 	index_type nmax = static_cast<index_type>(1) << (M.cols() - 1);
@@ -144,7 +144,7 @@ void linopt::hurwitz_parametrization(matrix_type &M, const point &x)
 		M.resize(N, N);
 	int i, j, k = 0;
 	complex_type eii, eij;
-	vector_type coli(N);
+	column_type coli(N);
 	real_type xi;
 	eii = std::polar(1., 2.*M_PI*x[k++]);
 	M.setZero();

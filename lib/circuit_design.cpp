@@ -24,6 +24,7 @@
  * @brief Circuit designs and decompositions into elementary blocks.
  */
 
+#include <memory>
 #include "circuit_design.h"
 #include "exceptions.h"
 
@@ -99,9 +100,9 @@ void linopt::clements_design(matrix_type &M, const point &x, const point &y)
 		M.resize(N, N);
 		M.setIdentity();
 	}
-	int* mm = new int[NN];
-	checkmate(mm, N);
-	matrix_type colm(N, 1);
+	std::unique_ptr<int[]> mm(new int[NN]);
+	checkmate(mm.get(), N);
+	column_type colm(N);
 	const complex_type i1(0., 1.);
 	complex_type expphi, exp2theta;
 	real_type cosp, cosm, sinp, sinm;
@@ -123,7 +124,6 @@ void linopt::clements_design(matrix_type &M, const point &x, const point &y)
 		M.col(m+1) = colm      *((exp2theta*(cosp + sinm) + (cosp - sinm))*i1*0.5) -
 					 M.col(m+1)*((exp2theta*(cosm + sinp) - (cosm - sinp))*0.5);
 	}
-	delete[] mm;
 	return;
 }
 
@@ -147,9 +147,9 @@ void linopt::clements_design(matrix_type &M, const point &x)
 		M.resize(N, N);
 		M.setIdentity();
 	}
-	int *mm = new int[NN];
-	checkmate(mm, N);
-	matrix_type colm(N, 1);
+	std::unique_ptr<int[]> mm(new int[NN]);
+	checkmate(mm.get(), N);
+	column_type colm(N);
 	const complex_type i1(0., 1.);
 	complex_type expphi, exp2theta;
 	for(int i = 0; i < NN; i++)
@@ -161,7 +161,6 @@ void linopt::clements_design(matrix_type &M, const point &x)
 		M.col(m)   = M.col(m)*((exp2theta - 1.)*expphi*0.5) + M.col(m + 1)*((exp2theta + 1.)*i1*expphi*0.5);
 		M.col(m+1) = colm    *((exp2theta + 1.)*i1*0.5)     - M.col(m + 1)*((exp2theta - 1.)*0.5);
 	}
-	delete[] mm;
 	return;
 }
 
@@ -239,14 +238,15 @@ void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
 	const int NN = N * (N - 1) / 2;
 	if(static_cast<int>(x.size()) != 2*NN)
 		x.resize(2*NN);
-	int* mm = new int[NN];
-	int* pattern = new int[NN];
-	checkmate(pattern, N);
+	std::unique_ptr<int[]> mm(new int[NN]);
+	std::unique_ptr<int[]> pattern(new int[NN]);
+	checkmate(pattern.get(), N);
 	int f = NN - 1, s = 0, i, n, m;
 	const complex_type i1(0., 1.);
 	complex_type expphi, exp2theta;
 	real_type phi, theta, phim, phin;
-	matrix_type tempcol(N, 1), temprow(1, N);
+	column_type tempcol(N);
+	row_type temprow(N);
 	using std::arg;
 	using std::atan;
 	using std::abs;
@@ -341,8 +341,6 @@ void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
 			}
 		}
 	}
-	delete[] mm;
-	delete[] pattern;
 }
 
 /** @ingroup design

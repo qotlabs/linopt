@@ -29,14 +29,10 @@
 namespace linopt
 {
 
-typedef Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor> matrix_type;
-typedef Eigen::Matrix<complex_type, Eigen::Dynamic, 1> vector_type;
-typedef std::vector<real_type> point;
-
-/** @ingroup matrix
- * @brief Default precision for numeric comparison operations.
- */
-constexpr real_type default_epsilon = 1e-15;
+using matrix_type = Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+using column_type = Eigen::Matrix<complex_type, Eigen::Dynamic, 1>;
+using row_type = Eigen::Matrix<complex_type, 1, Eigen::Dynamic>;
+using point = std::vector<real_type>;
 
 void hurwitz_parametrization(matrix_type &M, const point &x);
 matrix_type hurwitz_parametrization(const point &x);
@@ -50,7 +46,6 @@ bool is_row_unitary(const matrix_type &M, real_type eps = default_epsilon);
 bool is_unitary(const matrix_type &M, real_type eps = default_epsilon);
 
 complex_type permanent(const matrix_type &M);
-complex_type ppermanent(const matrix_type &M);	// TODO: Parallel version
 
 }
 

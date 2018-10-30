@@ -131,6 +131,7 @@ PYBIND11_MODULE(pylinopt, m)
 {
 	m.doc() = docstr;
 #endif
+	m.attr("default_epsilon") = py::float_(default_epsilon);
 
 	// Execution policies
 	py::enum_<pyexecution>(m, "execution")
@@ -637,7 +638,7 @@ PYBIND11_MODULE(pylinopt, m)
 		.def_property("input_state",
 			 &circuit::get_input_state,
 			 &circuit::set_input_state,
-			 "Input Fock state.")
+			 "Input state.")
 
 		.def_property("output_basis",
 			 &circuit::get_output_basis,

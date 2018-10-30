@@ -33,9 +33,15 @@
 #include "circuit.h"
 #include "circuit_design.h"
 
+/**
+ * @brief The main namespace containing all library classes, functions, etc.
+ */
 namespace linopt
 {
 
+/**
+  * @brief Library version specification.
+  */
 constexpr struct version
 {
 	static constexpr auto string = "0.2.0";

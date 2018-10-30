@@ -27,13 +27,22 @@
 namespace linopt
 {
 
-typedef double real_type;
-typedef std::complex<real_type> complex_type;
+using real_type = double;
+using complex_type = std::complex<real_type>;
 
+/** @ingroup matrix
+ * @brief Default precision for numeric comparison operations.
+ */
+constexpr real_type default_epsilon = 1e-15;
+
+/**
+ * @brief The namespace containing execution policies used by several library
+ * functions.
+ */
 namespace execution
 {
-	class seq;
-	class par;
+	class seq {};	///< Sequential execution policy.
+	class par {};	///< Parallel execution policy.
 }
 
 }
