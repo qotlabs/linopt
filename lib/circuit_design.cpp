@@ -54,7 +54,7 @@ static void checkmate(int mm[], const int N)
  * result.
  * @param[in] x -- an array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
- * splitters, and odd ones are @f$ \theta @f$ -- phase shifts _between_ the beam
+ * splitters, and odd ones are @f$ \theta @f$ -- halves of phase shifts _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration
  * order.
  * @param[in] y -- an array of beam splitters angle defects, such that even
@@ -199,7 +199,7 @@ matrix_type linopt::clements_design(const point &x)
  * matrix is destroyed during calculations.
  * @param[out] x -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
- * splitters, and odd ones are @f$ \theta @f$ -- phase shifts _between_ the beam
+ * splitters, and odd ones are @f$ \theta @f$ -- halves of phase shifts _between_ the beam
  * splitters. All pairs of parameters go in reverse column-wise enumeration
  * order. If `x` has improper size then it will be resized.
  * @param[in] eps -- precision for unitarity test of the input matrix `M`. If
@@ -212,6 +212,27 @@ matrix_type linopt::clements_design(const point &x)
  *		e^{i\phi}\sin{\theta} &  \cos{\theta}  \\
  *		e^{i\phi}\cos{\theta} & -\sin{\theta}
  *	\end{pmatrix}.
+ * @f]
+ * As a result of multiplication
+ * @f[
+ *		
+ *	\begin{pmatrix}
+ *		1/\sqrt{2} &  i/\sqrt{2}  \\
+ *		i/\sqrt{2} &  1/\sqrt{2} 
+ *	\end{pmatrix}
+ *	\begin{pmatrix}
+ *		e^{i2\theta} &  0  \\
+ *		0 &  1 
+ *	\end{pmatrix}
+ *	\begin{pmatrix}
+ *		1/\sqrt{2} &  i/\sqrt{2}  \\
+ *		i/\sqrt{2} &  1/\sqrt{2} 
+ * 	\end{pmatrix}
+ *	\begin{pmatrix}
+ *		e^{i\phi} &  0  \\
+ *		0 &  1 
+ *		\end{pmatrix}
+ *	
  * @f]
  * This function is effectively inverse of the `clements_design(M, x)`.
  *
