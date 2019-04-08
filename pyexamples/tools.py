@@ -93,3 +93,15 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
 			res += p * abs(postselected.dot(target_state))**10
 
 	return -res
+
+def cf_output_state(random_vector, input_fock, target, full_basis):
+	c = Circuit()
+	c.input_state = input_fock
+	c.output_basis = full_basis
+	c.unitary = exp_hermite(random_vector)
+	postselected = State()
+	out_state = c.output_state()
+
+	res = abs(out_state.dot(target))**2
+
+	return -res

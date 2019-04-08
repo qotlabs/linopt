@@ -34,16 +34,12 @@ $(TARGET).so: $(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
 	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH)) -c -MMD $<
 include $(wildcard *.d)
 
-doc:	doxygen.conf $(SRCS) $(HDRS)
-	$(DOXYGEN) $<
-
 clean:
-	$(RM) -r *.o *.d *.s *.a *.so* doc/
+	$(RM) -r *.o *.d *.s *.a *.so*
 
 help:
 	@echo "Available commands:"
 	@echo "    help - display this help message."
 	@echo "    $(TARGET).so - build shared version of the library."
-	@echo "    doc - build documentation using doxygen."
 	@echo "    clean - clean build files."
 
