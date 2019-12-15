@@ -14,7 +14,7 @@ CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
           $(shell pkg-config $(PYTHON) --cflags) \
           -D_USE_MATH_DEFINES \
           -fpermissive
-TARGET := pylinopt
+TARGET := linopt
 VPATH = .
 
 SRCS := $(wildcard $(addsuffix /*.cpp, $(VPATH)))

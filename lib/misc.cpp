@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -23,10 +23,10 @@
 
 using namespace linopt;
 
-std::ostream& linopt::print_complex(std::ostream &stream, const complex_type &x)
+std::ostream& linopt::printComplex(std::ostream &stream, const Complex &x)
 {
-	const real_type re = x.real();
-	const real_type im = x.imag();
+	const Real re = x.real();
+	const Real im = x.imag();
 	stream << re;
 	if(im >= 0)
 		stream << "+";

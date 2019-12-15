@@ -43,28 +43,28 @@ enum class pyexecution
 };
 
 // __repr__ and __str__ methods for class "fock"
-std::string fock_str(const fock &f)
+std::string fockStr(const Fock &f)
 {
 	std::stringstream ss;
-	print_array(ss, f, "[", ",", "]");
+	printArray(ss, f, "[", ",", "]");
 	return ss.str();
 }
 
-std::string fock_repr(const fock &f)
+std::string fockRepr(const Fock &f)
 {
-	return "fock(" + fock_str(f) + ")";
+	return "fock(" + fockStr(f) + ")";
 }
 
 // __repr__ and __str__ methods for class "basis"
-std::string basis_str(const basis &b)
+std::string basisStr(const Basis &b)
 {
 	std::stringstream ss;
 	if(!b.empty())
 	{
 		ss << "{";
 		for(auto iter = b.begin(); iter != --b.end(); ++iter)
-			print_array(ss, *iter, "(", ",", ")") << ", ";
-		print_array(ss, *(--b.end()), "(", ",", ")");
+			printArray(ss, *iter, "(", ",", ")") << ", ";
+		printArray(ss, *(--b.end()), "(", ",", ")");
 		ss << "}";
 	}
 	else
@@ -74,13 +74,13 @@ std::string basis_str(const basis &b)
 	return ss.str();
 }
 
-std::string basis_repr(const basis &b)
+std::string basisRepr(const Basis &b)
 {
-	return "basis(" + basis_str(b) + ")";
+	return "basis(" + basisStr(b) + ")";
 }
 
 // __repr__ and __str__ methods for class "state"
-std::string state_str(const state &s)
+std::string stateStr(const State &s)
 {
 	std::stringstream ss;
 	if(!s.empty())
@@ -88,13 +88,13 @@ std::string state_str(const state &s)
 		ss << "{";
 		for(auto iter = s.begin(); iter != --s.end(); ++iter)
 		{
-			print_array(ss, iter->first, "(", ",", ")") << ": ";
-			print_complex(ss, iter->second);
+			printArray(ss, iter->first, "(", ",", ")") << ": ";
+			printComplex(ss, iter->second);
 			ss << ", ";
 		}
 		auto iter = --s.end();
-		print_array(ss, iter->first, "(", ",", ")") << ": ";
-		print_complex(ss, iter->second);
+		printArray(ss, iter->first, "(", ",", ")") << ": ";
+		printComplex(ss, iter->second);
 		ss << "}";
 	}
 	else
@@ -104,13 +104,13 @@ std::string state_str(const state &s)
 	return ss.str();
 }
 
-std::string state_repr(const state &s)
+std::string stateRepr(const State &s)
 {
-	return "state(" + state_str(s) + ")";
+	return "state(" + stateStr(s) + ")";
 }
 
 template<typename Container, typename Key>
-void erase_key(Container &c, const Key &k)
+void eraseKey(Container &c, const Key &k)
 {
 	auto iter = c.find(k);
 	if(iter == c.end())
@@ -125,13 +125,13 @@ static const auto docstr =
 #if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2
 PYBIND11_PLUGIN(pylinopt)
 {
-	py::module m("pylinopt", docstr);
+	py::module m("linopt", docstr);
 #else
-PYBIND11_MODULE(pylinopt, m)
+PYBIND11_MODULE(linopt, m)
 {
 	m.doc() = docstr;
 #endif
-	m.attr("default_epsilon") = py::float_(default_epsilon);
+	m.attr("default_epsilon") = py::float_(defaultEpsilon);
 
 	// Execution policies
 	py::enum_<pyexecution>(m, "execution")
@@ -143,47 +143,48 @@ PYBIND11_MODULE(pylinopt, m)
 	m
 	.def("permanent", &permanent,
 		 "Calculates permanent of a square nxn matrix M.\n"
-		 "Internally the function uses Glynn formula with Gray code summation technique.\n"
+		 "Internally the function uses Glynn formula with Gray code summation\n"
+		 "technique.\n"
 		 "Complexity is O(n*2^n).",
 		 py::arg("M"))
 
-	.def("is_column_unitary", &is_column_unitary,
+	.def("is_column_unitary", &isColumnUnitary,
 		 "Checks whether a matrix M is column unitary within accuracy eps.",
-		 py::arg("M"), py::arg("eps") = default_epsilon)
+		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 
-	.def("is_row_unitary", &is_row_unitary,
+	.def("is_row_unitary", &isRowUnitary,
 		 "Checks whether a matrix M is row unitary within accuracy eps.",
-		 py::arg("M"), py::arg("eps") = default_epsilon)
+		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 
-	.def("is_unitary", &is_unitary,
+	.def("is_unitary", &isUnitary,
 		 "Checks whether a square matrix M is unitary within accuracy eps.",
-		 py::arg("M"), py::arg("eps") = default_epsilon)
+		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 
-	.def("hurwitz", (matrix_type (*)(const point &x)) &hurwitz_parametrization,
+	.def("hurwitz", (Matrix (*)(const Point &x)) &hurwitzParametrization,
 		 "Hurwitz parametrization of a unitary matrix.",
 		 py::arg("x"))
 
-	.def("exp_hermite", (matrix_type (*)(const point &x)) &exp_hermite_parametrization,
+	.def("exp_hermite", (Matrix (*)(const Point &x)) &expHermiteParametrization,
 		 "Exponential Hermitian parametrization of a unitary matrix.\n"
 		 "The resulting matrix is, U = exp(j*H(x)).",
 		 py::arg("x"))
 	;
 
 	// Fock
-	py::class_<fock>(m, "fock")
+	py::class_<Fock>(m, "Fock")
 		.def(py::init<>())
-		.def(py::init<const fock &>())
-		.def(py::init<const fock::vector_class &>())
+		.def(py::init<const Fock &>())
+		.def(py::init<const Fock::Vector &>())
 
-		.def("__str__", &fock_str)
-		.def("__repr__", &fock_repr)
+		.def("__str__", &fockStr)
+		.def("__repr__", &fockRepr)
 
 		.def(py::self < py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "Compares two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is less than 'f'.",
 			 py::arg("f"))
 		.def(py::self <= py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "Compares two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is less or equal than 'f'.",
 			 py::arg("f"))
 		.def(py::self == py::self,
@@ -193,18 +194,18 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Tests whether two Fock state differ.",
 			 py::arg("f"))
 		.def(py::self >= py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "Compares two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is greater or equal than 'f'.",
 			 py::arg("f"))
 		.def(py::self > py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if "
+			 "Compares two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is greater than 'f'.",
 			 py::arg("f"))
 
-		.def("__len__", [](const fock &f) { return f.size(); },
+		.def("__len__", [](const Fock &f) { return f.size(); },
 			 "Returns number of modes of the Fock state.")
 
-		.def("__getitem__", [](const fock &f, int i) {
+		.def("__getitem__", [](const Fock &f, int i) {
 				if( !(0 <= i && i < f.size()) )
 					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				return f[i];
@@ -212,11 +213,11 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Returns the occupation number of the i-th mode.",
 			 py::arg("i"))
 
-		.def("__getitem__", [](const fock &f, py::slice slice) {
+		.def("__getitem__", [](const Fock &f, py::slice slice) {
 				size_t start, stop, step, len;
 				if(!slice.compute(f.size(), &start, &stop, &step, &len))
 					throw py::error_already_set();
-				fock *res = new fock(len);
+				Fock *res = new Fock(len);
 				for(size_t i = 0; i < len; i++)
 				{
 					(*res)[i] = f[start];
@@ -225,7 +226,7 @@ PYBIND11_MODULE(pylinopt, m)
 				return res;
 			 })
 
-		.def("__setitem__", [](fock &f, int i, fock::value_type val) {
+		.def("__setitem__", [](Fock &f, int i, Fock::Value val) {
 				if( !(0 <= i && i < f.size()) )
 					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				return f[i] = val;
@@ -233,7 +234,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Sets the occupation number of the i-th mode to 'val'.",
 			 py::arg("i"), py::arg("val"))
 
-		.def("__setitem__", [](fock &f, py::slice slice, const fock &val) {
+		.def("__setitem__", [](Fock &f, py::slice slice, const Fock &val) {
 				 size_t start, stop, step, len;
 				 if(!slice.compute(f.size(), &start, &stop, &step, &len))
 					 throw py::error_already_set();
@@ -247,7 +248,7 @@ PYBIND11_MODULE(pylinopt, m)
 				 }
 			 })
 
-		.def("__delitem__", [](fock &f, int i) {
+		.def("__delitem__", [](Fock &f, int i) {
 				 if( !(0 <= i && i < f.size()) )
 					 throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				 return f.erase(f.begin() + i);
@@ -255,23 +256,23 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Removes i-th mode.",
 			 py::arg("i"))
 
-		.def("__iter__", [](fock &f) {
+		.def("__iter__", [](Fock &f) {
 				 return py::make_iterator(f.begin(), f.end());
 			 },
 			 "Returns corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
-		.def("__reversed__", [](fock &f) {
+		.def("__reversed__", [](Fock &f) {
 				 return py::make_iterator(f.rbegin(), f.rend());
 			 },
 			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
-		.def("append", (void (fock::*)(const fock::value_type &n)) &fock::push_back,
+		.def("append", &Fock::pushBack,
 			  "Adds the mode with the occupation number 'n' to the end.",
 			  py::arg("n"))
 
-		.def("insert", [](fock &f, int i, fock::value_type n) {
+		.def("insert", [](Fock &f, int i, Fock::Value n) {
 				if( !(0 <= i && i <= f.size()) )
 					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				else
@@ -280,14 +281,14 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Inserts the mode with occupation number 'n' at position 'i'.",
 			 py::arg("i"), py::arg("n"))
 
-		.def("pop", [](fock &f) {
+		.def("pop", [](Fock &f) {
 				 auto val = f.back();
-				 f.pop_back();
+				 f.popBack();
 				 return val;
 			 },
 			 "Removes the last mode and returns its occupation number.")
 
-		.def("pop", [](fock &f, int i) {
+		.def("pop", [](Fock &f, int i) {
 				 if( !(0 <= i && i < f.size()) )
 					 throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				 auto val = f[i];
@@ -297,17 +298,17 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Removes i-th mode and returns its occupation number.",
 			 py::arg("i"))
 
-		.def("clear", [](fock &f) { f.clear(); },
+		.def("clear", [](Fock &f) { f.clear(); },
 			 "Completely clears the Fock state")
 
-		.def("resize", [](fock &f, int n) { f.resize(n); },
+		.def("resize", [](Fock &f, int n) { f.resize(n); },
 			 "Sets the numbers of modes for the Fock state to 'n'.",
 			 py::arg("n"))
 
-		.def("total", &fock::total,
+		.def("total", &Fock::total,
 			 "Calculates the total number of photons in all modes.")
 
-		.def("prod_fact", &fock::prod_fact,
+		.def("prod_fact", &Fock::prodFact,
 			 "Calculates a product of factorials of occupation numbers.")
 
 		.def(py::self * py::self,
@@ -317,13 +318,13 @@ PYBIND11_MODULE(pylinopt, m)
 			 py::arg("f"))
 
 		.def(py::self + py::self,
-			 "Calculates a sum of two Fock states (elementwise addition of "
+			 "Calculates a sum of two Fock states (elementwise addition of\n"
 			 "corresponding occupation numbers).")
 		.def(py::self += py::self,
 			 "Effectively equivalent to self = self + f.",
 			 py::arg("f"))
 
-		.def("as_list", [](const fock &f) {
+		.def("as_list", [](const Fock &f) {
 				 py::list l;
 				 for (const auto &elem: f)
 					 l.append(elem);
@@ -333,59 +334,59 @@ PYBIND11_MODULE(pylinopt, m)
 	;
 
 	// Basis
-	py::class_<basis>(m, "basis")
+	py::class_<Basis>(m, "Basis")
 		.def(py::init<>())
-		.def(py::init<const basis &>())
-		.def(py::init<const basis::set_class &>())
+		.def(py::init<const Basis &>())
+		.def(py::init<const Basis::Set &>())
 		.def(py::init<int, int>(),
 			 py::arg("nphot"), py::arg("modes"))
 
-		.def("__str__", &basis_str)
-		.def("__repr__", &basis_repr)
+		.def("__str__", &basisStr)
+		.def("__repr__", &basisRepr)
 
-		.def("__len__", [](const basis &b) { return b.size(); },
+		.def("__len__", [](const Basis &b) { return b.size(); },
 			 "Returns the number of Fock states in the basis.")
 
-		.def("__delitem__", (void (*)(basis &, const fock &)) &erase_key,
+		.def("__delitem__", (void (*)(Basis &, const Fock &)) &eraseKey,
 			 "Removes the Fock 'f' from the basis.",
 			 py::arg("f"))
 
-		.def("__iter__", [](basis &b) {
+		.def("__iter__", [](Basis &b) {
 				 return py::make_iterator(b.begin(), b.end());
 			 },
 			 "Returns corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
-		.def("__reversed__", [](basis &b) {
+		.def("__reversed__", [](Basis &b) {
 				 return py::make_iterator(b.rbegin(), b.rend());
 			 },
 			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
-		.def("__contains__", [](const basis &b, const fock &f) {
+		.def("__contains__", [](const Basis &b, const Fock &f) {
 				 return b.find(f) != b.end();
 			 },
 			 "Tests whether the Fock 'f' is in the basis.",
 			 py::arg("f"))
 
-		.def("add", [](basis &b, const fock &f) {
+		.def("add", [](Basis &b, const Fock &f) {
 				 b.insert(f);
 			 },
 			 "Adds the Fock state 'f' to the basis.",
 			 py::arg("f"))
 
-		.def("remove", (void (*)(basis &, const fock &)) &erase_key,
-			 "Removes the Fock state 'f' from the basis. Throws KeyError if 'f' "
+		.def("remove", (void (*)(Basis &, const Fock &)) &eraseKey,
+			 "Removes the Fock state 'f' from the basis. Throws KeyError if 'f'\n"
 			 "does not exist",
 			 py::arg("f"))
 
-		.def("discard", [](basis &b, const fock &f) {
+		.def("discard", [](Basis &b, const Fock &f) {
 				 b.erase(f);
 			 },
 			 "Removes the Fock state 'f' from the basis if it is present.",
 			 py::arg("f"))
 
-		.def("clear", [](basis &b) { b.clear(); },
+		.def("clear", [](Basis &b) { b.clear(); },
 			 "Remove all elements from the basis.")
 
 		.def(py::self + py::self,
@@ -396,42 +397,42 @@ PYBIND11_MODULE(pylinopt, m)
 
 		.def(py::self * py::self,
 			 "Calculates a tensor product of two bases.\n"
-			 "Returns a basis consisting of all possible elementwise tensor "
+			 "Returns a basis consisting of all possible elementwise tensor\n"
 			 "products of elements of the bases.")
 		.def(py::self *= py::self,
 			 "Effectively equivalent to self = self * b.",
 			 py::arg("b"))
 
-		.def("generate_basis", &basis::generate_basis,
-			 "Generates a basis of all possible Fock states with 'modes' modes "
+		.def("generate_basis", &Basis::generateBasis,
+			 "Generates a basis of all possible Fock states with 'modes' modes\n"
 			 "and containing 'nphot' photons.",
-			 py::arg("nphot"), py::arg("modes"), py::arg("head") = fock())
+			 py::arg("nphot"), py::arg("modes"), py::arg("head") = Fock())
 
-		.def("postselect", &basis::postselect,
+		.def("postselect", &Basis::postselect,
 			 "Returns a postselected basis after observing ancilla 'anc'.\n"
 			 "Ancilla is assumed to occupy the first modes.",
 			 py::arg("anc"))
 
-		.def("apply_function", [](const basis &b, const fock_amp_function &f, pyexecution exec_policy) {
-				 state s;
+		.def("apply_function", [](const Basis &b, const FockAmpFunction &f, pyexecution exec_policy) {
+				 State s;
 				 switch(exec_policy)
 				 {
 				 case pyexecution::seq:
-					 s =  b.apply_function<execution::seq>(f);
+					 s =  b.applyFunction<execution::Seq>(f);
 					 break;
 				 case pyexecution::par:
-					 s =  b.apply_function<execution::par>(f);
+					 s =  b.applyFunction<execution::Par>(f);
 					 break;
 				 }
 				 return s;
 			 },
-			 "Applies a function 'func' to all Fock states of the basis to "
-			 "compute a corresponding amplitude and returns the corresponding "
-			 "state. The 'func' should take a fock object as an argument and "
+			 "Applies a function 'func' to all Fock states of the basis to\n"
+			 "compute a corresponding amplitude and returns the corresponding\n"
+			 "state. The 'func' should take a fock object as an argument and\n"
 			 "return a complex number representing its amplitude.",
 			 py::arg("func"), py::arg("exec_policy") = pyexecution::seq)
 
-		.def("as_set", [](const basis &b) {
+		.def("as_set", [](const Basis &b) {
 				 py::set s;
 				 for(const auto &f: b)
 					 s.add(f);
@@ -441,20 +442,20 @@ PYBIND11_MODULE(pylinopt, m)
 	;
 
 	// State
-	py::class_<state>(m, "state")
+	py::class_<State>(m, "State")
 		.def(py::init<>())
-		.def(py::init<const state &>())
-		.def(py::init<const fock &>())
-		.def(py::init<const state::map_class &>())
-		.def(py::init<const basis &>())
+		.def(py::init<const State &>())
+		.def(py::init<const Fock &>())
+		.def(py::init<const State::Map &>())
+		.def(py::init<const Basis &>())
 
-		.def("__str__", &state_str)
-		.def("__repr__", &state_repr)
+		.def("__str__", &stateStr)
+		.def("__repr__", &stateRepr)
 
-		.def("__len__", [](const state &s) { return s.size(); },
+		.def("__len__", [](const State &s) { return s.size(); },
 			 "Returns number of Focks with a specified amplitude in the state.")
 
-		.def("__getitem__", [](const state &s, const fock &f) {
+		.def("__getitem__", [](const State &s, const Fock &f) {
 				 auto iter = s.find(f);
 				 if(iter == s.end())
 					 throw py::key_error();
@@ -463,43 +464,43 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Returns an amplitude corresponding to the Fock 'f'.",
 			 py::arg("f"))
 
-		.def("__missing__", [](state &s) { return state::value_type(0.); })
+		.def("__missing__", [](State &s) { return State::Value(0.); })
 
-		.def("__setitem__", [](state &s, const fock &f, state::value_type amp) {
+		.def("__setitem__", [](State &s, const Fock &f, State::Value amp) {
 				 if(amp == 0.)
 					 s.erase(f);
 				 else
 					 s[f] = amp;
 				 return amp;
 			 },
-			 "Sets amplitude of the Fock 'f' to 'amp'. If 'amp' = 0, then "
+			 "Sets amplitude of the Fock 'f' to 'amp'. If 'amp' = 0, then\n"
 			 "deletes the Fock 'f' from the state.",
 			 py::arg("f"), py::arg("amp"))
 
-		.def("__delitem__", (void (*)(state &, const fock &)) &erase_key,
+		.def("__delitem__", (void (*)(State &, const Fock &)) &eraseKey,
 			 "Removes the Fock 'f' from the state. Equivalent to self[f] = 0.",
 			 py::arg("f"))
 
-		.def("__iter__", [](state &s) {
+		.def("__iter__", [](State &s) {
 				 return py::make_key_iterator(s.begin(), s.end());
 			 },
 			 "Returns corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
-		.def("__reversed__", [](state &s) {
+		.def("__reversed__", [](State &s) {
 				 return py::make_key_iterator(s.rbegin(), s.rend());
 			 },
 			 "Returns corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
-		.def("__contains__", [](const state &s, const fock &f) {
+		.def("__contains__", [](const State &s, const Fock &f) {
 				 return s.find(f) != s.end();
 			 },
-			 "Tests whether the state has a specified amplitude corresponding "
+			 "Tests whether the state has a specified amplitude corresponding\n"
 			 "to the Fock 'f'.",
 			 py::arg("f"))
 
-		.def("clear", [](state &s) { s.clear(); },
+		.def("clear", [](State &s) { s.clear(); },
 			 "Completely clears the state.")
 
 		.def(py::self + py::self,
@@ -523,101 +524,101 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Effectively equivalent to self = self * s.",
 			 py::arg("s"))
 
-		.def(py::self * complex_type(),
+		.def(py::self * Complex(),
 			 "Multiplies a state by a complex number.")
-		.def(py::self *= complex_type(),
+		.def(py::self *= Complex(),
 			 "Effectively equivalent to self = self * z.",
 			 py::arg("z"))
 
-		.def(py::self / complex_type(),
+		.def(py::self / Complex(),
 			 "Divides a state by a complex number.")
-		.def(py::self /= complex_type(),
+		.def(py::self /= Complex(),
 			 "Effectively equivalent to self = self / z.",
 			 py::arg("z"))
 
-		.def("norm", &state::norm,
+		.def("norm", &State::norm,
 			 "Returns norm of the state.")
 
-		.def("normalize", &state::normalize,
+		.def("normalize", &State::normalize,
 			 "Normalizes the state to have unit norm.")
 
-		.def("dot", &state::dot,
+		.def("dot", &State::dot,
 			 "Calculates a dot (scalar) product.")
 
-		.def("postselect", (state (state::*)(const fock&) const) &state::postselect,
-			 "Returns postselected state for ancilla 'anc'. The ancilla is "
+		.def("postselect", (State (State::*)(const Fock&) const) &State::postselect,
+			 "Returns postselected state for ancilla 'anc'. The ancilla is\n"
 			 "assumed to occupy the first modes.",
 			 py::arg("anc"))
 
-		.def("postselect", (std::map<fock, state> (state::*)(int) const) &state::postselect,
-			 "Calculates postselected states for all possible ancillas that "
-			 "occupy the first 'nmodes' modes. Returns a dictionary in the "
+		.def("postselect", (std::map<Fock, State> (State::*)(int) const) &State::postselect,
+			 "Calculates postselected states for all possible ancillas that\n"
+			 "occupy the first 'nmodes' modes. Returns a dictionary in the\n"
 			 "following format:\n"
 			 "{anc1: postselected_state1, anc2: postselected_state2, ...},\n"
 			 "where anc1, anc2, ... have 'nmodes' modes.\n"
-			 "This function is useful when postselection for all possible "
-			 "ancillas is required. It is faster than calling postselect(anc) "
+			 "This function is useful when postselection for all possible\n"
+			 "ancillas is required. It is faster than calling postselect(anc)\n"
 			 "in cycle for different 'anc'.",
 			 py::arg("nmodes"))
 
-		.def("postselect", (std::map<fock, state> (state::*)(const basis &) const) &state::postselect,
-			 "Calculates postselected states for all ancillas specified by "
+		.def("postselect", (std::map<Fock, State> (State::*)(const Basis &) const) &State::postselect,
+			 "Calculates postselected states for all ancillas specified by\n"
 			 "'basis'. Returns a dictionary in the following format:\n"
 			 "{anc1: postselected_state1, anc2: postselected_state2, ...}.\n"
-			 "This function is useful when postselection for an array of "
-			 "ancillas is required. It is faster than calling postselect(anc) "
+			 "This function is useful when postselection for an array of\n"
+			 "ancillas is required. It is faster than calling postselect(anc)\n"
 			 "in cycle for different 'anc'.",
 			 py::arg("basis"))
 
-		.def("get_basis", &state::get_basis,
+		.def("get_basis", &State::getBasis,
 			 "Returns basis of the state.")
 
-		.def("set_basis", &state::set_basis,
+		.def("set_basis", &State::setBasis,
 			 "Sets basis of the state.",
 			 py::arg("basis"))
 
-		.def("get_amplitudes", &state::get_amplitudes,
+		.def("get_amplitudes", &State::getAmplitudes,
 			 "Returns an array of state amplitudes.")
 
-		.def("set_amplitudes", [](state &s, const std::vector<complex_type> &amps, pyexecution exec_policy) {
+		.def("set_amplitudes", [](State &s, const std::vector<Complex> &amps, pyexecution exec_policy) {
 				switch(exec_policy)
 				{
 				case pyexecution::seq:
-					s.set_amplitudes<execution::seq>(amps);
+					s.setAmplitudes<execution::Seq>(amps);
 					break;
 				case pyexecution::par:
-					s.set_amplitudes<execution::par>(amps);
+					s.setAmplitudes<execution::Par>(amps);
 					break;
 				}
 			 },
 			 "Sets amplitudes of the state according to the array 'amps'.",
 			 py::arg("amps"), py::arg("exec_policy") = pyexecution::seq)
 
-		.def("set_amplitudes", [](state &s, const fock_amp_function &f, pyexecution exec_policy) {
+		.def("set_amplitudes", [](State &s, const FockAmpFunction &f, pyexecution exec_policy) {
 				 switch(exec_policy)
 				 {
 				 case pyexecution::seq:
-					 s.set_amplitudes<execution::seq>(f);
+					 s.setAmplitudes<execution::Seq>(f);
 					 break;
 				 case pyexecution::par:
-					 s.set_amplitudes<execution::par>(f);
+					 s.setAmplitudes<execution::Par>(f);
 					 break;
 				 }
 			  },
 			  "Sets amplitudes of the state using a function 'func'.",
 			  py::arg("func"), py::arg("exec_policy") = pyexecution::seq)
 
-		.def("as_dict", [](const state &s) {
+		.def("as_dict", [](const State &s) {
 				 py::dict d;
 				 for(const auto &elem: s)
-				 d[py::make_tuple(elem.first)] = elem.second;
-			 return d;
+					d[py::make_tuple(elem.first)] = elem.second;
+				 return d;
 			 },
 			 "Returns Python dict object that represents the state.")
 	;
 
 	m
-	.def("__mul__", (state (*)(complex_type, const state &)) &operator*,
+	.def("__mul__", (State (*)(Complex, const State &)) &operator*,
 		 "Multiplies a state by a complex number.",
 		 py::arg("z"), py::arg("s"))
 	.def("dot", &dot,
@@ -626,50 +627,50 @@ PYBIND11_MODULE(pylinopt, m)
 	;
 
 	// Implicit conversions
-	py::implicitly_convertible<fock::vector_class, fock>();
-	py::implicitly_convertible<basis::set_class, basis>();
-	py::implicitly_convertible<state::map_class, state>();
-	py::implicitly_convertible<fock, state>();
+	py::implicitly_convertible<Fock::Vector, Fock>();
+	py::implicitly_convertible<Basis::Set, Basis>();
+	py::implicitly_convertible<State::Map, State>();
+	py::implicitly_convertible<Fock, State>();
 
 	// Circuit
-	py::class_<circuit>(m, "circuit")
+	py::class_<Circuit>(m, "Circuit")
 		.def(py::init<>())
 
 		.def_property("input_state",
-			 &circuit::get_input_state,
-			 &circuit::set_input_state,
+			 &Circuit::getInputState,
+			 &Circuit::setInputState,
 			 "Input state.")
 
 		.def_property("output_basis",
-			 &circuit::get_output_basis,
-			 &circuit::set_output_basis,
-			 "A basis of Fock states used to compute the output state. It may "
-			 "either contain the full Fock state basis of the system or be "
-			 "composed only of the combination of the possible states in the "
-			 "logical and ancilla subsystems. Such a combination eliminates "
-			 "the necessity to compute the probabilities for the output states "
-			 "which won't be present in the system. For example, if the total "
-			 "number of photons in the system is 4, the ancilla subsystem is "
-			 "set to have 2 photons, and the logical subsystem is also set to "
-			 "have 2 photons, the states, where 3 or 4 photons populate either "
-			 "ancilla or logical subsystem are irrelevant to the problem being "
+			 &Circuit::getOutputBasis,
+			 &Circuit::setOutputBasis,
+			 "A basis of Fock states used to compute the output state. It may\n"
+			 "either contain the full Fock state basis of the system or be\n"
+			 "composed only of the combination of the possible states in the\n"
+			 "logical and ancilla subsystems. Such a combination eliminates\n"
+			 "the necessity to compute the probabilities for the output states\n"
+			 "which won't be present in the system. For example, if the total\n"
+			 "number of photons in the system is 4, the ancilla subsystem is\n"
+			 "set to have 2 photons, and the logical subsystem is also set to\n"
+			 "have 2 photons, the states, where 3 or 4 photons populate either\n"
+			 "ancilla or logical subsystem are irrelevant to the problem being\n"
 			 "solved.")
 
 		.def_property("unitary",
-			 &circuit::get_unitary,
-			 &circuit::set_unitary,
-			 "Unitary matrix representing a transformation of creation "
+			 &Circuit::getUnitary,
+			 &Circuit::setUnitary,
+			 "Unitary matrix representing a transformation of creation\n"
 			 "operators of photons in modes.")
 
-		.def("output_state", [](circuit &c, pyexecution exec_policy) {
-				 state s;
+		.def("output_state", [](Circuit &c, pyexecution exec_policy) {
+				 State s;
 				 switch(exec_policy)
 				 {
 				 case pyexecution::seq:
-					 s = c.output_state<execution::seq>();
+					 s = c.outputState<execution::Seq>();
 					 break;
 				 case pyexecution::par:
-					 s = c.output_state<execution::par>();
+					 s = c.outputState<execution::Par>();
 					 break;
 				 }
 				 return s;
@@ -680,52 +681,52 @@ PYBIND11_MODULE(pylinopt, m)
 
 	// Circuit design
 	m
-	.def("clements_design", [](matrix_type Min, const point &x, const point &y) {
-			 clements_design(Min, x, y);
+	.def("clements_design", [](Matrix Min, const Point &x, const Point &y) {
+			 clementsDesign(Min, x, y);
 			 return Min;
 		 },
 		 "Returns a unitary NxN matrix 'M' according to the Clements design.\n"
 		 "Min - a diagonal unitary matrix of size NxN.\n"
-		 "x - an array of N*(N-1) phase-shift parameters, such that even "
-		 "elements are phase shifts before the beam splitters, and odd ones "
-		 "are phase shifts between the beam splitters. All pairs of parameters "
+		 "x - an array of N*(N-1) phase-shift parameters, such that even\n"
+		 "elements are phase shifts before the beam splitters, and odd ones\n"
+		 "are phase shifts between the beam splitters. All pairs of parameters\n"
 		 "go in reverse column-wise enumeration order.\n"
-		 "y - an array of N*(N-1) beam splitters angle defects, such that "
-		 "even elements are defects of the first splitters, and odd ones are "
-		 "defects of the second splitters. All pairs of parameters go in "
+		 "y - an array of N*(N-1) beam splitters angle defects, such that\n"
+		 "even elements are defects of the first splitters, and odd ones are\n"
+		 "defects of the second splitters. All pairs of parameters go in\n"
 		 "reverse column-wise enumeration order.",
 		 py::arg("Min"), py::arg("x"), py::arg("y"))
 
-	.def("clements_design", (matrix_type (*)(const point &, const point &)) &clements_design,
-		 "Effectively equivalent to clements_design(Min, x, y) with Min being "
+	.def("clements_design", (Matrix (*)(const Point &, const Point &)) &clementsDesign,
+		 "Effectively equivalent to clements_design(Min, x, y) with Min being\n"
 		 "the identity matrix.",
 		 py::arg("x"), py::arg("y"))
 
-	.def("clements_design", [](matrix_type Min, const point &x) {
-			 clements_design(Min, x);
+	.def("clements_design", [](Matrix Min, const Point &x) {
+			 clementsDesign(Min, x);
 			 return Min;
 		 },
-		 "Effectively equivalent to clements_design(Min, x, y) with y = 0."
+		 "Effectively equivalent to clements_design(Min, x, y) with y = 0.\n"
 		 "This function is provided for optimization.",
 		 py::arg("Min"), py::arg("x"))
 
-	.def("clements_design", (matrix_type (*)(const point &)) &clements_design,
-		 "Effectively equivalent to clements_design(Min, x) with Min being "
+	.def("clements_design", (Matrix (*)(const Point &)) &clementsDesign,
+		 "Effectively equivalent to clements_design(Min, x) with Min being\n"
 		 "the identity matrix.",
 		 py::arg("x"))
 
-	.def("get_clements_design", [](matrix_type M, real_type eps) {
-			 point x;
-			 get_clements_design(M, x, eps);
-			 return std::pair<point, matrix_type>(x, M);
+	.def("get_clements_design", [](Matrix M, Real eps) {
+			 Point x;
+			 getClementsDesign(M, x, eps);
+			 return std::pair<Point, Matrix>(x, M);
 		 },
-		 "Calculates phase-shift coefficients 'x' for a unitary matrix 'M' "
-		 "according to the Clements design. This function is inverse of "
-		 "clements_design(x). Returns a pair ('x', 'Mout'), where 'Mout' is a "
+		 "Calculates phase-shift coefficients 'x' for a unitary matrix 'M'\n"
+		 "according to the Clements design. This function is inverse of\n"
+		 "clements_design(x). Returns a pair ('x', 'Mout'), where 'Mout' is a\n"
 		 "diagonal unitary matrix.\n"
-		 "'eps' is a precision for a unitarity test of the input matrix 'M'. "
-		 "If 'eps' is negative then no tests are performed",
-		 py::arg("M"), py::arg("eps") = default_epsilon)
+		 "'eps' is a precision for a unitarity test of the input matrix 'M'.\n"
+		 "If 'eps' is negative then no tests are performed.",
+		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 	;
 
 #if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2

@@ -42,14 +42,14 @@ namespace linopt
 /**
   * @brief Library version specification.
   */
-constexpr struct version
+struct Version
 {
-	static constexpr auto string = "0.2.1";
+	static constexpr auto string = "0.3.0";
 	static constexpr int major = 0;
-	static constexpr int minor = 2;
-	static constexpr int patch = 1;
-} version;
+	static constexpr int minor = 3;
+	static constexpr int patch = 0;
+};
 
-}
+} // Namespace linopt
 
 #endif // LINOPT_H

@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -29,24 +29,24 @@
 namespace linopt
 {
 
-using matrix_type = Eigen::Matrix<complex_type, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
-using column_type = Eigen::Matrix<complex_type, Eigen::Dynamic, 1>;
-using row_type = Eigen::Matrix<complex_type, 1, Eigen::Dynamic>;
-using point = std::vector<real_type>;
+using Matrix = Eigen::Matrix<Complex, Eigen::Dynamic, Eigen::Dynamic, Eigen::ColMajor>;
+using Column = Eigen::Matrix<Complex, Eigen::Dynamic, 1>;
+using Row = Eigen::Matrix<Complex, 1, Eigen::Dynamic>;
+using Point = std::vector<Real>;
 
-void hurwitz_parametrization(matrix_type &M, const point &x);
-matrix_type hurwitz_parametrization(const point &x);
-void exp_hermite_parametrization(matrix_type &M, const point &x);
-matrix_type exp_hermite_parametrization(const point &x);
+void hurwitzParametrization(Matrix &M, const Point &x);
+Matrix hurwitzParametrization(const Point &x);
+void expHermiteParametrization(Matrix &M, const Point &x);
+Matrix expHermiteParametrization(const Point &x);
 
-real_type matrix_fidelity(const matrix_type &A, const matrix_type &B);
+Real matrixFidelity(const Matrix &A, const Matrix &B);
 
-bool is_column_unitary(const matrix_type &M, real_type eps = default_epsilon);
-bool is_row_unitary(const matrix_type &M, real_type eps = default_epsilon);
-bool is_unitary(const matrix_type &M, real_type eps = default_epsilon);
+bool isColumnUnitary(const Matrix &M, Real eps = defaultEpsilon);
+bool isRowUnitary(const Matrix &M, Real eps = defaultEpsilon);
+bool isUnitary(const Matrix &M, Real eps = defaultEpsilon);
 
-complex_type permanent(const matrix_type &M);
+Complex permanent(const Matrix &M);
 
-}
+} // Namespace linopt
 
 #endif // MATRIX_H

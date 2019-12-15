@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -38,7 +38,7 @@ using namespace linopt;
 /**
  * @brief Returns the total number of photons in all modes.
  */
-int fock::total() const
+int Fock::total() const
 {
 	int tot = 0;
 	for(auto &n: *this)
@@ -46,20 +46,20 @@ int fock::total() const
 	return tot;
 }
 
-static constexpr int factorial_precomputed[] = {
+static constexpr int factorialPrecomputed[] = {
 	1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880, 3628800, 39916800, 479001600};
 
-static inline real_type factorial(int n)
+static inline Real factorial(int n)
 {
-	return (n <= 12) ? factorial_precomputed[n] : std::tgamma(n+1);
+	return (n <= 12) ? factorialPrecomputed[n] : std::tgamma(n+1);
 }
 
 /**
  * @brief Returns a product of factorials of occupation numbers.
  */
-real_type fock::prod_fact() const
+Real Fock::prodFact() const
 {
-	real_type p = 1.;
+	Real p = 1.;
 	for(auto &n: *this)
 		p *= factorial(n);
 	return p;
@@ -68,16 +68,16 @@ real_type fock::prod_fact() const
 /**
  * @brief Returns a tensor product of `*this` and `f`.
  */
-fock fock::operator*(const fock &f) const
+Fock Fock::operator*(const Fock &f) const
 {
-	fock newf = *this;
+	Fock newf = *this;
 	return newf *= f;
 }
 
 /**
  * @brief Effectively equivalent to `*this = (*this) * f`.
  */
-fock &fock::operator*=(const fock &f)
+Fock &Fock::operator*=(const Fock &f)
 {
 	insert(end(), f.begin(), f.end());
 	return *this;
@@ -88,21 +88,21 @@ fock &fock::operator*=(const fock &f)
  * corresponding occupation numbers).
  *
  * @throw
- * If `*this` and `f` have different sizes then `wrong_size` is thrown.
+ * If `*this` and `f` have different sizes then `WrongSize` is thrown.
  */
-fock fock::operator+(const fock &f) const
+Fock Fock::operator+(const Fock &f) const
 {
-	fock newf = *this;
+	Fock newf = *this;
 	return newf += f;
 }
 
 /**
  * @brief Effectively equivalent to `*this = (*this) + f`.
  */
-fock &fock::operator+=(const fock &f)
+Fock &Fock::operator+=(const Fock &f)
 {
 	if(this->size() != f.size())
-		throw wrong_size(ERROR_MSG("Sizes of two Fock states should be equal. "
+		throw WrongSize(ERROR_MSG("Sizes of two Fock states should be equal. "
 				"Currently they are " + std::to_string(this->size()) + " and " +
 				std::to_string(f.size()) + "."));
 	auto iter = this->begin();
@@ -118,26 +118,26 @@ fock &fock::operator+=(const fock &f)
  * @brief Constructs a basis of all possible Fock states with `modes` modes and
  * containing `nphot` photons.
  */
-basis::basis(int nphot, int modes):
-	basis()
+Basis::Basis(int nphot, int modes):
+	Basis()
 {
-	generate_basis(nphot, modes);
+	generateBasis(nphot, modes);
 }
 
 /**
  * @brief Returns a basis which is a union of Fock states from both `*this` and
  * `b`.
  */
-basis basis::operator+(const basis &b) const
+Basis Basis::operator+(const Basis &b) const
 {
-	basis newb = *this;
+	Basis newb = *this;
 	return newb += b;
 }
 
 /**
  * @brief Effectively equivalent to `*this = (*this) + b`.
  */
-basis &basis::operator+=(const basis &b)
+Basis &Basis::operator+=(const Basis &b)
 {
 	insert(b.begin(), b.end());
 	return *this;
@@ -149,9 +149,9 @@ basis &basis::operator+=(const basis &b)
  * Returns a basis consisting of all possible elementwise tensor
  * products of elements of `*this` and `b`.
  */
-basis basis::operator*(const basis &b) const
+Basis Basis::operator*(const Basis &b) const
 {
-	basis newb;
+	Basis newb;
 	for(auto &f1: *this)
 		for(auto &f2: b)
 			newb.insert(newb.end(), f1 * f2);
@@ -161,7 +161,7 @@ basis basis::operator*(const basis &b) const
 /**
  * @brief Effectively equivalent to `*this = (*this) * b`.
  */
-basis &basis::operator*=(const basis &b)
+Basis &Basis::operator*=(const Basis &b)
 {
 	*this = (*this) * b;
 	return *this;
@@ -182,7 +182,7 @@ basis &basis::operator*=(const basis &b)
  * Therefore, if you want to freshly generate a basis, you should call
  * `basis::clear` first.
  */
-basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
+Basis &Basis::generateBasis(const int nphot, const int modes, const Fock &head)
 {
 	if(head.size() == modes)
 	{
@@ -192,9 +192,9 @@ basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
 	}
 	for(int i = 0; i <= nphot; i++)
 	{
-		fock f(head);
-		f.push_back(i);
-		generate_basis(nphot - i, modes, f);
+		Fock f(head);
+		f.pushBack(i);
+		generateBasis(nphot - i, modes, f);
 	}
 	return *this;
 }
@@ -219,13 +219,13 @@ basis &basis::generate_basis(const int nphot, const int modes, const fock &head)
  * @f[ \{ | 4567 \rangle, | 9999 \rangle \}. @f]
  *
  */
-basis basis::postselect(const fock &ancilla) const
+Basis Basis::postselect(const Fock &ancilla) const
 {
-	basis b;
+	Basis b;
 	for(auto &fp: *this)
 	{
 		if(std::equal(ancilla.begin(), ancilla.end(), fp.begin()))
-			b.insert(b.end(), fock(fp.begin() + ancilla.size(), fp.end()));
+			b.insert(b.end(), Fock(fp.begin() + ancilla.size(), fp.end()));
 	}
 	return b;
 }
@@ -239,23 +239,23 @@ basis basis::postselect(const fock &ancilla) const
  * Applies a function `f` to all Fock states of `*this` to compute a
  * corresponding amplitude of a resulting state.
  */
-template<class exec_policy>
-state basis::apply_function(const fock_amp_function &f) const
+template<typename ExecPolicy>
+State Basis::applyFunction(const FockAmpFunction &f) const
 {
-	state s(*this);
-	s.set_amplitudes<exec_policy>(f);
+	State s(*this);
+	s.setAmplitudes<ExecPolicy>(f);
 	return s;
 }
 
-template state basis::apply_function<execution::seq>(const fock_amp_function &f) const;
-template state basis::apply_function<execution::par>(const fock_amp_function &f) const;
+template State Basis::applyFunction<execution::Seq>(const FockAmpFunction &f) const;
+template State Basis::applyFunction<execution::Par>(const FockAmpFunction &f) const;
 
 /**
  * @brief Adds two states, i.e., calculates their superposition.
  */
-state state::operator+(const state &s) const
+State State::operator+(const State &s) const
 {
-	state snew;
+	State snew;
 	auto a = this->begin();
 	auto b = s.begin();
 	while(a != this->end() && b != s.end())
@@ -267,7 +267,7 @@ state state::operator+(const state &s) const
 		}
 		else if(a->first == b->first)
 		{
-			snew.insert(snew.end(), state::element(a->first, a->second + b->second));
+			snew.insert(snew.end(), State::Element(a->first, a->second + b->second));
 			a++;
 			b++;
 		}
@@ -287,7 +287,7 @@ state state::operator+(const state &s) const
 /**
  * @brief Effectively equivalent to `*this = (*this) + s`.
  */
-state &state::operator+=(const state &s)
+State &State::operator+=(const State &s)
 {
 	for(auto &elem: s)
 		(*this)[elem.first] += elem.second;
@@ -297,7 +297,7 @@ state &state::operator+=(const state &s)
 /**
  * @brief Effectively equivalent to `*this = (*this) - s`.
  */
-state &state::operator-=(const state &s)
+State &State::operator-=(const State &s)
 {
 	for(auto &elem: s)
 		(*this)[elem.first] -= elem.second;
@@ -307,19 +307,19 @@ state &state::operator-=(const state &s)
 /**
  * @brief Returns a tensor product of two states.
  */
-state state::operator*(const state &s) const
+State State::operator*(const State &s) const
 {
-	state snew;
+	State snew;
 	for(auto &a: *this)
 		for(auto &b: s)
-			snew.insert(snew.end(), state::element(a.first * b.first, a.second * b.second));
+			snew.insert(snew.end(), State::Element(a.first * b.first, a.second * b.second));
 	return snew;
 }
 
 /**
  * @brief Effectively equivalent to `*this = (*this) * s`.
  */
-state &state::operator*=(const state &s)
+State &State::operator*=(const State &s)
 {
 	return *this = (*this) * s;
 }
@@ -327,9 +327,9 @@ state &state::operator*=(const state &s)
 /**
  * @brief Negates amplitudes of the state.
  */
-state state::operator-() const
+State State::operator-() const
 {
-	state s = *this;
+	State s = *this;
 	for(auto &elem: s)
 		elem.second = -elem.second;
 	return s;
@@ -338,16 +338,16 @@ state state::operator-() const
 /**
  * @brief Multiplies a state by a complex number.
  */
-state state::operator*(complex_type x) const
+State State::operator*(Complex x) const
 {
-	state s = *this;
+	State s = *this;
 	return s *= x;
 }
 
 /** @ingroup states
  * @brief Multiplies a state by a complex number.
  */
-state linopt::operator*(complex_type x, const state &s)
+State linopt::operator*(Complex x, const State &s)
 {
 	return s*x;
 }
@@ -355,7 +355,7 @@ state linopt::operator*(complex_type x, const state &s)
 /**
  * @brief Effectively equivalent to `*this = (*this) * x`.
  */
-state &state::operator*=(complex_type x)
+State &State::operator*=(Complex x)
 {
 	for(auto &elem: *this)
 		elem.second *= x;
@@ -365,16 +365,16 @@ state &state::operator*=(complex_type x)
 /**
   * @brief Divides a state by a complex number.
   */
-state state::operator/(complex_type x) const
+State State::operator/(Complex x) const
 {
-	state s = *this;
+	State s = *this;
 	return s /= x;
 }
 
 /**
  * @brief Effectively equivalent to `*this = (*this) / x`.
  */
-state &state::operator/=(complex_type x)
+State &State::operator/=(Complex x)
 {
 	for(auto &elem: *this)
 		elem.second /= x;
@@ -384,9 +384,9 @@ state &state::operator/=(complex_type x)
 /**
  * @brief Returns norm of the state.
  */
-real_type state::norm() const
+Real State::norm() const
 {
-	real_type n = 0.;
+	Real n = 0.;
 	for(auto &elem: *this)
 		n += std::norm(elem.second);
 	return sqrt(n);
@@ -395,7 +395,7 @@ real_type state::norm() const
 /**
  * @brief Normalizes the state to have unit norm.
  */
-state &state::normalize()
+State &State::normalize()
 {
 	return *this /= norm();
 }
@@ -403,9 +403,9 @@ state &state::normalize()
 /**
  * @brief Calculates a dot (scalar) product.
  */
-complex_type state::dot(const state &s) const
+Complex State::dot(const State &s) const
 {
-	complex_type z = 0.;
+	Complex z = 0.;
 	auto a = this->begin();
 	auto b = s.begin();
 	while(a != this->end() && b != s.end())
@@ -431,23 +431,23 @@ complex_type state::dot(const state &s) const
 /** @ingroup states
  * @brief Calculates a dot (scalar) product.
  */
-complex_type linopt::dot(const state &a, const state &b)
+Complex linopt::dot(const State &a, const State &b)
 {
 	return a.dot(b);
 }
 
-state state::postselect(const fock &ancilla) const
+State State::postselect(const Fock &ancilla) const
 {
-	state s;
+	State s;
 	auto asize = ancilla.size();
 	bool found = false;
 	for(auto &elem: *this)
 	{
-		const fock &f = elem.first;
-		const complex_type &amp = elem.second;
+		const Fock &f = elem.first;
+		const Complex &amp = elem.second;
 		if(std::equal(ancilla.begin(), ancilla.end(), f.begin()))
 		{
-			s.emplace_hint(s.end(), fock(f.begin() + asize, f.end()), amp);
+			s.emplace_hint(s.end(), Fock(f.begin() + asize, f.end()), amp);
 			found = true;
 		}
 		else if(found)
@@ -458,49 +458,49 @@ state state::postselect(const fock &ancilla) const
 	return s;
 }
 
-std::map<fock, state> state::postselect(int modes) const
+std::map<Fock, State> State::postselect(int modes) const
 {
-	std::map<fock, state> res;
-	const fock &f = (*this->begin()).first;
-	fock anc(f.begin(), f.begin() + modes);
-	state *s = &res[anc];
+	std::map<Fock, State> res;
+	const Fock &f = (*this->begin()).first;
+	Fock anc(f.begin(), f.begin() + modes);
+	State *s = &res[anc];
 	for(auto &elem: *this)
 	{
-		const fock &f = elem.first;
-		const complex_type &amp = elem.second;
+		const Fock &f = elem.first;
+		const Complex &amp = elem.second;
 		if(!std::equal(anc.begin(), anc.end(), f.begin()))
 		{
 			anc.assign(f.begin(), f.begin() + modes);
 			s = &res[anc];
 		}
-		s->emplace_hint(s->end(), fock(f.begin() + modes, f.end()), amp);
+		s->emplace_hint(s->end(), Fock(f.begin() + modes, f.end()), amp);
 	}
 	return res;
 }
 
-std::map<fock, state> state::postselect(const basis &b) const
+std::map<Fock, State> State::postselect(const Basis &b) const
 {
 	if(b.size() == 0)
-		return {{fock(), *this}};
-	std::map<fock, state> res;
+		return {{Fock(), *this}};
+	std::map<Fock, State> res;
 	auto si = this->begin();
 	auto bi = b.begin();
-	state *res_bi = &res[*bi];
+	State *resBi = &res[*bi];
 	while(si != this->end() && bi != b.end())
 	{
-		const fock &f = si->first;
-		const complex_type &amp = si->second;
-		const fock anc(f.begin(), f.begin() + bi->size());
+		const Fock &f = si->first;
+		const Complex &amp = si->second;
+		const Fock anc(f.begin(), f.begin() + bi->size());
 		if(*bi < anc)
 		{
 			bi++;
 			if(bi == b.end())
 				break;
-			res_bi = &res[*bi];
+			resBi = &res[*bi];
 		}
 		else if(*bi == anc)
 		{
-			res_bi->emplace_hint(res_bi->end(), fock(f.begin() + bi->size(), f.end()), amp);
+			resBi->emplace_hint(resBi->end(), Fock(f.begin() + bi->size(), f.end()), amp);
 			si++;
 		}
 		else
@@ -510,28 +510,28 @@ std::map<fock, state> state::postselect(const basis &b) const
 	}
 	bi++;
 	for(; bi != b.end(); bi++)
-		res[*bi] = state();
+		res[*bi] = State();
 	return res;
 }
 
-basis state::get_basis() const
+Basis State::getBasis() const
 {
-	basis b;
+	Basis b;
 	for(auto &elem: *this)
 		b.insert(b.end(), elem.first);
 	return b;
 }
 
-void state::set_basis(const basis &b)
+void State::setBasis(const Basis &b)
 {
 	clear();
 	for(auto &f: b)
 		emplace_hint(end(), f, 0.);
 }
 
-std::vector<state::value_type> state::get_amplitudes() const
+std::vector<State::Value> State::getAmplitudes() const
 {
-	std::vector<state::value_type> amps;
+	std::vector<State::Value> amps;
 	amps.reserve(size());
 	for(auto &elem: *this)
 		amps.push_back(elem.second);
@@ -539,29 +539,29 @@ std::vector<state::value_type> state::get_amplitudes() const
 }
 
 template<>
-void state::set_amplitudes<execution::seq>(const std::vector<complex_type> &amps)
+void State::setAmplitudes<execution::Seq>(const std::vector<Complex> &amps)
 {
 	using std::to_string;
 	if(static_cast<int>(amps.size()) != size())
-		throw wrong_size(ERROR_MSG("The size of 'amps' (which is " +
+		throw WrongSize(ERROR_MSG("The size of 'amps' (which is " +
 			to_string(amps.size()) + ") should be equal to the state size (which is " +
 			to_string(size()) + ")."));
-	auto amps_iter = amps.begin();
+	auto ampsIter = amps.begin();
 	for(auto &elem: *this)
 	{
-		elem.second = *amps_iter;
-		amps_iter++;
+		elem.second = *ampsIter;
+		ampsIter++;
 	}
 }
 
 template<>
-void state::set_amplitudes<execution::par>(const std::vector<complex_type> &)
+void State::setAmplitudes<execution::Par>(const std::vector<Complex> &)
 {
-	throw not_supported(ERROR_MSG("Parallel execution is not supported."));
+	throw NotSupported(ERROR_MSG("Parallel execution is not supported."));
 }
 
 template<>
-void state::set_amplitudes<execution::seq>(const fock_amp_function &f)
+void State::setAmplitudes<execution::Seq>(const FockAmpFunction &f)
 {
 	for(auto &elem: *this)
 		elem.second = f(elem.first);
@@ -569,7 +569,7 @@ void state::set_amplitudes<execution::seq>(const fock_amp_function &f)
 
 #ifdef _OPENMP
 template<>
-void state::set_amplitudes<execution::par>(const fock_amp_function &f)
+void State::setAmplitudes<execution::Par>(const FockAmpFunction &f)
 {
 	const int tnum = omp_get_max_threads();
 	#pragma omp parallel num_threads(tnum)
@@ -584,30 +584,30 @@ void state::set_amplitudes<execution::par>(const fock_amp_function &f)
 
 #else
 template<>
-void state::set_amplitudes<execution::par>(const fock_amp_function &)
+void state::setAmplitudes<execution::par>(const FockAmpFunction &)
 {
-	throw not_supported(ERROR_MSG("Parallel execution is not supported when "
-								  "the library is compiled without OpenMP."));
+	throw NotSupported(ERROR_MSG("Parallel execution is not supported when "
+								 "the library is compiled without OpenMP."));
 }
 #endif // _OPENMP
 
-std::ostream& operator<<(std::ostream &stream, const linopt::state::element &e)
+std::ostream& operator<<(std::ostream &stream, const linopt::State::Element &e)
 {
 	stream << e.first << " = " << e.second;
 	return stream;
 }
 
-std::ostream& operator<<(std::ostream &stream, const fock &f)
+std::ostream& operator<<(std::ostream &stream, const Fock &f)
 {
-	return print_array(stream, f);
+	return printArray(stream, f);
 }
 
-std::ostream& operator<<(std::ostream &stream, const basis &b)
+std::ostream& operator<<(std::ostream &stream, const Basis &b)
 {
-	return print_array(stream, b, "{", ",\n", "}");
+	return printArray(stream, b, "{", ",\n", "}");
 }
 
-std::ostream& operator<<(std::ostream &stream, const state &s)
+std::ostream& operator<<(std::ostream &stream, const State &s)
 {
-	return print_array(stream, s, "{", ",\n", "}");
+	return printArray(stream, s, "{", ",\n", "}");
 }

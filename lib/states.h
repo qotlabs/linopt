@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -33,15 +33,15 @@
 namespace linopt
 {
 
-class fock;
-class basis;
-class state;
+class Fock;
+class Basis;
+class State;
 
 /** @ingroup states
  * @brief A typedef of a function taking a Fock state as an argument and
  * returning a corresponding `complex_type` amplitude.
  */
-typedef std::function<complex_type(const fock&)> fock_amp_function;
+using FockAmpFunction = std::function<Complex(const Fock&)>;
 
 /** @ingroup states
  * @brief The class representing a Fock state.
@@ -53,65 +53,68 @@ typedef std::function<complex_type(const fock&)> fock_amp_function;
  *
  * The interface of this class is very similar to `std::vector`.
  */
-class fock : private std::vector<int>
+class Fock: private std::vector<int>
 {
-	typedef std::vector<int> base_class;
+	using Base = std::vector<int>;
+
 public:
 	/// Convenience typedef to std::vector.
-	typedef std::vector<int> vector_class; //In principle this can be different from base_class
-	typedef int value_type;
-	typedef int& reference;
+	using Vector = std::vector<int>; // In principle this can be different from Base
+	using Value = int;
+	using value_type = Value;
+	using Reference = Value&;
+	using reference = Reference;
 
-	using base_class::base_class;
-	using base_class::operator=;
+	using Base::Base;
+	using Base::operator=;
 
-	using base_class::iterator;
-	using base_class::const_iterator;
-	using base_class::reverse_iterator;
-	using base_class::const_reverse_iterator;
+	using Iterator = Base::iterator;
+	using ConstIterator = Base::const_iterator;
+	using ReverseIterator = Base::reverse_iterator;
+	using ConstReverseIterator = Base::const_reverse_iterator;
 
-	using base_class::begin;
-	using base_class::end;
-	using base_class::rbegin;
-	using base_class::rend;
-	using base_class::cbegin;
-	using base_class::cend;
-	using base_class::crbegin;
-	using base_class::crend;
+	using Base::begin;
+	using Base::end;
+	using Base::rbegin;
+	using Base::rend;
+	using Base::cbegin;
+	using Base::cend;
+	using Base::crbegin;
+	using Base::crend;
 
-	using base_class::front;
-	using base_class::back;
-	using base_class::operator[];
+	using Base::front;
+	using Base::back;
+	using Base::operator[];
 
 	/// Checks whether a Fock is empty, i.e. contains zero modes.
-	using base_class::empty;
+	using Base::empty;
 	/// Returns the number of modes in a Fock state.
-	int size() const { return static_cast<int>(base_class::size()); }
-	using base_class::resize;
-	using base_class::assign;
-	using base_class::push_back;
-	using base_class::pop_back;
-	using base_class::insert;
-	using base_class::erase;
+	int size() const { return static_cast<int>(Base::size()); }
+	using Base::resize;
+	using Base::assign;
+	void pushBack(Value n) { Base::push_back(n); }
+	void popBack() { Base::pop_back(); }
+	using Base::insert;
+	using Base::erase;
 	/// Clears a Fock state.
-	using base_class::clear;
+	using Base::clear;
 
 	/// Default constructor.
-	fock() = default;
+	Fock() = default;
 	/// Construct a Fock state from a `fock::vector_class`.
-	fock(const vector_class &v): base_class(v) {}
+	Fock(const Vector &v): Base(v) {}
 	int total() const;
-	real_type prod_fact() const;
-	fock operator*(const fock &f) const;
-	fock &operator*=(const fock &f);
-	fock operator+(const fock &f) const;
-	fock &operator+=(const fock &f);
+	Real prodFact() const;
+	Fock operator*(const Fock &f) const;
+	Fock &operator*=(const Fock &f);
+	Fock operator+(const Fock &f) const;
+	Fock &operator+=(const Fock &f);
 };
 
 /** @ingroup states
  * @brief Tests whether two Fock states are equal.
  */
-inline bool operator==(const fock &f, const fock &g)
+inline bool operator==(const Fock &f, const Fock &g)
 {
 	return f.size() == g.size() &&
 			std::equal(f.begin(), f.end(), g.begin());
@@ -123,7 +126,7 @@ inline bool operator==(const fock &f, const fock &g)
  * @return
  * `true` if `f` is less than `g`.
  */
-inline bool operator<(const fock &f, const fock &g)
+inline bool operator<(const Fock &f, const Fock &g)
 {
 	return std::lexicographical_compare(f.begin(), f.end(),
 										g.begin(), g.end());
@@ -132,7 +135,7 @@ inline bool operator<(const fock &f, const fock &g)
 /** @ingroup states
  * @brief Tests whether two Fock states differ.
  */
-inline bool operator!=(const fock &f, const fock &g)
+inline bool operator!=(const Fock &f, const Fock &g)
 {
 	return !(f == g);
 }
@@ -143,7 +146,7 @@ inline bool operator!=(const fock &f, const fock &g)
  * @return
  * `true` if `f` is greater than `g`.
  */
-inline bool operator>(const fock &f, const fock &g)
+inline bool operator>(const Fock &f, const Fock &g)
 {
 	return g < f;
 }
@@ -154,7 +157,7 @@ inline bool operator>(const fock &f, const fock &g)
  * @return
  * `true` if `f` is less or equal than `g`.
  */
-inline bool operator<=(const fock &f, const fock &g)
+inline bool operator<=(const Fock &f, const Fock &g)
 {
 	return !(f > g);
 }
@@ -165,7 +168,7 @@ inline bool operator<=(const fock &f, const fock &g)
  * @return
  * `true` if `f` is greater or equal than `g`.
  */
-inline bool operator>=(const fock &f, const fock &g)
+inline bool operator>=(const Fock &f, const Fock &g)
 {
 	return !(f < g);
 }
@@ -175,132 +178,138 @@ inline bool operator>=(const fock &f, const fock &g)
  *
  * The interface of this class is very similar to `std::set<fock>`.
  */
-class basis : private std::set<fock>
+class Basis: private std::set<Fock>
 {
-	typedef std::set<fock> base_class;
+	using Base = std::set<Fock>;
+
 public:
 	/// Convenience typedef to std::set.
-	typedef std::set<fock> set_class; //In principle this can be different from base_class
-	typedef fock value_type;
-	typedef fock& reference;
+	using Set = std::set<Fock>; // In principle this can be different from Base
+	using Value = Fock;
+	using value_type = Value;
+	using Reference = Value&;
+	using reference = Reference;
 
-	using base_class::iterator;
-	using base_class::const_iterator;
-	using base_class::reverse_iterator;
-	using base_class::const_reverse_iterator;
+	using Iterator = Base::iterator;
+	using ConstIterator = Base::const_iterator;
+	using ReverseIterator = Base::reverse_iterator;
+	using ConstReverseIterator = Base::const_reverse_iterator;
 
-	using base_class::begin;
-	using base_class::end;
-	using base_class::rbegin;
-	using base_class::rend;
-	using base_class::cbegin;
-	using base_class::cend;
-	using base_class::crbegin;
-	using base_class::crend;
+	using Base::begin;
+	using Base::end;
+	using Base::rbegin;
+	using Base::rend;
+	using Base::cbegin;
+	using Base::cend;
+	using Base::crbegin;
+	using Base::crend;
 
-	using base_class::empty;
+	using Base::empty;
 	/// Returns the number of Fock states in the basis.
-	int size() const { return static_cast<int>(base_class::size()); }
-	using base_class::insert;
-	using base_class::erase;
-	using base_class::clear;
-	using base_class::find;
+	int size() const { return static_cast<int>(Base::size()); }
+	using Base::insert;
+	using Base::erase;
+	using Base::clear;
+	using Base::find;
 
-	using base_class::operator=;
-	basis(): base_class() {}
-	basis(const set_class &s): base_class(s) {}
-	basis(std::initializer_list<fock> il): base_class(il) {}
-	explicit basis(int nphot, int modes);
+	using Base::operator=;
+	Basis(): Base() {}
+	Basis(const Set &s): Base(s) {}
+	Basis(std::initializer_list<Fock> il): Base(il) {}
+	explicit Basis(int nphot, int modes);
 
-	basis operator+(const basis &b) const;
-	basis &operator+=(const basis &b);
-	basis operator*(const basis &b) const;
-	basis &operator*=(const basis &b);
-	basis &generate_basis(const int nphot, const int modes, const fock &head = fock());
-	basis postselect(const fock &ancilla) const;
-	template<class exec_policy = execution::seq>
-	state apply_function(const fock_amp_function &f) const;
+	Basis operator+(const Basis &b) const;
+	Basis &operator+=(const Basis &b);
+	Basis operator*(const Basis &b) const;
+	Basis &operator*=(const Basis &b);
+	Basis &generateBasis(const int nphot, const int modes, const Fock &head = Fock());
+	Basis postselect(const Fock &ancilla) const;
+	template<typename ExecPolicy = execution::Seq>
+	State applyFunction(const FockAmpFunction &f) const;
 };
 
 /** @ingroup states
  * @brief The class representing a linear optical state.
  *
- * The interface of this class is very similar to `std::map<fock,complex_type>`.
+ * The interface of this class is very similar to `std::map<Fock, Complex>`.
  */
-class state : private std::map<fock, complex_type>
+class State: private std::map<Fock, Complex>
 {
-	typedef std::map<fock, complex_type> base_class;
+	using Base = std::map<Fock, Complex>;
+
 public:
-	typedef std::pair<fock, complex_type> element;
-	typedef std::map<fock, complex_type> map_class; //In principle this can be different from base_class
-	typedef complex_type value_type;
-	typedef complex_type& reference;
+	using Element = std::pair<Fock, Complex>;
+	using Map = std::map<Fock, Complex>; // In principle this can be different from Base
+	using Value = Complex;
+	using value_type = Value;
+	using Reference = Value&;
+	using reference = Reference;
 
-	using base_class::iterator;
-	using base_class::const_iterator;
-	using base_class::reverse_iterator;
-	using base_class::const_reverse_iterator;
+	using Iterator = Base::iterator;
+	using ConstIterator = Base::const_iterator;
+	using ReverseIterator = Base::reverse_iterator;
+	using ConstReverseIterator = Base::const_reverse_iterator;
 
-	using base_class::begin;
-	using base_class::end;
-	using base_class::rbegin;
-	using base_class::rend;
-	using base_class::cbegin;
-	using base_class::cend;
-	using base_class::crbegin;
-	using base_class::crend;
+	using Base::begin;
+	using Base::end;
+	using Base::rbegin;
+	using Base::rend;
+	using Base::cbegin;
+	using Base::cend;
+	using Base::crbegin;
+	using Base::crend;
 
-	using base_class::empty;
-	int size() const { return static_cast<int>(base_class::size()); }
-	using base_class::operator[];
-	using base_class::insert;
-	using base_class::erase;
-	using base_class::clear;
-	using base_class::find;
+	using Base::empty;
+	int size() const { return static_cast<int>(Base::size()); }
+	using Base::operator[];
+	using Base::insert;
+	using Base::erase;
+	using Base::clear;
+	using Base::find;
 
-	using base_class::operator=;
+	using Base::operator=;
 	/// Default constructor.
-	state(): base_class() {}
-	state(const map_class &m): base_class(m) {}
+	State(): Base() {}
+	State(const Map &m): Base(m) {}
 	/// Constructs a `state` from `fock` with unit amplitude.
-	state(const fock &f): base_class() { (*this)[f] = 1; }
-	state(const basis &b): base_class() { set_basis(b); }
+	State(const Fock &f): Base() { (*this)[f] = 1; }
+	State(const Basis &b): Base() { setBasis(b); }
 
-	state operator+(const state &s) const;
-	state &operator+=(const state &s);
+	State operator+(const State &s) const;
+	State &operator+=(const State &s);
 	/// Subtracts two states.
-	state operator-(const state &s) const { return *this + (-s); }
-	state &operator-=(const state &s);
-	state operator*(const state &s) const;
-	state &operator*=(const state &s);
-	state operator-() const;
-	state operator*(complex_type x) const;
-	state &operator*=(complex_type x);
-	state operator/(complex_type x) const;
-	state &operator/=(complex_type x);
-	real_type norm() const;
-	state &normalize();
-	complex_type dot(const state &s) const;
-	state postselect(const fock &ancilla) const;
-	std::map<fock, state> postselect(int modes) const;
-	std::map<fock, state> postselect(const basis &b) const;
-	basis get_basis() const;
-	void set_basis(const basis &b);
-	std::vector<state::value_type> get_amplitudes() const;
-	template<class exec_policy = execution::seq>
-	void set_amplitudes(const std::vector<complex_type> &amps);
-	template<class exec_policy = execution::seq>
-	void set_amplitudes(const fock_amp_function &f);
+	State operator-(const State &s) const { return *this + (-s); }
+	State &operator-=(const State &s);
+	State operator*(const State &s) const;
+	State &operator*=(const State &s);
+	State operator-() const;
+	State operator*(Complex x) const;
+	State &operator*=(Complex x);
+	State operator/(Complex x) const;
+	State &operator/=(Complex x);
+	Real norm() const;
+	State &normalize();
+	Complex dot(const State &s) const;
+	State postselect(const Fock &ancilla) const;
+	std::map<Fock, State> postselect(int modes) const;
+	std::map<Fock, State> postselect(const Basis &b) const;
+	Basis getBasis() const;
+	void setBasis(const Basis &b);
+	std::vector<State::Value> getAmplitudes() const;
+	template<typename ExecPolicy = execution::Seq>
+	void setAmplitudes(const std::vector<Complex> &amps);
+	template<typename ExecPolicy = execution::Seq>
+	void setAmplitudes(const FockAmpFunction &f);
 };
 
-state operator*(complex_type x, const state &s);
-complex_type dot(const state &a, const state &b);
+State operator*(Complex x, const State &s);
+Complex dot(const State &a, const State &b);
 
-}
+} // Namespace linopt
 
-std::ostream &operator<<(std::ostream &stream, const linopt::fock &f);
-std::ostream &operator<<(std::ostream &stream, const linopt::basis &b);
-std::ostream &operator<<(std::ostream &stream, const linopt::state::element &e);
-std::ostream &operator<<(std::ostream &stream, const linopt::state &s);
+std::ostream &operator<<(std::ostream &stream, const linopt::Fock &f);
+std::ostream &operator<<(std::ostream &stream, const linopt::Basis &b);
+std::ostream &operator<<(std::ostream &stream, const linopt::State::Element &e);
+std::ostream &operator<<(std::ostream &stream, const linopt::State &s);
 
 #endif // STATES_H

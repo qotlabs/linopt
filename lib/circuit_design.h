@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -28,13 +28,13 @@
 namespace linopt
 {
 
-void clements_design(matrix_type &M, const point &x, const point &y);
-void clements_design(matrix_type &M, const point &x);
-matrix_type clements_design(const point &x, const point &y);
-matrix_type clements_design(const point &x);
-void get_clements_design(matrix_type &M, point &x, real_type eps  = default_epsilon);
-point get_clements_design(matrix_type &M, real_type eps = default_epsilon);
+void clementsDesign(Matrix &M, const Point &x, const Point &y);
+void clementsDesign(Matrix &M, const Point &x);
+Matrix clementsDesign(const Point &x, const Point &y);
+Matrix clementsDesign(const Point &x);
+void getClementsDesign(Matrix &M, Point &x, Real eps  = defaultEpsilon);
+Point getClementsDesign(Matrix &M, Real eps = defaultEpsilon);
 
-}
+} // Namespace linopt
 
 #endif // CIRCUIT_DESIGN_H

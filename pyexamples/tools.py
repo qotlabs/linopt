@@ -1,5 +1,5 @@
 import random
-from pylinopt import *
+from linopt import *
 from math import sqrt
 
 def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
@@ -13,7 +13,7 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
 		random_vector:  a 1xN^2 list of float numbers in [0,1] used to initialize
 						a random starting point in the unitary matrix space
 
-		input_fock:     input fock state, should be an instance of the class "fock"
+		input_fock:     input fock state, should be an instance of the class "Fock"
 
 		target:         the target state you want to achieve given an input fock state,
 						a linear optical transformation and a list of ancilla fock
@@ -71,11 +71,11 @@ def cf_inner_product(random_vector, input_fock, target, ancilla, full_basis):
 	# 				raise ValueError('Number of input modes is inconsistent with total output number of modes')   
 
 	#v = VectorX(random_vector)
-	c = circuit()
+	c = Circuit()
 	c.input_state = input_fock
 	c.output_basis = full_basis
 	c.unitary = exp_hermite(random_vector)
-	postselected = state()
+	postselected = State()
 	out_state = c.output_state()
 
 	p, res = 0, 0

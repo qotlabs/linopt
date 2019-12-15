@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -32,12 +32,12 @@
 namespace linopt
 {
 
-inline std::string format_error_message(std::string msg, const char *func)
+inline std::string formatErrorMessage(std::string msg, const char *func)
 {
 	return std::string() + "linopt::" + func + "(): " + msg;
 }
 
-#define ERROR_MSG(...) format_error_message(__VA_ARGS__, __func__)
+#define ERROR_MSG(...) formatErrorMessage(__VA_ARGS__, __func__)
 
 /** @ingroup exceptions
  * @brief The base exception class.
@@ -45,7 +45,7 @@ inline std::string format_error_message(std::string msg, const char *func)
  * All other exceptions inherits from it. Therefore, you can catch objects of
  * this type to handle all Linopt exceptions.
  */
-class general_error: public std::logic_error
+class GeneralError: public std::logic_error
 {
 	using logic_error::logic_error;
 };
@@ -54,25 +54,25 @@ class general_error: public std::logic_error
  * @brief The object of this type is thrown when an object of improper size
  * is encountered.
  */
-class wrong_size: public general_error
+class WrongSize: public GeneralError
 {
-	using general_error::general_error;
+	using GeneralError::GeneralError;
 };
 
 /** @ingroup exceptions
  * @brief The object of this type is thrown when a unitary matrix is expected,
  * but it is not.
  */
-class not_unitary : public general_error
+class NotUnitary : public GeneralError
 {
-	using general_error::general_error;
+	using GeneralError::GeneralError;
 };
 
-class not_supported: public general_error
+class NotSupported: public GeneralError
 {
-	using general_error::general_error;
+	using GeneralError::GeneralError;
 };
 
-}
+} // Namespace linopt
 
 #endif // EXCEPTIONS_H

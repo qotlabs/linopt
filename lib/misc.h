@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -101,10 +101,10 @@ inline int isqrt(int x)
 }
 
 template<typename T>
-std::ostream& print_array(std::ostream &stream, const T &a,
-						  const char *b1 = "{",
-						  const char *delim = ", ",
-						  const char *b2 = "}")
+std::ostream& printArray(std::ostream &stream, const T &a,
+						 const char *b1 = "{",
+						 const char *delim = ", ",
+						 const char *b2 = "}")
 {
 	if(a.empty())
 	{
@@ -120,8 +120,8 @@ std::ostream& print_array(std::ostream &stream, const T &a,
 	return stream;
 }
 
-std::ostream& print_complex(std::ostream &stream, const complex_type &x);
+std::ostream& printComplex(std::ostream &stream, const Complex &x);
 
-}
+} // Namespace linopt
 
 #endif // MISC_H

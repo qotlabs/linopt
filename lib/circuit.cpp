@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -24,7 +24,7 @@
 
 using namespace linopt;
 
-void circuit::copy_columns_on_input(matrix_type &Ucc, const matrix_type &U, const fock &fin)
+void Circuit::copyColumnsOnInput(Matrix &Ucc, const Matrix &U, const Fock &fin)
 {
 	const int tot = fin.total();
 	const int modes = fin.size();
@@ -35,7 +35,7 @@ void circuit::copy_columns_on_input(matrix_type &Ucc, const matrix_type &U, cons
 			Ucc.col(k++) = U.col(m);
 }
 
-void circuit::copy_rows_on_output(matrix_type &Ucr, const matrix_type &U, const fock &fout)
+void Circuit::copyRowsOnOutput(Matrix &Ucr, const Matrix &U, const Fock &fout)
 {
 	const int tot = fout.total();
 	const int modes = fout.size();
@@ -46,95 +46,95 @@ void circuit::copy_rows_on_output(matrix_type &Ucr, const matrix_type &U, const 
 			Ucr.row(k++) = U.row(m);
 }
 
-complex_type circuit::calc_fock_amp(const fock &fout) const
+Complex Circuit::calcFockAmp(const Fock &fout) const
 {
-	matrix_type Uout;
-	copy_rows_on_output(Uout, unitary, fout);
+	Matrix Uout;
+	copyRowsOnOutput(Uout, unitary, fout);
 	const auto tot = fout.total();
-	const auto out_prod_fact = fout.prod_fact();
-	matrix_type Uoutin(tot, tot);
-	complex_type amp = 0.;
-	for(const auto &in_elem: input_state)
+	const auto outProdFact = fout.prodFact();
+	Matrix Uoutin(tot, tot);
+	Complex amp = 0.;
+	for(const auto &inElem: inputState)
 	{
-		const fock &fin = in_elem.first;
+		const Fock &fin = inElem.first;
 		if(fin.total() != tot)
 			continue;
-		copy_columns_on_input(Uoutin, Uout, fin);
-		amp += permanent(Uoutin) * in_elem.second /
-								std::sqrt(out_prod_fact * fin.prod_fact());
+		copyColumnsOnInput(Uoutin, Uout, fin);
+		amp += permanent(Uoutin) * inElem.second /
+								std::sqrt(outProdFact * fin.prodFact());
 	}
 	return amp;
 }
 
-complex_type circuit::calc_fock_amp_1(const uin_fin &precomputed, const fock &fout) const
+Complex Circuit::calcFockAmp1(const UinFin &precomputed, const Fock &fout) const
 {
 	if(fout.total()	!= precomputed.tot)
 		return 0.;
-	matrix_type Uinout;
-	copy_rows_on_output(Uinout, precomputed.Uin, fout);
-	return permanent(Uinout) * precomputed.mult / std::sqrt(fout.prod_fact());
+	Matrix Uinout;
+	copyRowsOnOutput(Uinout, precomputed.Uin, fout);
+	return permanent(Uinout) * precomputed.mult / std::sqrt(fout.prodFact());
 }
 
-const state &circuit::get_input_state() const
+const State &Circuit::getInputState() const
 {
-	return input_state;
+	return inputState;
 }
 
-void circuit::set_input_state(const state &s)
+void Circuit::setInputState(const State &s)
 {
-	output_state_valid = false;
-	input_state = s;
+	outputStateValid = false;
+	inputState = s;
 }
 
-const basis circuit::get_output_basis() const
+const Basis Circuit::getOutputBasis() const
 {
-	return _output_state.get_basis();
+	return outputState_.getBasis();
 }
 
-void circuit::set_output_basis(const basis &bout)
+void Circuit::setOutputBasis(const Basis &bout)
 {
-	output_state_valid = false;
-	_output_state.set_basis(bout);
+	outputStateValid = false;
+	outputState_.setBasis(bout);
 }
 
-const matrix_type &circuit::get_unitary() const
+const Matrix &Circuit::getUnitary() const
 {
 	return unitary;
 }
 
-void circuit::set_unitary(const matrix_type &U)
+void Circuit::setUnitary(const Matrix &U)
 {
-	output_state_valid = false;
+	outputStateValid = false;
 	unitary = U;
 }
 
-template<class exec_policy>
-const state &circuit::output_state()
+template<typename ExecPolicy>
+const State &Circuit::outputState()
 {
 	using namespace std;
 	using namespace std::placeholders;
-	if(!output_state_valid)
+	if(!outputStateValid)
 	{
-		if(input_state.size() > 1)
+		if(inputState.size() > 1)
 		{
-			_output_state.set_amplitudes<exec_policy>(
-				bind(&circuit::calc_fock_amp, this, _1));
+			outputState_.setAmplitudes<ExecPolicy>(
+				bind(&Circuit::calcFockAmp, this, _1));
 		}
 		else
 		{
-			uin_fin precomputed;
-			const fock &fin = input_state.begin()->first;
-			const auto &amp = input_state.begin()->second;
-			copy_columns_on_input(precomputed.Uin, unitary, fin);
+			UinFin precomputed;
+			const Fock &fin = inputState.begin()->first;
+			const auto &amp = inputState.begin()->second;
+			copyColumnsOnInput(precomputed.Uin, unitary, fin);
 			precomputed.tot = fin.total();
-			precomputed.mult = amp / std::sqrt(fin.prod_fact());
-			_output_state.set_amplitudes<exec_policy>(
-				bind(&circuit::calc_fock_amp_1, this, ref(precomputed), _1));
+			precomputed.mult = amp / std::sqrt(fin.prodFact());
+			outputState_.setAmplitudes<ExecPolicy>(
+				bind(&Circuit::calcFockAmp1, this, ref(precomputed), _1));
 		}
-		output_state_valid = true;
+		outputStateValid = true;
 	}
-	return _output_state;
+	return outputState_;
 }
 
-template const state &circuit::output_state<execution::seq>();
-template const state &circuit::output_state<execution::par>();
+template const State &Circuit::outputState<execution::Seq>();
+template const State &Circuit::outputState<execution::Par>();

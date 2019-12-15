@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -74,38 +74,38 @@ static void checkmate(int mm[], const int N)
  *
  * @throw
  * If `x` size is not equal to @f$ N(N-1) @f$ for some integer @f$ N @f$ or if
- * `x` and `y` sizes do not match, then `wrong_size` is thrown.
+ * `x` and `y` sizes do not match, then `WrongSize` is thrown.
  *
- * @see get_clements_design()
+ * @see getClementsDesign()
  *
  * @see
  * W. R. Clements, _et al._ "Optimal design for universal multiport
  * interferometers." Optica __3__, pp. 1460-1465 (2016),
  * https://doi.org/10.1364/OPTICA.3.001460
  */
-void linopt::clements_design(matrix_type &M, const point &x, const point &y)
+void linopt::clementsDesign(Matrix &M, const Point &x, const Point &y)
 {
 	// Gives unitary matrix assured
 	if(x.size() != y.size())
-		throw wrong_size(ERROR_MSG("Size of x (which is " + std::to_string(x.size()) +
+		throw WrongSize(ERROR_MSG("Size of x (which is " + std::to_string(x.size()) +
 			") should be equal to size of y (which is " + std::to_string(y.size()) +
 			")."));
 	const int NN = static_cast<int>(x.size() / 2.);
 	const int N = static_cast<int>(std::sqrt(2.*NN + 0.25) + 0.5);
 	if(N*(N - 1) / 2 != NN)
-		throw wrong_size(ERROR_MSG("Wrong size of points (current is " +
+		throw WrongSize(ERROR_MSG("Wrong size of points (current is " +
 			std::to_string(x.size()) + ")."));
-	if(M.cols() != N || M.rows() != N || !is_unitary(M))
+	if(M.cols() != N || M.rows() != N || !isUnitary(M))
 	{
 		M.resize(N, N);
 		M.setIdentity();
 	}
 	std::unique_ptr<int[]> mm(new int[NN]);
 	checkmate(mm.get(), N);
-	column_type colm(N);
-	const complex_type i1(0., 1.);
-	complex_type expphi, exp2theta;
-	real_type cosp, cosm, sinp, sinm;
+	Column colm(N);
+	const Complex i1(0., 1.);
+	Complex expphi, exp2theta;
+	Real cosp, cosm, sinp, sinm;
 	using std::cos;
 	using std::sin;
 	using std::polar;
@@ -128,30 +128,30 @@ void linopt::clements_design(matrix_type &M, const point &x, const point &y)
 }
 
 /** @ingroup design
- * @brief Equivalent to `clements_design(M, x, y)` with all @f$ y_i = 0 @f$.
+ * @brief Equivalent to `clementsDesign(M, x, y)` with all @f$ y_i = 0 @f$.
  *
- * This function is equivalent to the `clements_design(M, x, y)` with all
+ * This function is equivalent to the `clementsDesign(M, x, y)` with all
  * elements of `y` set to zero. However, calculations are a bit faster than
- * direct call of `clements_design(M, x, y)`.
+ * direct call of `clementsDesign(M, x, y)`.
  */
-void linopt::clements_design(matrix_type &M, const point &x)
+void linopt::clementsDesign(Matrix &M, const Point &x)
 {
 	// Gives unitary matrix assured
 	const int NN = static_cast<int>(x.size() / 2.);
 	const int N = static_cast<int>(std::sqrt(2.*NN + 0.25) + 0.5);
 	if(N*(N - 1) / 2 != NN)
-		throw wrong_size(ERROR_MSG("Wrong size of point (current is " +
+		throw WrongSize(ERROR_MSG("Wrong size of point (current is " +
 			std::to_string(x.size()) + ")."));
-	if (M.cols() != N || M.rows() != N || !is_unitary(M))
+	if (M.cols() != N || M.rows() != N || !isUnitary(M))
 	{
 		M.resize(N, N);
 		M.setIdentity();
 	}
 	std::unique_ptr<int[]> mm(new int[NN]);
 	checkmate(mm.get(), N);
-	column_type colm(N);
-	const complex_type i1(0., 1.);
-	complex_type expphi, exp2theta;
+	Column colm(N);
+	const Complex i1(0., 1.);
+	Complex expphi, exp2theta;
 	for(int i = 0; i < NN; i++)
 	{
 		int m = mm[NN - 1 - i] - 1;
@@ -165,28 +165,28 @@ void linopt::clements_design(matrix_type &M, const point &x)
 }
 
 /** @ingroup design
- * @brief This function is equivalent to `clements_design(M, x, y)` with `M`
+ * @brief This function is equivalent to `clementsDesign(M, x, y)` with `M`
  * being the identity matrix.
  *
  * @return Calculated unitary matrix `M`.
  */
-matrix_type linopt::clements_design(const point &x, const point &y)
+Matrix linopt::clementsDesign(const Point &x, const Point &y)
 {
-	matrix_type M;
-	clements_design(M, x, y);
+	Matrix M;
+	clementsDesign(M, x, y);
 	return M;
 }
 
 /** @ingroup design
- * @brief This function is equivalent to `clements_design(M, x)` with `M` being
+ * @brief This function is equivalent to `clementsDesign(M, x)` with `M` being
  * the identity matrix.
  *
  * @return Calculated unitary matrix `M`.
  */
-matrix_type linopt::clements_design(const point &x)
+Matrix linopt::clementsDesign(const Point &x)
 {
-	matrix_type M;
-	clements_design(M, x);
+	Matrix M;
+	clementsDesign(M, x);
 	return M;
 }
 
@@ -199,9 +199,10 @@ matrix_type linopt::clements_design(const point &x)
  * matrix is destroyed during calculations.
  * @param[out] x -- the array of @f$ N(N-1) @f$ phase-shift parameters, such
  * that even elements are @f$ \phi @f$ -- phase shifts _before_ the beam
- * splitters, and odd ones are @f$ \theta @f$ -- halves of phase shifts _between_ the beam
- * splitters. All pairs of parameters go in reverse column-wise enumeration
- * order. If `x` has improper size then it will be resized.
+ * splitters, and odd ones are @f$ \theta @f$ -- halves of phase shifts
+ * _between_ the beam splitters. All pairs of parameters go in reverse
+ * column-wise enumeration order. If `x` has improper size then it will be
+ * resized.
  * @param[in] eps -- precision for unitarity test of the input matrix `M`. If
  * `eps` is negative then no tests are performed.
  *
@@ -234,28 +235,28 @@ matrix_type linopt::clements_design(const point &x)
  *		\end{pmatrix}
  *	
  * @f]
- * This function is effectively inverse of the `clements_design(M, x)`.
+ * This function is effectively inverse of the `clementsDesign(M, x)`.
  *
  * @throw
- * If `M` is not unitary within given precision `eps`, then `not_unitary` is
+ * If `M` is not unitary within given precision `eps`, then `NotUnitary` is
  * thrown.
  *
- * @see clements_design()
+ * @see clementsDesign()
  *
  * @see
  * W. R. Clements, _et al._ "Optimal design for universal multiport
  * interferometers." Optica __3__, pp. 1460-1465 (2016),
  * https://doi.org/10.1364/OPTICA.3.001460
  */
-void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
+void linopt::getClementsDesign(Matrix &M, Point &x, Real eps)
 {
 	// Leaves diagonal unitary matrix & gives point in which even elements are
 	// phi, odd elements are theta. Phase shift coefficients are given in
 	// reverse column-wise enumeration order
 	const int N = static_cast<int>(M.cols());
 	if(eps > 0)
-		if (!is_unitary(M, eps))
-			throw not_unitary(ERROR_MSG("Given matrix is not unitary"));
+		if (!isUnitary(M, eps))
+			throw NotUnitary(ERROR_MSG("Given matrix is not unitary"));
 	const int NN = N * (N - 1) / 2;
 	if(static_cast<int>(x.size()) != 2*NN)
 		x.resize(2*NN);
@@ -263,11 +264,11 @@ void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
 	std::unique_ptr<int[]> pattern(new int[NN]);
 	checkmate(pattern.get(), N);
 	int f = NN - 1, s = 0, i, n, m;
-	const complex_type i1(0., 1.);
-	complex_type expphi, exp2theta;
-	real_type phi, theta, phim, phin;
-	column_type tempcol(N);
-	row_type temprow(N);
+	const Complex i1(0., 1.);
+	Complex expphi, exp2theta;
+	Real phi, theta, phim, phin;
+	Column tempcol(N);
+	Row temprow(N);
 	using std::arg;
 	using std::atan;
 	using std::abs;
@@ -369,9 +370,9 @@ void linopt::get_clements_design(matrix_type &M, point &x, real_type eps)
  *
  * @return Calculated array `x` of phase-shift parameters.
  */
-point linopt::get_clements_design(matrix_type &M, real_type eps)
+Point linopt::getClementsDesign(Matrix &M, Real eps)
 {
-	point x;
-	get_clements_design(M, x, eps);
+	Point x;
+	getClementsDesign(M, x, eps);
 	return x;
 }

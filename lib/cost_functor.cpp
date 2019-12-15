@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -23,24 +23,24 @@
 
 using namespace linopt;
 
-cost_functor::cost_functor(const basis &full_basis,
-						   const basis &ancilla_basis,
-						   const fock &input_state,
-						   const std::vector<state> &target_states):
-	target_states(target_states),
-	ancilla_basis(ancilla_basis)
+CostFunctor::CostFunctor(const Basis &fullBasis,
+						 const Basis &ancillaBasis,
+						 const Fock &inputState,
+						 const std::vector<State> &targetStates):
+	targetStates(targetStates),
+	ancillaBasis(ancillaBasis)
 {
-	C.set_output_basis(full_basis);
-	C.set_input_state(input_state);
+	C.setOutputBasis(fullBasis);
+	C.setInputState(inputState);
 }
 
-real_type stanisic_functor::operator()(const point &x)
+Real StanisicFunctor::operator()(const Point &x)
 {
-	C.set_unitary(exp_hermite_parametrization(x));
-	state out = C.output_state();
-	state postselected;
-	real_type p, res = 0.;
-	for(auto anc = ancilla_basis.begin(); anc != ancilla_basis.end(); anc++)
+	C.setUnitary(expHermiteParametrization(x));
+	State out = C.outputState();
+	State postselected;
+	Real p, res = 0.;
+	for(auto anc = ancillaBasis.begin(); anc != ancillaBasis.end(); anc++)
 	{
 		postselected = out.postselect(*anc);
 		p = postselected.norm();
@@ -48,20 +48,20 @@ real_type stanisic_functor::operator()(const point &x)
 			continue;
 		postselected /= p;
 		p = p*p;
-		for(size_t i = 0; i < target_states.size(); i++)
-			res += p * std::pow(std::norm(dot(postselected, target_states[i])), 5);
+		for(size_t i = 0; i < targetStates.size(); i++)
+			res += p * std::pow(std::norm(dot(postselected, targetStates[i])), 5);
 	}
 	return res;
 }
 
-real_type log_functor::operator()(const point &x)
+Real LogFunctor::operator()(const Point &x)
 {
-	const real_type epsilon = 1e-2;
-	C.set_unitary(hurwitz_parametrization(x));
-	state out = C.output_state();
-	state postselected;
-	real_type p, res = 0.;
-	for(auto anc = ancilla_basis.begin(); anc != ancilla_basis.end(); anc++)
+	const Real epsilon = 1e-2;
+	C.setUnitary(hurwitzParametrization(x));
+	State out = C.outputState();
+	State postselected;
+	Real p, res = 0.;
+	for(auto anc = ancillaBasis.begin(); anc != ancillaBasis.end(); anc++)
 	{
 		postselected = out.postselect(*anc);
 		p = postselected.norm();
@@ -69,9 +69,9 @@ real_type log_functor::operator()(const point &x)
 			continue;
 		postselected /= p;
 		p = p*p;
-		for(size_t i = 0; i < target_states.size(); i++)
+		for(size_t i = 0; i < targetStates.size(); i++)
 		{
-			res += epsilon*p/(1. + epsilon - std::norm(dot(postselected, target_states[i])));
+			res += epsilon*p/(1. + epsilon - std::norm(dot(postselected, targetStates[i])));
 		}
 	}
 	return res;

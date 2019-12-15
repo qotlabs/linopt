@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -28,34 +28,35 @@
 namespace linopt
 {
 
-class cost_functor
+class CostFunctor
 {
+public:
+	CostFunctor(const Basis &fullBasis,
+				const Basis &ancillaBasis,
+				const Fock &inputState,
+				const std::vector<State> &targetStates);
+	Real operator()(const Point &x);
+
 protected:
-	std::vector<state> target_states;
-	basis ancilla_basis;
-	circuit C;
-public:
-	cost_functor(const basis &full_basis,
-				 const basis &ancilla_basis,
-				 const fock &input_state,
-				 const std::vector<state> &target_states);
-	real_type operator()(const point &x);
+	std::vector<State> targetStates;
+	Basis ancillaBasis;
+	Circuit C;
 };
 
-class stanisic_functor: public cost_functor
+class StanisicFunctor: public CostFunctor
 {
 public:
-	using cost_functor::cost_functor;
-	real_type operator()(const point &x);
+	using CostFunctor::CostFunctor;
+	Real operator()(const Point &x);
 };
 
-class log_functor: public cost_functor
+class LogFunctor: public CostFunctor
 {
 public:
-	using cost_functor::cost_functor;
-	real_type operator()(const point &x);
+	using CostFunctor::CostFunctor;
+	Real operator()(const Point &x);
 };
 
-}
+} // Namespace linopt
 
 #endif // COST_FUNCTOR_H

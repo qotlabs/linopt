@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -28,46 +28,42 @@
 namespace linopt
 {
 
-class circuit
+class Circuit
 {
+public:
+	const State &getInputState() const;
+	void setInputState(const State &s);
+	const Basis getOutputBasis() const;
+	void setOutputBasis(const Basis &bout);
+	const Matrix &getUnitary() const;
+	void setUnitary(const Matrix &U);
+	template<typename ExecPolicy = execution::Seq>
+	const State &outputState();
+
 private:
-	state input_state;
-	matrix_type unitary;
-	state _output_state;
+	State inputState;
+	Matrix unitary;
+	State outputState_;
 
-	// Cache
+	// Indicates whether variable `outputState_` is valid
+	bool outputStateValid = true;
 
-	// Indicates whether variable `_output_state` is valid
-	bool output_state_valid = true;
-
-	// Cache struct for `calc_fock_amp_1()`
-	struct uin_fin
+	// Cache struct for `calcFockAmp1()`
+	struct UinFin
 	{
-		matrix_type Uin;
+		Matrix Uin;
 		int tot;
-		complex_type mult;
+		Complex mult;
 	};
 
-	// Members
-
-	static void copy_columns_on_input(matrix_type &Ucc, const matrix_type &U, const fock &fin);
-	static void copy_rows_on_output(matrix_type &Ucr, const matrix_type &Uin, const fock &fout);
+	static void copyColumnsOnInput(Matrix &Ucc, const Matrix &U, const Fock &fin);
+	static void copyRowsOnOutput(Matrix &Ucr, const Matrix &Uin, const Fock &fout);
 	// Calculates amplitude corresponding to the output Fock state `fout`
-	complex_type calc_fock_amp(const fock &fout) const;
-	// Optimized version of `calc_fock_amp()` when `input_state` has size = 1
-	complex_type calc_fock_amp_1(const uin_fin &precomputed, const fock &fout) const;
-
-public:
-	const state &get_input_state() const;
-	void set_input_state(const state &s);
-	const basis get_output_basis() const;
-	void set_output_basis(const basis &bout);
-	const matrix_type &get_unitary() const;
-	void set_unitary(const matrix_type &U);
-	template<class exec_policy = execution::seq>
-	const state &output_state();
+	Complex calcFockAmp(const Fock &fout) const;
+	// Optimized version of `calcFockAmp()` when `inputState` has size = 1
+	Complex calcFockAmp1(const UinFin &precomputed, const Fock &fout) const;
 };
 
-}
+} // Namespace linopt
 
 #endif // CIRCUIT_H

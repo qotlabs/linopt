@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -27,13 +27,13 @@
 namespace linopt
 {
 
-using real_type = double;
-using complex_type = std::complex<real_type>;
+using Real = double;
+using Complex = std::complex<Real>;
 
 /** @ingroup matrix
  * @brief Default precision for numeric comparison operations.
  */
-constexpr real_type default_epsilon = 1e-15;
+constexpr Real defaultEpsilon = 1e-15;
 
 /**
  * @brief The namespace containing execution policies used by several library
@@ -41,10 +41,10 @@ constexpr real_type default_epsilon = 1e-15;
  */
 namespace execution
 {
-	class seq {};	///< Sequential execution policy.
-	class par {};	///< Parallel execution policy.
-}
+	class Seq {};	///< Sequential execution policy.
+	class Par {};	///< Parallel execution policy.
+} // Namespace execution
 
-}
+} // Namespace linopt
 
 #endif // TYPES_H
