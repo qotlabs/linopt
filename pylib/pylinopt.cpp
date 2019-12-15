@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -297,7 +297,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Removes i-th mode and returns its occupation number.",
 			 py::arg("i"))
 
-		.def("clear", &fock::clear,
+		.def("clear", [](fock &f) { f.clear(); },
 			 "Completely clears the Fock state")
 
 		.def("resize", [](fock &f, int n) { f.resize(n); },
@@ -385,7 +385,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "Removes the Fock state 'f' from the basis if it is present.",
 			 py::arg("f"))
 
-		.def("clear", &basis::clear,
+		.def("clear", [](basis &b) { b.clear(); },
 			 "Remove all elements from the basis.")
 
 		.def(py::self + py::self,
@@ -499,7 +499,7 @@ PYBIND11_MODULE(pylinopt, m)
 			 "to the Fock 'f'.",
 			 py::arg("f"))
 
-		.def("clear", &state::clear,
+		.def("clear", [](state &s) { s.clear(); },
 			 "Completely clears the state.")
 
 		.def(py::self + py::self,

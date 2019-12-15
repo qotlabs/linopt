@@ -1,4 +1,4 @@
-/* Copyright © 2018, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -44,10 +44,10 @@ namespace linopt
   */
 constexpr struct version
 {
-	static constexpr auto string = "0.2.0";
+	static constexpr auto string = "0.2.1";
 	static constexpr int major = 0;
 	static constexpr int minor = 2;
-	static constexpr int patch = 0;
+	static constexpr int patch = 1;
 } version;
 
 }
