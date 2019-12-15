@@ -26,7 +26,15 @@ Linopt is likely to compile with any C++11 compatible compiler which is supporte
 * GCC 7.2 or newer,
 * Microsoft Visual Studio 2017.
 
-We develop Linopt under [Ubuntu](https://www.ubuntu.com/) 18.04 and provide Makefiles for building. To build C++ library you should run `make` command from the `lib` directory. It will generate static version of the library `liblinopt.a`. Type `make help` for a list of available commands. If you want to build Python version of the library go to `pylib` directory and execute `make` in it. If the build is successful Python module `pylinopt.so` will appear. We also provide [Qt Creator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/#ide) project files (with extension *.creator) for convenience (however, Qt Creator uses the same Makefiles for building).
+We develop Linopt under [Ubuntu](https://www.ubuntu.com/) 18.04 and provide Makefiles for building. To build C++ library you should run `make` command from the `lib` directory. It will generate static version of the library `liblinopt.a`. Type `make help` for a list of available commands.
+
+If you want to build Python version of the library go to `pylib` directory and execute `make` in it. If the build is successful Python module `linopt.so` will appear. We also provide [Qt Creator](https://www.qt.io/qt-features-libraries-apis-tools-and-ide/#ide) project files (with extension *.creator) for convenience (however, Qt Creator uses the same Makefiles for building).
+
+Makefile for building Python version of Linopt assumes that [pybind11 Python module](https://pypi.org/project/pybind11/) is installed on your system. The easiest way to get it is via PIP:
+```
+sudo -H pip3 install pybind11
+```
+This command will install pybind11 system-wide for Python 3.
 
 ### Documentation
 
@@ -51,7 +59,7 @@ Contributing to Linopt is done via pull request mechanism. See [CONTRIBUTING.md]
 
 ### License
 
-Copyright © 2018, [Quantum Optical Technologies Laboratories](https://www.qotlabs.org/en/).
+Copyright © 2018, 2019, [Quantum Optical Technologies Laboratories](https://www.qotlabs.org/en/).
 
 Linopt is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

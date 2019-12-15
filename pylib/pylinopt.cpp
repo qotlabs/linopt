@@ -464,7 +464,7 @@ PYBIND11_MODULE(linopt, m)
 			 "Returns an amplitude corresponding to the Fock 'f'.",
 			 py::arg("f"))
 
-		.def("__missing__", [](State &s) { return State::Value(0.); })
+		.def("__missing__", [](State &) { return State::Value(0.); })
 
 		.def("__setitem__", [](State &s, const Fock &f, State::Value amp) {
 				 if(amp == 0.)

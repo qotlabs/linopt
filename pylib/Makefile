@@ -5,13 +5,12 @@ CC := g++
 PYTHON := python3
 LIBLINOPT_PATH := ../lib
 LDLIBS := -lm \
-		  $(shell pkg-config $(PYTHON) --libs) \
 		  -L ${LIBLINOPT_PATH} -llinopt
 CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
-          -Wall -Wextra -Wno-unused-parameter -Wno-int-in-bool-context\
+          -Wall -Wextra \
           -I /usr/include -I ${LIBLINOPT_PATH} \
           $(shell pkg-config eigen3 --cflags) \
-          $(shell pkg-config $(PYTHON) --cflags) \
+		  $(shell $(PYTHON) -m pybind11 --includes) \
           -D_USE_MATH_DEFINES \
           -fpermissive
 TARGET := linopt
@@ -23,12 +22,12 @@ OBJS := $(notdir $(SRCS:.cpp=.o))
 
 .PHONY: all clean doc help
 
-all:	$(TARGET).so
+all: $(TARGET).so
 
 $(LIBLINOPT_PATH)/liblinopt.a:
 	$(MAKE) -C $(LIBLINOPT_PATH)
 
-$(TARGET).so:	$(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
+$(TARGET).so: $(LIBLINOPT_PATH)/liblinopt.a $(OBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
 
 %.o: %.cpp

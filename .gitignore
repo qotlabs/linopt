@@ -10,5 +10,6 @@
 *.so
 *.pyc
 *.example
+example
 
 doc/

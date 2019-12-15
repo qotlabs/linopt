@@ -4,7 +4,7 @@ DOXYGEN := doxygen
 CC := g++
 LDLIBS := -lm
 CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
-          -Wall -Wextra -Wno-int-in-bool-context \
+          -Wall -Wextra \
           -I /usr/include \
           $(shell pkg-config eigen3 --cflags) \
           -D_USE_MATH_DEFINES
@@ -17,21 +17,21 @@ OBJS := $(notdir $(SRCS:.cpp=.o))
 
 .PHONY: all clean help static shared
 
-all:	$(TARGET).a
-static: clean $(TARGET).a
-shared: clean $(TARGET).so
+all: static
+static: $(TARGET).a
+shared: $(TARGET).so
 
-$(TARGET).a:	$(OBJS)
+$(TARGET).a: $(OBJS)
 	$(AR) $(ARFLAGS) $@ $^
 
-$(TARGET).so:	$(OBJS)
+$(TARGET).so: $(OBJS)
 	$(CC) $(CFLAGS) -shared -Wl,-soname,$@ -o $@ $^ $(LDLIBS)
 
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(addprefix -I , $(VPATH)) -c -MMD $<
 include $(wildcard *.d)
 
-doc:	doxygen.conf $(SRCS) $(HDRS)
+doc: doxygen.conf $(SRCS) $(HDRS)
 	$(DOXYGEN) $<
 
 clean:
