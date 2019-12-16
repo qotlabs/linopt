@@ -52,7 +52,7 @@ std::string fockStr(const Fock &f)
 
 std::string fockRepr(const Fock &f)
 {
-	return "fock(" + fockStr(f) + ")";
+	return "Fock(" + fockStr(f) + ")";
 }
 
 // __repr__ and __str__ methods for class "basis"
@@ -76,7 +76,7 @@ std::string basisStr(const Basis &b)
 
 std::string basisRepr(const Basis &b)
 {
-	return "basis(" + basisStr(b) + ")";
+	return "Basis(" + basisStr(b) + ")";
 }
 
 // __repr__ and __str__ methods for class "state"
@@ -106,7 +106,7 @@ std::string stateStr(const State &s)
 
 std::string stateRepr(const State &s)
 {
-	return "state(" + stateStr(s) + ")";
+	return "State(" + stateStr(s) + ")";
 }
 
 template<typename Container, typename Key>
