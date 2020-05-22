@@ -63,7 +63,7 @@ std::string basisStr(const Basis &b)
 	{
 		ss << "{";
 		for(auto iter = b.begin(); iter != --b.end(); ++iter)
-			printArray(ss, *iter, "(", ",", ")") << ", ";
+			printArray(ss, *iter, "(", ",", ")") << ",\n";
 		printArray(ss, *(--b.end()), "(", ",", ")");
 		ss << "}";
 	}
@@ -90,7 +90,7 @@ std::string stateStr(const State &s)
 		{
 			printArray(ss, iter->first, "(", ",", ")") << ": ";
 			printComplex(ss, iter->second);
-			ss << ", ";
+			ss << ",\n";
 		}
 		auto iter = --s.end();
 		printArray(ss, iter->first, "(", ",", ")") << ": ";
