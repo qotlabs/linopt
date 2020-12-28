@@ -39,7 +39,7 @@ class State;
 
 /** @ingroup states
  * @brief A typedef of a function taking a Fock state as an argument and
- * returning a corresponding `complex_type` amplitude.
+ * returning a corresponding `Complex` amplitude.
  */
 using FockAmpFunction = std::function<Complex(const Fock&)>;
 
