@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -19,8 +19,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef COST_FUNCTOR_H
-#define COST_FUNCTOR_H
+#ifndef _LINOPT_COST_FUNCTOR_H
+#define _LINOPT_COST_FUNCTOR_H
 
 #include <vector>
 #include "circuit.h"
@@ -59,4 +59,4 @@ public:
 
 } // Namespace linopt
 
-#endif // COST_FUNCTOR_H
+#endif // _LINOPT_COST_FUNCTOR_H

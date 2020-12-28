@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -23,8 +23,8 @@
   * @brief Exception types.
   */
 
-#ifndef EXCEPTIONS_H
-#define EXCEPTIONS_H
+#ifndef _LINOPT_EXCEPTIONS_H
+#define _LINOPT_EXCEPTIONS_H
 
 #include <string>
 #include <stdexcept>
@@ -75,4 +75,4 @@ class NotSupported: public GeneralError
 
 } // Namespace linopt
 
-#endif // EXCEPTIONS_H
+#endif // _LINOPT_EXCEPTIONS_H

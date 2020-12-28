@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -19,8 +19,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef STATES_H
-#define STATES_H
+#ifndef _LINOPT_STATES_H
+#define _LINOPT_STATES_H
 
 #include <vector>
 #include <set>
@@ -312,4 +312,4 @@ std::ostream &operator<<(std::ostream &stream, const linopt::Basis &b);
 std::ostream &operator<<(std::ostream &stream, const linopt::State::Element &e);
 std::ostream &operator<<(std::ostream &stream, const linopt::State &s);
 
-#endif // STATES_H
+#endif // _LINOPT_STATES_H

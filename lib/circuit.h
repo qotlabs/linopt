@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -19,8 +19,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CIRCUIT_H
-#define CIRCUIT_H
+#ifndef _LINOPT_CIRCUIT_H
+#define _LINOPT_CIRCUIT_H
 
 #include "states.h"
 #include "matrix.h"
@@ -66,4 +66,4 @@ private:
 
 } // Namespace linopt
 
-#endif // CIRCUIT_H
+#endif // _LINOPT_CIRCUIT_H

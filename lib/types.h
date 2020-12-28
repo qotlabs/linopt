@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -19,8 +19,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef _LINOPT_TYPES_H
+#define _LINOPT_TYPES_H
 
 #include <complex>
 
@@ -47,4 +47,4 @@ namespace execution
 
 } // Namespace linopt
 
-#endif // TYPES_H
+#endif // _LINOPT_TYPES_H

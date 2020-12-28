@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -20,8 +20,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CIRCUIT_DESIGN_H
-#define CIRCUIT_DESIGN_H
+#ifndef _LINOPT_CIRCUIT_DESIGN_H
+#define _LINOPT_CIRCUIT_DESIGN_H
 
 #include "matrix.h"
 
@@ -37,4 +37,4 @@ Point getClementsDesign(Matrix &M, Real eps = defaultEpsilon);
 
 } // Namespace linopt
 
-#endif // CIRCUIT_DESIGN_H
+#endif // _LINOPT_CIRCUIT_DESIGN_H

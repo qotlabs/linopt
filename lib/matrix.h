@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -19,8 +19,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MATRIX_H
-#define MATRIX_H
+#ifndef _LINOPT_MATRIX_H
+#define _LINOPT_MATRIX_H
 
 #include <Eigen/Dense>
 #include <vector>
@@ -49,4 +49,4 @@ Complex permanent(const Matrix &M);
 
 } // Namespace linopt
 
-#endif // MATRIX_H
+#endif // _LINOPT_MATRIX_H

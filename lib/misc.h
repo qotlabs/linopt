@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -19,8 +19,8 @@
  * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MISC_H
-#define MISC_H
+#ifndef _LINOPT_MISC_H
+#define _LINOPT_MISC_H
 
 #include <cmath>
 #include <ostream>
@@ -124,4 +124,4 @@ std::ostream& printComplex(std::ostream &stream, const Complex &x);
 
 } // Namespace linopt
 
-#endif // MISC_H
+#endif // _LINOPT_MISC_H

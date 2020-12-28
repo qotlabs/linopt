@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -41,8 +41,8 @@
  * the configuration of the interferometer given a precomputed unitary matrix.
  */
 
-#ifndef LINOPT_H
-#define LINOPT_H
+#ifndef _LINOPT_LINOPT_H
+#define _LINOPT_LINOPT_H
 
 #include "types.h"
 #include "matrix.h"
@@ -69,4 +69,4 @@ struct Version
 
 } // Namespace linopt
 
-#endif // LINOPT_H
+#endif // _LINOPT_LINOPT_H
