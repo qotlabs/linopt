@@ -86,23 +86,28 @@ public:
 	using Base::back;
 	using Base::operator[];
 
-	/// Checks whether a Fock is empty, i.e. contains zero modes.
+	/// Check whether a Fock is empty, i.e. contains zero modes.
 	using Base::empty;
-	/// Returns the number of modes in a Fock state.
-	int size() const { return static_cast<int>(Base::size()); }
+
+	/// Return the number of modes in a Fock state.
+	int size() const noexcept { return static_cast<int>(Base::size()); }
+
 	using Base::resize;
 	using Base::assign;
 	void pushBack(Value n) { Base::push_back(n); }
 	void popBack() { Base::pop_back(); }
 	using Base::insert;
 	using Base::erase;
-	/// Clears a Fock state.
+
+	/// Clear a Fock state.
 	using Base::clear;
 
 	/// Default constructor.
 	Fock() = default;
+
 	/// Construct a Fock state from a `fock::vector_class`.
 	Fock(const Vector &v): Base(v) {}
+
 	int total() const;
 	Real prodFact() const;
 	Fock operator*(const Fock &f) const;
@@ -112,7 +117,7 @@ public:
 };
 
 /** @ingroup states
- * @brief Tests whether two Fock states are equal.
+ * @brief Check whether two Fock states are equal.
  */
 inline bool operator==(const Fock &f, const Fock &g)
 {
@@ -121,7 +126,7 @@ inline bool operator==(const Fock &f, const Fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order.
+ * @brief Compare two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is less than `g`.
@@ -133,7 +138,7 @@ inline bool operator<(const Fock &f, const Fock &g)
 }
 
 /** @ingroup states
- * @brief Tests whether two Fock states differ.
+ * @brief Test whether two Fock states differ.
  */
 inline bool operator!=(const Fock &f, const Fock &g)
 {
@@ -141,7 +146,7 @@ inline bool operator!=(const Fock &f, const Fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order.
+ * @brief Compare two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is greater than `g`.
@@ -152,7 +157,7 @@ inline bool operator>(const Fock &f, const Fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order.
+ * @brief Compare two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is less or equal than `g`.
@@ -163,7 +168,7 @@ inline bool operator<=(const Fock &f, const Fock &g)
 }
 
 /** @ingroup states
- * @brief Compares two Fock states in lexicographic order.
+ * @brief Compare two Fock states in lexicographic order.
  *
  * @return
  * `true` if `f` is greater or equal than `g`.
@@ -205,12 +210,26 @@ public:
 	using Base::crend;
 
 	using Base::empty;
-	/// Returns the number of Fock states in the basis.
-	int size() const { return static_cast<int>(Base::size()); }
+
+	/// Return the number of Fock states in the basis.
+	int size() const noexcept { return static_cast<int>(Base::size()); }
+
 	using Base::insert;
 	using Base::erase;
 	using Base::clear;
 	using Base::find;
+
+	/// Check whether two bases are equal.
+	bool operator ==(const Basis &b) const
+	{
+		return static_cast<const Base&>(*this) == static_cast<const Base&>(b);
+	}
+
+	/// Check whether two bases differ.
+	bool operator !=(const Basis &b) const
+	{
+		return static_cast<const Base&>(*this) != static_cast<const Base&>(b);
+	}
 
 	using Base::operator=;
 	Basis(): Base() {}
@@ -268,11 +287,15 @@ public:
 	using Base::find;
 
 	using Base::operator=;
+
 	/// Default constructor.
 	State(): Base() {}
+
 	State(const Map &m): Base(m) {}
-	/// Constructs a `state` from `fock` with unit amplitude.
+
+	/// Construct this state from `Fock` with unit amplitude.
 	State(const Fock &f): Base() { (*this)[f] = 1; }
+
 	State(const Basis &b): Base() { setBasis(b); }
 
 	/// Check whether two states are equal.
@@ -289,8 +312,10 @@ public:
 
 	State operator+(const State &s) const;
 	State &operator+=(const State &s);
-	/// Subtracts two states.
+
+	/// Subtract two states.
 	State operator-(const State &s) const { return *this + (-s); }
+
 	State &operator-=(const State &s);
 	State operator*(const State &s) const;
 	State &operator*=(const State &s);

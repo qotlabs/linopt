@@ -142,22 +142,22 @@ PYBIND11_MODULE(linopt, m)
 	// Matrix functions
 	m
 	.def("permanent", &permanent,
-		 "Calculates permanent of a square nxn matrix M.\n"
+		 "Calculate permanent of a square nxn matrix M.\n"
 		 "Internally the function uses Glynn formula with Gray code summation\n"
 		 "technique.\n"
 		 "Complexity is O(n*2^n).",
 		 py::arg("M"))
 
 	.def("is_column_unitary", &isColumnUnitary,
-		 "Checks whether a matrix M is column unitary within accuracy eps.",
+		 "Check whether a matrix M is column unitary within accuracy eps.",
 		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 
 	.def("is_row_unitary", &isRowUnitary,
-		 "Checks whether a matrix M is row unitary within accuracy eps.",
+		 "Check whether a matrix M is row unitary within accuracy eps.",
 		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 
 	.def("is_unitary", &isUnitary,
-		 "Checks whether a square matrix M is unitary within accuracy eps.",
+		 "Check whether a square matrix M is unitary within accuracy eps.",
 		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 
 	.def("hurwitz", (Matrix (*)(const Point &x)) &hurwitzParametrization,
@@ -180,37 +180,37 @@ PYBIND11_MODULE(linopt, m)
 		.def("__repr__", &fockRepr)
 
 		.def(py::self < py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if\n"
+			 "Compare two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is less than 'f'.",
 			 py::arg("f"))
 		.def(py::self <= py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if\n"
+			 "Compare two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is less or equal than 'f'.",
 			 py::arg("f"))
 		.def(py::self == py::self,
-			 "Tests whether two Fock states are equal.",
+			 "Test whether two Fock states are equal.",
 			 py::arg("f"))
 		.def(py::self != py::self,
-			 "Tests whether two Fock state differ.",
+			 "Test whether two Fock state differ.",
 			 py::arg("f"))
 		.def(py::self >= py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if\n"
+			 "Compare two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is greater or equal than 'f'.",
 			 py::arg("f"))
 		.def(py::self > py::self,
-			 "Compares two Fock states in lexicographic order. Returns True if\n"
+			 "Compare two Fock states in lexicographic order. Returns True if\n"
 			 "'self' is greater than 'f'.",
 			 py::arg("f"))
 
 		.def("__len__", [](const Fock &f) { return f.size(); },
-			 "Returns number of modes of the Fock state.")
+			 "Return the number of modes of the Fock state.")
 
 		.def("__getitem__", [](const Fock &f, int i) {
 				if( !(0 <= i && i < f.size()) )
 					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				return f[i];
 			 },
-			 "Returns the occupation number of the i-th mode.",
+			 "Return the occupation number of the i-th mode.",
 			 py::arg("i"))
 
 		.def("__getitem__", [](const Fock &f, py::slice slice) {
@@ -231,7 +231,7 @@ PYBIND11_MODULE(linopt, m)
 					throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				return f[i] = val;
 			 },
-			 "Sets the occupation number of the i-th mode to 'val'.",
+			 "Set the occupation number of the i-th mode to 'val'.",
 			 py::arg("i"), py::arg("val"))
 
 		.def("__setitem__", [](Fock &f, py::slice slice, const Fock &val) {
@@ -253,23 +253,23 @@ PYBIND11_MODULE(linopt, m)
 					 throw py::index_error("Index " + std::to_string(i) + " is out of range.");
 				 return f.erase(f.begin() + i);
 			 },
-			 "Removes i-th mode.",
+			 "Remove i-th mode.",
 			 py::arg("i"))
 
 		.def("__iter__", [](Fock &f) {
 				 return py::make_iterator(f.begin(), f.end());
 			 },
-			 "Returns corresponding iterator object.",
+			 "Return corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__reversed__", [](Fock &f) {
 				 return py::make_iterator(f.rbegin(), f.rend());
 			 },
-			 "Returns corresponding reverse iterator object.",
+			 "Return corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("append", &Fock::pushBack,
-			  "Adds the mode with the occupation number 'n' to the end.",
+			  "Add the mode with the occupation number 'n' to the end.",
 			  py::arg("n"))
 
 		.def("insert", [](Fock &f, int i, Fock::Value n) {
@@ -278,7 +278,7 @@ PYBIND11_MODULE(linopt, m)
 				else
 					f.insert(f.begin() + i, n);
 			 },
-			 "Inserts the mode with occupation number 'n' at position 'i'.",
+			 "Insert the mode with occupation number 'n' at position 'i'.",
 			 py::arg("i"), py::arg("n"))
 
 		.def("pop", [](Fock &f) {
@@ -286,7 +286,7 @@ PYBIND11_MODULE(linopt, m)
 				 f.popBack();
 				 return val;
 			 },
-			 "Removes the last mode and returns its occupation number.")
+			 "Remove the last mode and returns its occupation number.")
 
 		.def("pop", [](Fock &f, int i) {
 				 if( !(0 <= i && i < f.size()) )
@@ -295,30 +295,30 @@ PYBIND11_MODULE(linopt, m)
 				 f.erase(f.begin() + i);
 				 return val;
 			 },
-			 "Removes i-th mode and returns its occupation number.",
+			 "Remove i-th mode and returns its occupation number.",
 			 py::arg("i"))
 
 		.def("clear", [](Fock &f) { f.clear(); },
-			 "Completely clears the Fock state")
+			 "Completely clear the Fock state")
 
 		.def("resize", [](Fock &f, int n) { f.resize(n); },
-			 "Sets the numbers of modes for the Fock state to 'n'.",
+			 "Set the numbers of modes for the Fock state to 'n'.",
 			 py::arg("n"))
 
 		.def("total", &Fock::total,
-			 "Calculates the total number of photons in all modes.")
+			 "Calculate the total number of photons in all modes.")
 
 		.def("prod_fact", &Fock::prodFact,
-			 "Calculates a product of factorials of occupation numbers.")
+			 "Calculate a product of factorials of occupation numbers.")
 
 		.def(py::self * py::self,
-			 "Calculates a tensor product of two Fock states.")
+			 "Calculate a tensor product of two Fock states.")
 		.def(py::self *= py::self,
 			 "Effectively equivalent to self = self * f.",
 			 py::arg("f"))
 
 		.def(py::self + py::self,
-			 "Calculates a sum of two Fock states (elementwise addition of\n"
+			 "Calculate a sum of two Fock states (elementwise addition of\n"
 			 "corresponding occupation numbers).")
 		.def(py::self += py::self,
 			 "Effectively equivalent to self = self + f.",
@@ -330,7 +330,7 @@ PYBIND11_MODULE(linopt, m)
 					 l.append(elem);
 				 return l;
 			 },
-			 "Returns Python list object that represents the Fock state.")
+			 "Return Python list object that represents the Fock state.")
 	;
 
 	// Basis
@@ -355,68 +355,68 @@ PYBIND11_MODULE(linopt, m)
 			 "Returns the number of Fock states in the basis.")
 
 		.def("__delitem__", (void (*)(Basis &, const Fock &)) &eraseKey,
-			 "Removes the Fock 'f' from the basis.",
+			 "Remove the Fock 'f' from the basis.",
 			 py::arg("f"))
 
 		.def("__iter__", [](Basis &b) {
 				 return py::make_iterator(b.begin(), b.end());
 			 },
-			 "Returns corresponding iterator object.",
+			 "Return corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__reversed__", [](Basis &b) {
 				 return py::make_iterator(b.rbegin(), b.rend());
 			 },
-			 "Returns corresponding reverse iterator object.",
+			 "Return corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__contains__", [](const Basis &b, const Fock &f) {
 				 return b.find(f) != b.end();
 			 },
-			 "Tests whether the Fock 'f' is in the basis.",
+			 "Check whether the Fock 'f' is in the basis.",
 			 py::arg("f"))
 
 		.def("add", [](Basis &b, const Fock &f) {
 				 b.insert(f);
 			 },
-			 "Adds the Fock state 'f' to the basis.",
+			 "Add the Fock state 'f' to the basis.",
 			 py::arg("f"))
 
 		.def("remove", (void (*)(Basis &, const Fock &)) &eraseKey,
-			 "Removes the Fock state 'f' from the basis. Throws KeyError if 'f'\n"
+			 "Remove the Fock state 'f' from the basis. Throws KeyError if 'f'\n"
 			 "does not exist",
 			 py::arg("f"))
 
 		.def("discard", [](Basis &b, const Fock &f) {
 				 b.erase(f);
 			 },
-			 "Removes the Fock state 'f' from the basis if it is present.",
+			 "Remove the Fock state 'f' from the basis if it is present.",
 			 py::arg("f"))
 
 		.def("clear", [](Basis &b) { b.clear(); },
 			 "Remove all elements from the basis.")
 
 		.def(py::self + py::self,
-			 "Returns a basis which is a union of Fock states from both bases.")
+			 "Return a basis which is a union of Fock states from both bases.")
 		.def(py::self += py::self,
 			 "Effectively equivalent to self = self + b.",
 			 py::arg("b"))
 
 		.def(py::self * py::self,
-			 "Calculates a tensor product of two bases.\n"
-			 "Returns a basis consisting of all possible elementwise tensor\n"
+			 "Calculate a tensor product of two bases.\n"
+			 "Return a basis consisting of all possible elementwise tensor\n"
 			 "products of elements of the bases.")
 		.def(py::self *= py::self,
 			 "Effectively equivalent to self = self * b.",
 			 py::arg("b"))
 
 		.def("generate_basis", &Basis::generateBasis,
-			 "Generates a basis of all possible Fock states with 'modes' modes\n"
+			 "Generate a basis of all possible Fock states with 'modes' modes\n"
 			 "and containing 'nphot' photons.",
 			 py::arg("nphot"), py::arg("modes"), py::arg("head") = Fock())
 
 		.def("postselect", &Basis::postselect,
-			 "Returns a postselected basis after observing ancilla 'anc'.\n"
+			 "Return a postselected basis after observing ancilla 'anc'.\n"
 			 "Ancilla is assumed to occupy the first modes.",
 			 py::arg("anc"))
 
@@ -433,7 +433,7 @@ PYBIND11_MODULE(linopt, m)
 				 }
 				 return s;
 			 },
-			 "Applies a function 'func' to all Fock states of the basis to\n"
+			 "Apply a function 'func' to all Fock states of the basis to\n"
 			 "compute a corresponding amplitude and returns the corresponding\n"
 			 "state. The 'func' should take a fock object as an argument and\n"
 			 "return a complex number representing its amplitude.",
@@ -445,7 +445,7 @@ PYBIND11_MODULE(linopt, m)
 					 s.add(f);
 				 return s;
 			 },
-			 "Returns Python set object that represents the basis.")
+			 "Return Python set object that represents the basis.")
 	;
 
 	// State
@@ -459,8 +459,15 @@ PYBIND11_MODULE(linopt, m)
 		.def("__str__", &stateStr)
 		.def("__repr__", &stateRepr)
 
+		.def(py::self == py::self,
+			 "Check whether two states are equal.",
+			 py::arg("s"))
+		.def(py::self != py::self,
+			 "Check whether two states differ.",
+			 py::arg("s"))
+
 		.def("__len__", [](const State &s) { return s.size(); },
-			 "Returns number of Focks with a specified amplitude in the state.")
+			 "Return number of Focks with a specified amplitude in the state.")
 
 		.def("__getitem__", [](const State &s, const Fock &f) {
 				 auto iter = s.find(f);
@@ -468,7 +475,7 @@ PYBIND11_MODULE(linopt, m)
 					 throw py::key_error();
 				 return iter->second;
 			 },
-			 "Returns an amplitude corresponding to the Fock 'f'.",
+			 "Return an amplitude corresponding to the Fock 'f'.",
 			 py::arg("f"))
 
 		.def("__missing__", [](State &) { return State::Value(0.); })
@@ -480,85 +487,85 @@ PYBIND11_MODULE(linopt, m)
 					 s[f] = amp;
 				 return amp;
 			 },
-			 "Sets amplitude of the Fock 'f' to 'amp'. If 'amp' = 0, then\n"
-			 "deletes the Fock 'f' from the state.",
+			 "Set amplitude of the Fock 'f' to 'amp'. If 'amp' = 0, then\n"
+			 "delete the Fock 'f' from the state.",
 			 py::arg("f"), py::arg("amp"))
 
 		.def("__delitem__", (void (*)(State &, const Fock &)) &eraseKey,
-			 "Removes the Fock 'f' from the state. Equivalent to self[f] = 0.",
+			 "Remove the Fock 'f' from the state. Equivalent to self[f] = 0.",
 			 py::arg("f"))
 
 		.def("__iter__", [](State &s) {
 				 return py::make_key_iterator(s.begin(), s.end());
 			 },
-			 "Returns corresponding iterator object.",
+			 "Return corresponding iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__reversed__", [](State &s) {
 				 return py::make_key_iterator(s.rbegin(), s.rend());
 			 },
-			 "Returns corresponding reverse iterator object.",
+			 "Return corresponding reverse iterator object.",
 			 py::keep_alive<0, 1>())
 
 		.def("__contains__", [](const State &s, const Fock &f) {
 				 return s.find(f) != s.end();
 			 },
-			 "Tests whether the state has a specified amplitude corresponding\n"
+			 "Test whether the state has a specified amplitude corresponding\n"
 			 "to the Fock 'f'.",
 			 py::arg("f"))
 
 		.def("clear", [](State &s) { s.clear(); },
-			 "Completely clears the state.")
+			 "Completely clear the state.")
 
 		.def(py::self + py::self,
-			 "Adds two states, i.e., calculates their superposition.")
+			 "Add two states, i.e., calculate their superposition.")
 		.def(py::self += py::self,
 			 "Effectively equivalent to self = self + s.",
 			 py::arg("s"))
 
 		.def(py::self - py::self,
-			 "Subtracts two states.")
+			 "Subtract two states.")
 		.def(py::self -= py::self,
 			 "Effectively equivalent to self = self - s.",
 			 py::arg("s"))
 
 		.def(-py::self,
-			 "Negates amplitudes of the state.")
+			 "Negate amplitudes of the state.")
 
 		.def(py::self * py::self,
-			 "Returns a tensor product of two states.")
+			 "Return a tensor product of two states.")
 		.def(py::self *= py::self,
 			 "Effectively equivalent to self = self * s.",
 			 py::arg("s"))
 
 		.def(py::self * Complex(),
-			 "Multiplies a state by a complex number.")
+			 "Multiply a state by a complex number.")
 		.def(py::self *= Complex(),
 			 "Effectively equivalent to self = self * z.",
 			 py::arg("z"))
 
 		.def(py::self / Complex(),
-			 "Divides a state by a complex number.")
+			 "Divide a state by a complex number.")
 		.def(py::self /= Complex(),
 			 "Effectively equivalent to self = self / z.",
 			 py::arg("z"))
 
 		.def("norm", &State::norm,
-			 "Returns norm of the state.")
+			 "Return norm of the state.")
 
 		.def("normalize", &State::normalize,
-			 "Normalizes the state to have unit norm.")
+			 "Normalize the state to have unit norm.")
 
 		.def("dot", &State::dot,
-			 "Calculates a dot (scalar) product.")
+			 "Calculate a dot (scalar) product.")
 
 		.def("postselect", (State (State::*)(const Fock&) const) &State::postselect,
-			 "Returns postselected state for ancilla 'anc'. The ancilla is\n"
+			 "Return a postselected state for ancilla 'anc'. The ancilla is\n"
 			 "assumed to occupy the first modes.",
 			 py::arg("anc"))
 
 		.def("postselect", (std::map<Fock, State> (State::*)(int) const) &State::postselect,
-			 "Calculates postselected states for all possible ancillas that\n"
+			 "Calculate postselected states for all possible ancillas that\n"
 			 "occupy the first 'nmodes' modes. Returns a dictionary in the\n"
 			 "following format:\n"
 			 "{anc1: postselected_state1, anc2: postselected_state2, ...},\n"
@@ -569,7 +576,7 @@ PYBIND11_MODULE(linopt, m)
 			 py::arg("nmodes"))
 
 		.def("postselect", (std::map<Fock, State> (State::*)(const Basis &) const) &State::postselect,
-			 "Calculates postselected states for all ancillas specified by\n"
+			 "Calculate postselected states for all ancillas specified by\n"
 			 "'basis'. Returns a dictionary in the following format:\n"
 			 "{anc1: postselected_state1, anc2: postselected_state2, ...}.\n"
 			 "This function is useful when postselection for an array of\n"
@@ -578,14 +585,14 @@ PYBIND11_MODULE(linopt, m)
 			 py::arg("basis"))
 
 		.def("get_basis", &State::getBasis,
-			 "Returns basis of the state.")
+			 "Return basis of the state.")
 
 		.def("set_basis", &State::setBasis,
-			 "Sets basis of the state.",
+			 "Set basis of the state.",
 			 py::arg("basis"))
 
 		.def("get_amplitudes", &State::getAmplitudes,
-			 "Returns an array of state amplitudes.")
+			 "Return an array of state amplitudes.")
 
 		.def("set_amplitudes", [](State &s, const std::vector<Complex> &amps, pyexecution exec_policy) {
 				switch(exec_policy)
@@ -598,7 +605,7 @@ PYBIND11_MODULE(linopt, m)
 					break;
 				}
 			 },
-			 "Sets amplitudes of the state according to the array 'amps'.",
+			 "Set amplitudes of the state according to the array 'amps'.",
 			 py::arg("amps"), py::arg("exec_policy") = pyexecution::seq)
 
 		.def("set_amplitudes", [](State &s, const FockAmpFunction &f, pyexecution exec_policy) {
@@ -612,7 +619,7 @@ PYBIND11_MODULE(linopt, m)
 					 break;
 				 }
 			  },
-			  "Sets amplitudes of the state using a function 'func'.",
+			  "Set amplitudes of the state using a function 'func'.",
 			  py::arg("func"), py::arg("exec_policy") = pyexecution::seq)
 
 		.def("as_dict", [](const State &s) {
@@ -621,15 +628,15 @@ PYBIND11_MODULE(linopt, m)
 					d[py::make_tuple(elem.first)] = elem.second;
 				 return d;
 			 },
-			 "Returns Python dict object that represents the state.")
+			 "Return a Python dict object that represents the state.")
 	;
 
 	m
 	.def("__mul__", (State (*)(Complex, const State &)) &operator*,
-		 "Multiplies a state by a complex number.",
+		 "Multiply a state by a complex number.",
 		 py::arg("z"), py::arg("s"))
 	.def("dot", &dot,
-		 "Calculates a dot (scalar) product of two states.",
+		 "Calculate a dot (scalar) product of two states.",
 		 py::arg("s1"), py::arg("s2"))
 	;
 
@@ -682,7 +689,7 @@ PYBIND11_MODULE(linopt, m)
 				 }
 				 return s;
 			 },
-			 "Calculates output state.",
+			 "Calculate output state.",
 			 py::arg("exec_policy") = pyexecution::seq)
 	;
 
@@ -692,7 +699,7 @@ PYBIND11_MODULE(linopt, m)
 			 clementsDesign(Min, x, y);
 			 return Min;
 		 },
-		 "Returns a unitary NxN matrix 'M' according to the Clements design.\n"
+		 "Return a unitary NxN matrix 'M' according to the Clements design.\n"
 		 "Min - a diagonal unitary matrix of size NxN.\n"
 		 "x - an array of N*(N-1) phase-shift parameters, such that even\n"
 		 "elements are phase shifts before the beam splitters, and odd ones\n"
@@ -727,7 +734,7 @@ PYBIND11_MODULE(linopt, m)
 			 getClementsDesign(M, x, eps);
 			 return std::pair<Point, Matrix>(x, M);
 		 },
-		 "Calculates phase-shift coefficients 'x' for a unitary matrix 'M'\n"
+		 "Calculate phase-shift coefficients 'x' for a unitary matrix 'M'\n"
 		 "according to the Clements design. This function is inverse of\n"
 		 "clements_design(x). Returns a pair ('x', 'Mout'), where 'Mout' is a\n"
 		 "diagonal unitary matrix.\n"
