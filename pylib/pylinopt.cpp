@@ -1,4 +1,4 @@
-/* Copyright © 2018, 2019, Quantum Optical Technologies Laboratories
+/* Copyright © 2018, 2019, 2022, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -343,6 +343,13 @@ PYBIND11_MODULE(linopt, m)
 
 		.def("__str__", &basisStr)
 		.def("__repr__", &basisRepr)
+
+		.def(py::self == py::self,
+			 "Check whether two bases are equal.",
+			 py::arg("b"))
+		.def(py::self != py::self,
+			 "Check whether two bases differ.",
+			 py::arg("b"))
 
 		.def("__len__", [](const Basis &b) { return b.size(); },
 			 "Returns the number of Fock states in the basis.")

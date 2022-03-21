@@ -1,4 +1,4 @@
-/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
+/* Copyright © 2018-2020, 2022, Quantum Optical Technologies Laboratories
  * <https://www.qotlabs.org/en/>
  * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
  *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
@@ -274,6 +274,18 @@ public:
 	/// Constructs a `state` from `fock` with unit amplitude.
 	State(const Fock &f): Base() { (*this)[f] = 1; }
 	State(const Basis &b): Base() { setBasis(b); }
+
+	/// Check whether two states are equal.
+	bool operator ==(const State &s) const
+	{
+		return static_cast<const Base&>(*this) == static_cast<const Base&>(s);
+	}
+
+	/// Check whether two states differ.
+	bool operator !=(const State &s) const
+	{
+		return static_cast<const Base&>(*this) != static_cast<const Base&>(s);
+	}
 
 	State operator+(const State &s) const;
 	State &operator+=(const State &s);
