@@ -1,23 +1,7 @@
-/* Copyright © 2018-2020, Quantum Optical Technologies Laboratories
- * <https://www.qotlabs.org/en/>
- * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
- *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
- *
- * This file is part of Linopt.
- *
- * Linopt is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Linopt is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
- */
+// SPDX-License-Identifier: LGPL-3.0-or-later
+// SPDX-FileCopyrightText: Copyright (c) 2018-2025, Quantum Optical Technologies Laboratories
+// SPDX-FileContributor: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
+// SPDX-FileContributor: Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
 
 /** @mainpage
  * Linopt is a numerical library designed for linear-optical quantum system
@@ -41,8 +25,7 @@
  * the configuration of the interferometer given a precomputed unitary matrix.
  */
 
-#ifndef _LINOPT_LINOPT_H
-#define _LINOPT_LINOPT_H
+#pragma once
 
 #include "types.h"
 #include "matrix.h"
@@ -61,12 +44,10 @@ namespace linopt
   */
 struct Version
 {
-	static constexpr auto string = "0.3.0";
+	static constexpr auto string = "0.4.0";
 	static constexpr int major = 0;
-	static constexpr int minor = 3;
+	static constexpr int minor = 4;
 	static constexpr int patch = 0;
 };
 
-} // Namespace linopt
-
-#endif // _LINOPT_LINOPT_H
+} // namespace linopt

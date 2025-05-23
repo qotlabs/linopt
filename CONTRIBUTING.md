@@ -10,7 +10,7 @@ It is recommended to discuss the change you wish to make via issue or email with
 
 ## Requirements
 
-* Use C++11 standard. C++14 or C++17 is NOT allowed without extreme necessity.
+* Use C++17 standard. C++20 or C++23 is NOT allowed without extreme necessity.
 * The code should be cross platform. Usually this means that it uses only STL and cross-platform libraries and does not include OS specific headers.
 * Cross platform implies that code should be cross compiler. In case when you need to include compiler-specific commands, e.g., bultins for optimization, use conditional compilation to select proper commands supported by a target compiler. An example of this approach can be found in [lib/misc.h](lib/misc.h) for a `ctz()` function.
 * Ensure that indentation is done via tabulation that is 4 spaces long.
@@ -24,14 +24,14 @@ The following prototype of a commentary block is recommended:
 /** @ingroup group
  * @brief Brief description.
  *
- * @param[in] p1 -- input parameter.
- * @param[out] p2 -- output parameter.
+ * @param[in] p1 - input parameter.
+ * @param[out] p2 - output parameter.
  * @return Calculated value.
  *
  * Detailed description.
  *
  * @throw
- * Throw `exception_class` in case of error.
+ * Throw `ExceptionClass` in case of error.
  *
  * @todo
  * Some stuff.

@@ -3,7 +3,7 @@ ARFLAGS := crs
 DOXYGEN := doxygen
 CC := g++
 LDLIBS := -lm
-CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
+CFLAGS := -std=c++17 -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra \
           -I /usr/include \
           -isystem /usr/include/eigen3 \

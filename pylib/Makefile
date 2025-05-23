@@ -6,10 +6,10 @@ PYTHON := python3
 LIBLINOPT_PATH := ../lib
 LDLIBS := -lm \
 		  -L ${LIBLINOPT_PATH} -llinopt
-CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
+CFLAGS := -std=c++17 -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra \
           -I /usr/include -I ${LIBLINOPT_PATH} \
-          $(shell pkg-config eigen3 --cflags) \
+          -isystem /usr/include/eigen3 \
 		  $(shell $(PYTHON) -m pybind11 --includes) \
           -D_USE_MATH_DEFINES \
           -fpermissive

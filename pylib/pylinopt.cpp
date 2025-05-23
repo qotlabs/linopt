@@ -1,25 +1,14 @@
-/* Copyright © 2018, 2019, 2022, Quantum Optical Technologies Laboratories
- * <https://www.qotlabs.org/en/>
- * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
- *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
- *
- * This file is part of Linopt.
- *
- * Linopt is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Linopt is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
- */
+// SPDX-License-Identifier: LGPL-3.0-or-later
+// SPDX-FileCopyrightText: Copyright (c) 2018-2025, Quantum Optical Technologies Laboratories
+// SPDX-FileContributor: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
+// SPDX-FileContributor: Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
 
-#include <iterator>
+#include "matrix.h"
+#include "states.h"
+#include "circuit.h"
+#include "circuit_design.h"
+#include "misc.h"
+
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/operators.h>
@@ -27,11 +16,8 @@
 #include <pybind11/eigen.h>
 #include <pybind11/numpy.h>
 
-#include "matrix.h"
-#include "states.h"
-#include "circuit.h"
-#include "circuit_design.h"
-#include "misc.h"
+#include <iterator>
+#include <execution>
 
 using namespace linopt;
 namespace py = pybind11;
@@ -122,15 +108,9 @@ void eraseKey(Container &c, const Key &k)
 static const auto docstr =
 	"Linear optics circuit calculator.";
 
-#if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2
-PYBIND11_PLUGIN(pylinopt)
-{
-	py::module m("linopt", docstr);
-#else
 PYBIND11_MODULE(linopt, m)
 {
 	m.doc() = docstr;
-#endif
 	m.attr("default_epsilon") = py::float_(defaultEpsilon);
 
 	// Execution policies
@@ -425,10 +405,10 @@ PYBIND11_MODULE(linopt, m)
 				 switch(exec_policy)
 				 {
 				 case pyexecution::seq:
-					 s =  b.applyFunction<execution::Seq>(f);
+					 s =  b.applyFunction<std::execution::sequenced_policy>(f);
 					 break;
 				 case pyexecution::par:
-					 s =  b.applyFunction<execution::Par>(f);
+					 s =  b.applyFunction<std::execution::parallel_policy>(f);
 					 break;
 				 }
 				 return s;
@@ -598,10 +578,10 @@ PYBIND11_MODULE(linopt, m)
 				switch(exec_policy)
 				{
 				case pyexecution::seq:
-					s.setAmplitudes<execution::Seq>(amps);
+					s.setAmplitudes<std::execution::sequenced_policy>(amps);
 					break;
 				case pyexecution::par:
-					s.setAmplitudes<execution::Par>(amps);
+					s.setAmplitudes<std::execution::parallel_policy>(amps);
 					break;
 				}
 			 },
@@ -612,10 +592,10 @@ PYBIND11_MODULE(linopt, m)
 				 switch(exec_policy)
 				 {
 				 case pyexecution::seq:
-					 s.setAmplitudes<execution::Seq>(f);
+					 s.setAmplitudes<std::execution::sequenced_policy>(f);
 					 break;
 				 case pyexecution::par:
-					 s.setAmplitudes<execution::Par>(f);
+					 s.setAmplitudes<std::execution::parallel_policy>(f);
 					 break;
 				 }
 			  },
@@ -681,10 +661,10 @@ PYBIND11_MODULE(linopt, m)
 				 switch(exec_policy)
 				 {
 				 case pyexecution::seq:
-					 s = c.outputState<execution::Seq>();
+					 s = c.outputState<std::execution::sequenced_policy>();
 					 break;
 				 case pyexecution::par:
-					 s = c.outputState<execution::Par>();
+					 s = c.outputState<std::execution::parallel_policy>();
 					 break;
 				 }
 				 return s;
@@ -742,8 +722,4 @@ PYBIND11_MODULE(linopt, m)
 		 "If 'eps' is negative then no tests are performed.",
 		 py::arg("M"), py::arg("eps") = defaultEpsilon)
 	;
-
-#if PYBIND11_VERSION_MAJOR <= 2 && PYBIND11_VERSION_MINOR < 2
-	return m.ptr();
-#endif
 }

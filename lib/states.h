@@ -1,26 +1,9 @@
-/* Copyright © 2018-2020, 2022, Quantum Optical Technologies Laboratories
- * <https://www.qotlabs.org/en/>
- * Contributed by: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
- *                 Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
- *
- * This file is part of Linopt.
- *
- * Linopt is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Linopt is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with Linopt. If not, see <https://www.gnu.org/licenses/>.
- */
+// SPDX-License-Identifier: LGPL-3.0-or-later
+// SPDX-FileCopyrightText: Copyright (c) 2018-2025, Quantum Optical Technologies Laboratories
+// SPDX-FileContributor: Struchalin Gleb <struchalin.gleb@physics.msu.ru>
+// SPDX-FileContributor: Dyakonov Ivan <iv.dyakonov@physics.msu.ru>
 
-#ifndef _LINOPT_STATES_H
-#define _LINOPT_STATES_H
+#pragma once
 
 #include "types.h"
 #include <vector>
@@ -29,6 +12,11 @@
 #include <ostream>
 #include <initializer_list>
 #include <functional>
+#include <execution>
+
+/** @defgroup states States
+ * @brief Linear optics states.
+ */
 
 namespace linopt
 {
@@ -108,11 +96,38 @@ public:
 	/// Construct a Fock state from a `fock::vector_class`.
 	Fock(const Vector &v): Base(v) {}
 
+	/**
+	 * @brief Return the total number of photons in all modes.
+	 */
 	int total() const;
+
+	/**
+	 * @brief Return a product of factorials of occupation numbers.
+	 */
 	Real prodFact() const;
+
+	/**
+	 * @brief Return a tensor product of `*this` and `f`.
+	 */
 	Fock operator*(const Fock &f) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) * f`.
+	 */
 	Fock &operator*=(const Fock &f);
+
+	/**
+	 * @brief Return a sum of two Fock states (elementwise addition of
+	 * corresponding occupation numbers).
+	 *
+	 * @throw
+	 * If `*this` and `f` have different sizes then `WrongSize` is thrown.
+	 */
 	Fock operator+(const Fock &f) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) + f`.
+	 */
 	Fock &operator+=(const Fock &f);
 };
 
@@ -235,15 +250,86 @@ public:
 	Basis(): Base() {}
 	Basis(const Set &s): Base(s) {}
 	Basis(std::initializer_list<Fock> il): Base(il) {}
+
+	/**
+	 * @brief Construct a basis of all possible Fock states with `modes` modes
+	 * and containing `nphot` photons.
+	 */
 	explicit Basis(int nphot, int modes);
 
+	/**
+	 * @brief Return a basis which is a union of Fock states from both `*this`
+	 * and `b`.
+	 */
 	Basis operator+(const Basis &b) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) + b`.
+	 */
 	Basis &operator+=(const Basis &b);
+
+	/**
+	 * @brief Calculate a tensor product of two bases.
+	 *
+	 * Return a basis consisting of all possible elementwise tensor products
+	 * of elements of `*this` and `b`.
+	 */
 	Basis operator*(const Basis &b) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) * b`.
+	 */
 	Basis &operator*=(const Basis &b);
-	Basis &generateBasis(const int nphot, const int modes, const Fock &head = Fock());
+
+	/**
+	 * @brief Generate a basis of all possible Fock states with `modes` modes
+	 * and containing `nphot` photons.
+	 *
+	 * @param[in] nphot -- number of photons in each Fock state.
+	 * @param[in] modes -- number of modes in each Fock state.
+	 * @deprecated
+	 * @param[in] head -- intended for internal usage. Normally empty Fock state
+	 * should be passed.
+	 *
+	 * @note
+	 * This funtion only appends elements to `*this` and never removes them.
+	 * Therefore, if you want to freshly generate a basis, you should call
+	 * `clear()` first.
+	 */
+	Basis &generateBasis(int nphot, int modes, const Fock &head = Fock());
+
+	/**
+	 * @brief Return a postselected basis after observing ancilla.
+	 *
+	 * @param[in] ancilla -- ancilla's Fock state for postselection.
+	 * @return A basis after postselection.
+	 *
+	 * Postselection of a basis @f$ B @f$ with the ancilla state
+	 * @f$ | \mathrm{anc} \rangle = | a_0, a_2, \dots, a_A \rangle @f$
+	 * picks only Fock states from @f$ B @f$ with the heading (first @f$ A @f$
+	 * occupation numbers) which equals to @f$ | \mathrm{anc} \rangle @f$.
+	 * The headings do not get to the new constructed basis.
+	 * Note that currently there is no possibility to specify a position of
+	 * ancilla modes.
+	 *
+	 * For example, postselection of a basis
+	 * @f[ \{ | 0000001 \rangle, | 1234567 \rangle, | 1239999 \rangle \} @f]
+	 * with the ancilla @f$ | 123 \rangle @f$ results in the basis
+	 * @f[ \{ | 4567 \rangle, | 9999 \rangle \}. @f]
+	 *
+	 */
 	Basis postselect(const Fock &ancilla) const;
-	template<typename ExecPolicy = execution::Seq>
+
+	/**
+	 * @brief Construct a state from the basis using function `f`.
+	 *
+	 * @param[in] f -- function to apply.
+	 * @return Constructed state.
+	 *
+	 * Apply a function `f` to all Fock states of `*this` to compute a
+	 * corresponding amplitude of a resulting state.
+	 */
+	template<typename ExecPolicy = std::execution::sequenced_policy>
 	State applyFunction(const FockAmpFunction &f) const;
 };
 
@@ -310,37 +396,102 @@ public:
 		return static_cast<const Base&>(*this) != static_cast<const Base&>(s);
 	}
 
+	/**
+	 * @brief Add two states, i.e., calculate their superposition.
+	 */
 	State operator+(const State &s) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) + s`.
+	 */
 	State &operator+=(const State &s);
 
 	/// Subtract two states.
 	State operator-(const State &s) const { return *this + (-s); }
 
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) - s`.
+	 */
 	State &operator-=(const State &s);
+
+	/**
+	 * @brief Return a tensor product of two states.
+	 */
 	State operator*(const State &s) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) * s`.
+	 */
 	State &operator*=(const State &s);
+
+	/**
+	 * @brief Negate amplitudes of the state.
+	 */
 	State operator-() const;
+
+	/**
+	 * @brief Multiply a state by a complex number.
+	 */
 	State operator*(Complex x) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) * x`.
+	 */
 	State &operator*=(Complex x);
+
+	/**
+	 * @brief Divide a state by a complex number.
+	 */
 	State operator/(Complex x) const;
+
+	/**
+	 * @brief Effectively equivalent to `*this = (*this) / x`.
+	 */
 	State &operator/=(Complex x);
+
+	/**
+	 * @brief Return norm of the state.
+	 */
 	Real norm() const;
+
+	/**
+	 * @brief Normalize the state to have unit norm.
+	 */
 	State &normalize();
+
+	/**
+	 * @brief Calculates a dot (scalar) product.
+	 */
 	Complex dot(const State &s) const;
+
 	State postselect(const Fock &ancilla) const;
+
 	std::map<Fock, State> postselect(int modes) const;
+
 	std::map<Fock, State> postselect(const Basis &b) const;
+
 	Basis getBasis() const;
+
 	void setBasis(const Basis &b);
+
 	std::vector<State::Value> getAmplitudes() const;
-	template<typename ExecPolicy = execution::Seq>
+
+	template<typename ExecPolicy = std::execution::sequenced_policy>
 	void setAmplitudes(const std::vector<Complex> &amps);
-	template<typename ExecPolicy = execution::Seq>
+
+	template<typename ExecPolicy = std::execution::sequenced_policy>
 	void setAmplitudes(const FockAmpFunction &f);
 };
 
+/** @ingroup states
+ * @brief Multiply a state by a complex number.
+ */
 State operator*(Complex x, const State &s);
-Complex dot(const State &a, const State &b);
+
+/** @ingroup states
+ * @brief Calculate a dot (scalar) product.
+ */
+static inline Complex dot(const State &a, const State &b) { return a.dot(b); }
 
 } // Namespace linopt
 
@@ -348,5 +499,3 @@ std::ostream &operator<<(std::ostream &stream, const linopt::Fock &f);
 std::ostream &operator<<(std::ostream &stream, const linopt::Basis &b);
 std::ostream &operator<<(std::ostream &stream, const linopt::State::Element &e);
 std::ostream &operator<<(std::ostream &stream, const linopt::State &s);
-
-#endif // _LINOPT_STATES_H
