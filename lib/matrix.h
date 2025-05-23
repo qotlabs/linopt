@@ -22,9 +22,9 @@
 #ifndef _LINOPT_MATRIX_H
 #define _LINOPT_MATRIX_H
 
+#include "types.h"
 #include <Eigen/Dense>
 #include <vector>
-#include "types.h"
 
 namespace linopt
 {

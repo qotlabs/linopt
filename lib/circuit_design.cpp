@@ -24,9 +24,9 @@
  * @brief Circuit designs and decompositions into elementary blocks.
  */
 
-#include <memory>
 #include "circuit_design.h"
 #include "exceptions.h"
+#include <memory>
 
 using namespace linopt;
 

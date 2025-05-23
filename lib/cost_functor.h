@@ -22,8 +22,8 @@
 #ifndef _LINOPT_COST_FUNCTOR_H
 #define _LINOPT_COST_FUNCTOR_H
 
-#include <vector>
 #include "circuit.h"
+#include <vector>
 
 namespace linopt
 {

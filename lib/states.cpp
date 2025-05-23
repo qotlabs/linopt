@@ -23,8 +23,8 @@
  * @brief Linear optics states.
  */
 
-#include "misc.h"
 #include "states.h"
+#include "misc.h"
 #include "exceptions.h"
 #ifdef _OPENMP
 #include <omp.h>

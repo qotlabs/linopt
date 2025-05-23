@@ -6,7 +6,7 @@ LDLIBS := -lm
 CFLAGS := -std=c++11 -fopenmp -O3 -march=native -ffast-math -fPIC \
           -Wall -Wextra \
           -I /usr/include \
-          $(shell pkg-config eigen3 --cflags) \
+          -isystem /usr/include/eigen3 \
           -D_USE_MATH_DEFINES
 TARGET := liblinopt
 VPATH = .

@@ -23,13 +23,13 @@
  * @brief Various matrix-related functions.
  */
 
+#include "matrix.h"
+#include "misc.h"
+#include "exceptions.h"
 #include <limits.h>
 #include <cmath>
 #include <complex>
 #include <unsupported/Eigen/MatrixFunctions>
-#include "misc.h"
-#include "matrix.h"
-#include "exceptions.h"
 
 using namespace linopt;
 

@@ -22,13 +22,13 @@
 #ifndef _LINOPT_STATES_H
 #define _LINOPT_STATES_H
 
+#include "types.h"
 #include <vector>
 #include <set>
 #include <map>
 #include <ostream>
 #include <initializer_list>
 #include <functional>
-#include "types.h"
 
 namespace linopt
 {

@@ -22,9 +22,9 @@
 #ifndef _LINOPT_MISC_H
 #define _LINOPT_MISC_H
 
+#include "types.h"
 #include <cmath>
 #include <ostream>
-#include "types.h"
 
 namespace linopt
 {
